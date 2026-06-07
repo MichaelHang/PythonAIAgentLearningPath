@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐍 Day09 Practice Template</title>
+    <style>
+        
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height:1.6; color:#333;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding:0;
+}
+.nav-sidebar {
+    width:250px; min-width:250px;
+    background: #181825;
+    color: #ffffff;
+    padding: 20px 15px;
+    font-size:14px;
+    overflow-y:auto;
+    height:100vh;
+    position:sticky; top:0;
+    display:flex; flex-direction:column;
+    gap:2px;
+}
+.nav-sidebar h3 {
+    color:#f5c2e7; font-size:15px; margin:18px 0 8px 0;
+    border-bottom:1px solid #45475a; padding-bottom:6px;
+}
+.nav-sidebar h3:first-child { margin-top:0; }
+.nav-sidebar h4 {
+    color:#a6e3a1; font-size:13px; margin:14px 0 4px 0;
+    font-weight:600;
+}
+.nav-sidebar a {
+    color:#89dceb; display:block; padding:5px 12px; font-size:13px;
+    border-radius:4px; text-decoration:none; transition:background 0.2s, color 0.2s;
+}
+.nav-sidebar a:hover {
+    background:#313244; color:#ffffff; text-decoration:none;
+}
+.nav-sidebar a.active {
+    background:#45475a; color:#ffffff; font-weight:700;
+    border-left:3px solid #f5c2e7; padding-left:9px;
+}
+.nav-wrapper { display:flex; min-height:100vh; }
+.main-content {
+    flex:1; min-width:0;
+    margin:20px 20px 20px 0; background:white; border-radius:10px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    overflow:hidden;
+}
+/* 返回顶部按钮 */
+.back-top {
+    position:fixed; bottom:30px; right:30px;
+    background:#667eea; color:white; border:none;
+    width:48px; height:48px; border-radius:50%;
+    cursor:pointer; font-size:20px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.3); display:none; z-index:999;
+    transition:background 0.3s;
+}
+.back-top:hover { background:#764ba2; }
+
+/* ── 内容区样式 ── */
+.header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color:white; padding:40px; text-align:center;
+}
+.header h1 { font-size:2.2em; margin-bottom:10px; text-shadow:2px 2px 4px rgba(0,0,0,0.2); }
+.header .meta { font-size:1.1em; opacity:0.9; }
+.content { padding:40px; }
+h1 { color:#667eea; border-bottom:3px solid #667eea; padding-bottom:10px; margin-top:30px; margin-bottom:20px; }
+h2 { color:#764ba2; margin-top:25px; margin-bottom:15px; border-left:5px solid #764ba2; padding-left:15px; }
+h3 { color:#555; margin-top:20px; margin-bottom:10px; }
+p { margin-bottom:15px; }
+.styled-table {
+    width:100%; border-collapse:collapse; margin:20px 0;
+    box-shadow:0 2px 15px rgba(0,0,0,0.1); border-radius:8px; overflow:hidden;
+}
+.styled-table thead { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white; }
+.styled-table th, .styled-table td { padding:12px 15px; text-align:left; border-bottom:1px solid #ddd; }
+.styled-table tbody tr:hover { background-color:#f5f5f5; }
+.styled-table tbody tr:nth-of-type(even) { background-color:#f9f9f9; }
+.code-block {
+    background:#282c34; color:#abb2bf; padding:15px;
+    border-radius:8px; overflow-x:auto; margin:15px 0;
+    box-shadow:0 4px 6px rgba(0,0,0,0.1);
+}
+code { background:#f4f4f4; padding:2px 6px; border-radius:3px; font-family:'Courier New',monospace; color:#e83e8c; }
+.code-block code { background:transparent; color:inherit; padding:0; }
+.note-block {
+    background:#fff3cd; border-left:5px solid #ffc107;
+    padding:15px; margin:15px 0; border-radius:4px;
+}
+ul, ol { margin-left:25px; margin-bottom:15px; }
+li { margin-bottom:8px; }
+a { color:#667eea; text-decoration:none; transition:color 0.3s; }
+a:hover { color:#764ba2; text-decoration:underline; }
+hr { border:none; height:2px; background:linear-gradient(to right,#667eea,#764ba2); margin:30px 0; }
+pre { position:relative; overflow-x:auto; }
+@media print { body { background:white; padding:0; } .main-content { box-shadow:none; } .nav-sidebar { display:none; } .back-top { display:none; } }
+@media (max-width:900px) {
+    .nav-sidebar { width:200px; min-width:200px; font-size:13px; padding:15px 10px; }
+    .header h1 { font-size:1.6em; }
+    .content { padding:20px; }
+}
+@media (max-width:650px) {
+    .nav-wrapper { flex-direction:column; }
+    .nav-sidebar { width:100%; min-width:100%; height:auto; position:relative; flex-direction:row; flex-wrap:wrap; gap:5px; padding:10px; }
+    .nav-sidebar h3, .nav-sidebar h4 { display:none; }
+}
+
+        pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: #49483e }
+.highlight { background: #272822; color: #F8F8F2 }
+.highlight .c { color: #959077 } /* Comment */
+.highlight .err { color: #ED007E; background-color: #1E0010 } /* Error */
+.highlight .esc { color: #F8F8F2 } /* Escape */
+.highlight .g { color: #F8F8F2 } /* Generic */
+.highlight .k { color: #66D9EF } /* Keyword */
+.highlight .l { color: #AE81FF } /* Literal */
+.highlight .n { color: #F8F8F2 } /* Name */
+.highlight .o { color: #FF4689 } /* Operator */
+.highlight .x { color: #F8F8F2 } /* Other */
+.highlight .p { color: #F8F8F2 } /* Punctuation */
+.highlight .ch { color: #959077 } /* Comment.Hashbang */
+.highlight .cm { color: #959077 } /* Comment.Multiline */
+.highlight .cp { color: #959077 } /* Comment.Preproc */
+.highlight .cpf { color: #959077 } /* Comment.PreprocFile */
+.highlight .c1 { color: #959077 } /* Comment.Single */
+.highlight .cs { color: #959077 } /* Comment.Special */
+.highlight .gd { color: #FF4689 } /* Generic.Deleted */
+.highlight .ge { color: #F8F8F2; font-style: italic } /* Generic.Emph */
+.highlight .ges { color: #F8F8F2; font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.highlight .gr { color: #F8F8F2 } /* Generic.Error */
+.highlight .gh { color: #F8F8F2 } /* Generic.Heading */
+.highlight .gi { color: #A6E22E } /* Generic.Inserted */
+.highlight .go { color: #66D9EF } /* Generic.Output */
+.highlight .gp { color: #FF4689; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { color: #F8F8F2; font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #959077 } /* Generic.Subheading */
+.highlight .gt { color: #F8F8F2 } /* Generic.Traceback */
+.highlight .kc { color: #66D9EF } /* Keyword.Constant */
+.highlight .kd { color: #66D9EF } /* Keyword.Declaration */
+.highlight .kn { color: #FF4689 } /* Keyword.Namespace */
+.highlight .kp { color: #66D9EF } /* Keyword.Pseudo */
+.highlight .kr { color: #66D9EF } /* Keyword.Reserved */
+.highlight .kt { color: #66D9EF } /* Keyword.Type */
+.highlight .ld { color: #E6DB74 } /* Literal.Date */
+.highlight .m { color: #AE81FF } /* Literal.Number */
+.highlight .s { color: #E6DB74 } /* Literal.String */
+.highlight .na { color: #A6E22E } /* Name.Attribute */
+.highlight .nb { color: #F8F8F2 } /* Name.Builtin */
+.highlight .nc { color: #A6E22E } /* Name.Class */
+.highlight .no { color: #66D9EF } /* Name.Constant */
+.highlight .nd { color: #A6E22E } /* Name.Decorator */
+.highlight .ni { color: #F8F8F2 } /* Name.Entity */
+.highlight .ne { color: #A6E22E } /* Name.Exception */
+.highlight .nf { color: #A6E22E } /* Name.Function */
+.highlight .nl { color: #F8F8F2 } /* Name.Label */
+.highlight .nn { color: #F8F8F2 } /* Name.Namespace */
+.highlight .nx { color: #A6E22E } /* Name.Other */
+.highlight .py { color: #F8F8F2 } /* Name.Property */
+.highlight .nt { color: #FF4689 } /* Name.Tag */
+.highlight .nv { color: #F8F8F2 } /* Name.Variable */
+.highlight .ow { color: #FF4689 } /* Operator.Word */
+.highlight .pm { color: #F8F8F2 } /* Punctuation.Marker */
+.highlight .w { color: #F8F8F2 } /* Text.Whitespace */
+.highlight .mb { color: #AE81FF } /* Literal.Number.Bin */
+.highlight .mf { color: #AE81FF } /* Literal.Number.Float */
+.highlight .mh { color: #AE81FF } /* Literal.Number.Hex */
+.highlight .mi { color: #AE81FF } /* Literal.Number.Integer */
+.highlight .mo { color: #AE81FF } /* Literal.Number.Oct */
+.highlight .sa { color: #E6DB74 } /* Literal.String.Affix */
+.highlight .sb { color: #E6DB74 } /* Literal.String.Backtick */
+.highlight .sc { color: #E6DB74 } /* Literal.String.Char */
+.highlight .dl { color: #E6DB74 } /* Literal.String.Delimiter */
+.highlight .sd { color: #E6DB74 } /* Literal.String.Doc */
+.highlight .s2 { color: #E6DB74 } /* Literal.String.Double */
+.highlight .se { color: #AE81FF } /* Literal.String.Escape */
+.highlight .sh { color: #E6DB74 } /* Literal.String.Heredoc */
+.highlight .si { color: #E6DB74 } /* Literal.String.Interpol */
+.highlight .sx { color: #E6DB74 } /* Literal.String.Other */
+.highlight .sr { color: #E6DB74 } /* Literal.String.Regex */
+.highlight .s1 { color: #E6DB74 } /* Literal.String.Single */
+.highlight .ss { color: #E6DB74 } /* Literal.String.Symbol */
+.highlight .bp { color: #F8F8F2 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #A6E22E } /* Name.Function.Magic */
+.highlight .vc { color: #F8F8F2 } /* Name.Variable.Class */
+.highlight .vg { color: #F8F8F2 } /* Name.Variable.Global */
+.highlight .vi { color: #F8F8F2 } /* Name.Variable.Instance */
+.highlight .vm { color: #F8F8F2 } /* Name.Variable.Magic */
+.highlight .il { color: #AE81FF } /* Literal.Number.Integer.Long */
+.highlight { background:#282c34; border-radius:8px; padding:15px; overflow-x:auto; margin:15px 0; }
+.highlight pre { margin:0; }
+
+        
+    .file-info {
+        background:#f0f0f0; padding:10px 15px; border-radius:6px;
+        margin-bottom:15px; font-size:14px; color:#666;
+        display:flex; align-items:center; justify-content:space-between;
+        flex-wrap:wrap; gap:8px;
+    }
+    .file-info .info-left { display:flex; align-items:center; gap:8px; }
+    .download-btn {
+        display:inline-flex; align-items:center; gap:5px;
+        background:#4caf50; color:#fff; border:none;
+        padding:6px 14px; border-radius:4px; font-size:13px;
+        text-decoration:none; cursor:pointer; white-space:nowrap;
+        transition: background 0.2s;
+    }
+    .download-btn:hover { background:#388e3c; }
+    
+    </style>
+</head>
+<body>
+<div class="nav-wrapper">
+<div class="nav-sidebar">
+<h3>资源导航</h3>
+<a class="" href="index.html">学习路线图 (主页)</a>
+<a class="" href="ACCEPTANCE_CRITERIA.html">验收标准</a>
+<h4>实战教程</h4>
+<a class="" href="tutorial_01_decorators.html">装饰器 8 步教程</a>
+<a class="" href="tutorial_02_async.html">异步 9 步教程</a>
+<h4>Day 1-3 (基础)</h4>
+<a class="" href="day01_practice_template.html">Day 1 - 模板</a>
+<a class="" href="day01_practice_validator.html">Day 1 - 验收</a>
+<a class="" href="day02_practice_template.html">Day 2 - 模板</a>
+<a class="" href="day02_practice_validator.html">Day 2 - 验收</a>
+<a class="" href="day03_practice_template.html">Day 3 - 模板</a>
+<a class="" href="day03_practice_validator.html">Day 3 - 验收</a>
+<h4>Day 4-5 (LLM)</h4>
+<a class="" href="day04_practice_template.html">Day 4 - 模板</a>
+<a class="" href="day04_practice_validator.html">Day 4 - 验收</a>
+<a class="" href="day05_practice_template.html">Day 5 - 模板</a>
+<a class="" href="day05_practice_validator.html">Day 5 - 验收</a>
+<h4>Day 6-7 (Agent)</h4>
+<a class="" href="day06_practice_template.html">Day 6 - 模板</a>
+<a class="" href="day06_practice_validator.html">Day 6 - 验收</a>
+<a class="" href="day07_practice_template.html">Day 7 - 模板</a>
+<a class="" href="day07_practice_validator.html">Day 7 - 验收</a>
+<h4>Day 8-10 (高级)</h4>
+<a class="" href="day08_practice_template.html">Day 8 - 模板</a>
+<a class="active" href="day09_practice_template.html">Day 9 - 模板</a>
+<a class="" href="day10_practice_template.html">Day 10 - 模板</a>
+</div>
+<div class="main-content">
+    <div class="header"><h1>🐍 Day09 Practice Template</h1></div>
+    <div class="content">
+        <div class="file-info"><div class="info-left">📄 文件: <code>day09_practice_template.py</code></div><a class="download-btn" href="day09_practice_template.py" download>⬇ 下载 .py 文件</a></div>
+<div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Day 9 练习：实现带记忆和 RAG 的 Agent</span>
+<span class="sd">验收标准：</span>
+<span class="sd">1. 实现了短期记忆（最近 N 轮对话历史）</span>
+<span class="sd">2. 对话历史超出限制时有裁剪策略</span>
+<span class="sd">3. 实现了长期记忆 / RAG（向量检索）</span>
+<span class="sd">4. 能对新输入做语义检索，找到相关历史/文档</span>
+<span class="sd">5. 多轮对话：Agent 能&quot;记住&quot;之前说过的话</span>
+
+<span class="sd">安装依赖：</span>
+<span class="sd">    pip install chromadb sentence-transformers</span>
+<span class="sd">    # 或者</span>
+<span class="sd">    pip install faiss-cpu numpy</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+
+
+<span class="c1"># ==================== 任务 1：实现短期记忆（对话历史） ====================</span>
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConversationMessage</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;对话消息&quot;&quot;&quot;</span>
+    <span class="n">role</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># &quot;user&quot; | &quot;assistant&quot; | &quot;system&quot; | &quot;tool&quot;</span>
+    <span class="n">content</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">timestamp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">__import__</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ShortTermMemory</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    短期记忆管理器</span>
+<span class="sd">    </span>
+<span class="sd">    需求：</span>
+<span class="sd">    1. 存储最近 N 条消息（默认 20 条）</span>
+<span class="sd">    2. 超出限制时自动裁剪最早的消息</span>
+<span class="sd">    3. 可以在 messages 和格式化文本之间转换</span>
+<span class="sd">    4. 保留 system message 不被裁剪</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_messages</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_messages</span> <span class="o">=</span> <span class="n">max_messages</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ConversationMessage</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">role</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">content</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;添加消息&quot;&quot;&quot;</span>
+        <span class="c1"># TODO 1.1：实现添加消息</span>
+        <span class="c1"># 提示：</span>
+        <span class="c1"># 1. 创建 ConversationMessage</span>
+        <span class="c1"># 2. 追加到列表</span>
+        <span class="c1"># 3. 如果超出限制，裁剪（但保留 system message）</span>
+        <span class="k">pass</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_recent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ConversationMessage</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;获取最近 N 条消息&quot;&quot;&quot;</span>
+        <span class="c1"># TODO 1.2：实现获取消息</span>
+        <span class="k">pass</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_api_format</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;转换为 LLM API 格式&quot;&quot;&quot;</span>
+        <span class="c1"># TODO 1.3：实现格式转换</span>
+        <span class="c1"># [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;...&quot;}, ...]</span>
+        <span class="k">pass</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;清除历史（保留 system message）&quot;&quot;&quot;</span>
+        <span class="c1"># TODO 1.4：实现清除</span>
+        <span class="k">pass</span>
+
+
+<span class="c1"># ==================== 任务 2：实现长期记忆 / 向量存储 ====================</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">VectorStore</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;向量存储抽象类&quot;&quot;&quot;</span>
+    
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;添加文本到向量存储&quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+    
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">top_k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;搜索最相关的文本，返回 (文本, 元数据, 相似度)&quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">SimpleVectorStore</span><span class="p">(</span><span class="n">VectorStore</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    简单的向量存储（不依赖外部库，用于学习）</span>
+<span class="sd">    </span>
+<span class="sd">    使用方式：</span>
+<span class="sd">    1. 存储（文本, 向量, 元数据）</span>
+<span class="sd">    2. 检索时计算相似度（cosine similarity）</span>
+<span class="sd">    </span>
+<span class="sd">    正式项目请用 ChromaDB 或 FAISS</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">documents</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">Dict</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">embedding</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;添加文本&quot;&quot;&quot;</span>
+        <span class="c1"># TODO 2.1：实现添加</span>
+        <span class="c1"># 提示：先存文本，embedding 可以后续计算</span>
+        <span class="k">pass</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">top_k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;搜索最相关的文本（基于关键词匹配的简单实现）&quot;&quot;&quot;</span>
+        <span class="c1"># TODO 2.2：实现简单搜索</span>
+        <span class="c1"># 提示：</span>
+        <span class="c1"># 简单版：基于关键词重叠度打分</span>
+        <span class="c1"># 正式版：用 embedding + cosine similarity</span>
+        <span class="k">pass</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">simple_keyword_search</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">documents</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">top_k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;简单的关键词搜索（不依赖 embedding 模型）&quot;&quot;&quot;</span>
+    <span class="n">query_words</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+    
+    <span class="n">scores</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">documents</span><span class="p">:</span>
+        <span class="n">doc_words</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+        <span class="c1"># Jaccard 相似度</span>
+        <span class="n">intersection</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">query_words</span> <span class="o">&amp;</span> <span class="n">doc_words</span><span class="p">)</span>
+        <span class="n">union</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">query_words</span> <span class="o">|</span> <span class="n">doc_words</span><span class="p">)</span>
+        <span class="n">score</span> <span class="o">=</span> <span class="n">intersection</span> <span class="o">/</span> <span class="n">union</span> <span class="k">if</span> <span class="n">union</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">doc</span><span class="p">,</span> <span class="n">score</span><span class="p">))</span>
+    
+    <span class="n">scores</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">scores</span><span class="p">[:</span><span class="n">top_k</span><span class="p">]</span>
+
+
+<span class="c1"># ==================== 任务 3：实现 RAG 检索模块 ====================</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">RAGRetriever</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    RAG 检索器</span>
+<span class="sd">    </span>
+<span class="sd">    流程：</span>
+<span class="sd">    1. 知识库管理：添加文档</span>
+<span class="sd">    2. 检索：根据用户问题，找到最相关的知识片段</span>
+<span class="sd">    3. 返回检索结果供 LLM 使用</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vector_store</span><span class="p">:</span> <span class="n">VectorStore</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vector_store</span> <span class="o">=</span> <span class="n">vector_store</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">knowledge_base</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_knowledge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;添加知识到知识库&quot;&quot;&quot;</span>
+        <span class="c1"># TODO 3.1：实现知识添加</span>
+        <span class="k">pass</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">retrieve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">top_k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        检索相关知识</span>
+<span class="sd">        </span>
+<span class="sd">        返回：格式化的知识文本（可直接拼接到 Prompt）</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO 3.2：实现检索</span>
+        <span class="c1"># 提示：</span>
+        <span class="c1"># 1. 搜索知识库</span>
+        <span class="c1"># 2. 格式化结果</span>
+        <span class="c1"># 3. 返回拼接后的文本</span>
+        <span class="k">pass</span>
+
+
+<span class="c1"># ==================== 任务 4：实现带记忆的 Agent ====================</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MemoryAgent</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    带记忆的 AI Agent</span>
+<span class="sd">    </span>
+<span class="sd">    组件：</span>
+<span class="sd">    - ShortTermMemory：短期对话历史</span>
+<span class="sd">    - RAGRetriever：长期记忆/知识检索</span>
+<span class="sd">    - 工具系统：和之前一样</span>
+<span class="sd">    </span>
+<span class="sd">    每次对话时：</span>
+<span class="sd">    1. 检索相关记忆/知识</span>
+<span class="sd">    2. 将检索结果注入 System Prompt</span>
+<span class="sd">    3. 处理用户输入</span>
+<span class="sd">    4. 更新短期记忆</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">short_memory</span> <span class="o">=</span> <span class="n">ShortTermMemory</span><span class="p">(</span><span class="n">max_messages</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vector_store</span> <span class="o">=</span> <span class="n">SimpleVectorStore</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rag</span> <span class="o">=</span> <span class="n">RAGRetriever</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vector_store</span><span class="p">)</span>
+        
+        <span class="c1"># 添加一些初始知识</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rag</span><span class="o">.</span><span class="n">add_knowledge</span><span class="p">(</span><span class="s2">&quot;Python 是一种高级编程语言，广泛用于 AI 开发。&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rag</span><span class="o">.</span><span class="n">add_knowledge</span><span class="p">(</span><span class="s2">&quot;AI Agent 是一种能自主决策的智能体，核心是 ReAct 循环。&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rag</span><span class="o">.</span><span class="n">add_knowledge</span><span class="p">(</span><span class="s2">&quot;LangGraph 是 LangChain 的图工作流框架，用于构建 AI Agent。&quot;</span><span class="p">)</span>
+    
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">chat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_input</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;处理用户输入，返回回答&quot;&quot;&quot;</span>
+        <span class="c1"># TODO 4.1：实现带记忆的对话</span>
+        <span class="c1"># 流程：</span>
+        <span class="c1"># 1. 检索相关知识（RAG）</span>
+        <span class="c1"># 2. 构建 System Prompt（包含相关知识）</span>
+        <span class="c1"># 3. 构建 Messages（短期记忆 + 当前输入）</span>
+        <span class="c1"># 4. 调用 LLM（先用模拟）</span>
+        <span class="c1"># 5. 将回答加入短期记忆</span>
+        <span class="c1"># 6. 返回回答</span>
+        <span class="k">pass</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">remember_fact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fact</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;记住一个事实（长期记忆）&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rag</span><span class="o">.</span><span class="n">add_knowledge</span><span class="p">(</span><span class="n">fact</span><span class="p">)</span>
+
+
+<span class="c1"># ==================== 任务 5：实现上下文窗口管理 ====================</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">compress_conversation</span><span class="p">(</span>
+    <span class="n">messages</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ConversationMessage</span><span class="p">],</span>
+    <span class="n">max_tokens</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4000</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ConversationMessage</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    对话压缩策略</span>
+<span class="sd">    </span>
+<span class="sd">    当对话历史超出 token 限制时：</span>
+<span class="sd">    1. 方案 A：滑动窗口（只保留最近 N 轮）</span>
+<span class="sd">    2. 方案 B：摘要压缩（调用 LLM 将历史总结为一段话）</span>
+<span class="sd">    3. 方案 C：智能裁剪（保留关键信息，丢弃冗余）</span>
+
+<span class="sd">    这里实现最简单的方案 A</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO 5.1：实现对话压缩</span>
+    <span class="c1"># 提示：</span>
+    <span class="c1"># 1. 估算每条消息的 token 数（粗略：1 个中文字 ≈ 2 tokens）</span>
+    <span class="c1"># 2. 从最新消息开始往前保留</span>
+    <span class="c1"># 3. 确保 system message 不被丢弃</span>
+    <span class="k">pass</span>
+
+
+<span class="c1"># ==================== 主函数：测试 ====================</span>
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Day 9 练习：记忆系统 + RAG&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+    
+    <span class="c1"># 测试 1：短期记忆</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">📝 测试 1：短期记忆（添加 + 裁剪）&quot;</span><span class="p">)</span>
+    <span class="n">memory</span> <span class="o">=</span> <span class="n">ShortTermMemory</span><span class="p">(</span><span class="n">max_messages</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">memory</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;你是一个 AI 助手&quot;</span><span class="p">)</span>
+    <span class="n">memory</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;我叫张三&quot;</span><span class="p">)</span>
+    <span class="n">memory</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;assistant&quot;</span><span class="p">,</span> <span class="s2">&quot;你好张三！&quot;</span><span class="p">)</span>
+    <span class="n">memory</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;Python 是什么？&quot;</span><span class="p">)</span>
+    <span class="n">memory</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;assistant&quot;</span><span class="p">,</span> <span class="s2">&quot;Python 是一种编程语言。&quot;</span><span class="p">)</span>
+    <span class="n">memory</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;它难学吗？&quot;</span><span class="p">)</span>  <span class="c1"># 触发裁剪</span>
+    
+    <span class="n">消息</span> <span class="o">=</span> <span class="n">memory</span><span class="o">.</span><span class="n">to_api_format</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  存储了 </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">memory</span><span class="o">.</span><span class="n">messages</span><span class="p">)</span><span class="si">}</span><span class="s2"> 条消息&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">消息</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    [</span><span class="si">{</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;role&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;content&#39;</span><span class="p">][:</span><span class="mi">40</span><span class="p">]</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># 测试 2：关键词搜索</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">📝 测试 2：关键词搜索&quot;</span><span class="p">)</span>
+    <span class="n">docs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Python 编程&quot;</span><span class="p">,</span> <span class="s2">&quot;AI Agent 开发&quot;</span><span class="p">,</span> <span class="s2">&quot;天气查询&quot;</span><span class="p">,</span> <span class="s2">&quot;LangGraph 框架&quot;</span><span class="p">]</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">simple_keyword_search</span><span class="p">(</span><span class="s2">&quot;Python Agent 开发&quot;</span><span class="p">,</span> <span class="n">docs</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">doc</span><span class="p">,</span> <span class="n">score</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  📄 </span><span class="si">{</span><span class="n">doc</span><span class="si">}</span><span class="s2">: 相似度 </span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># 测试 3：RAG 检索</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">📝 测试 3：RAG 检索&quot;</span><span class="p">)</span>
+    <span class="n">retriever</span> <span class="o">=</span> <span class="n">RAGRetriever</span><span class="p">(</span><span class="n">SimpleVectorStore</span><span class="p">())</span>
+    <span class="n">retriever</span><span class="o">.</span><span class="n">add_knowledge</span><span class="p">(</span><span class="s2">&quot;Python 是 AI 开发的主力语言&quot;</span><span class="p">)</span>
+    <span class="n">retriever</span><span class="o">.</span><span class="n">add_knowledge</span><span class="p">(</span><span class="s2">&quot;AI Agent 的核心是 ReAct 循环&quot;</span><span class="p">)</span>
+    <span class="n">retriever</span><span class="o">.</span><span class="n">add_knowledge</span><span class="p">(</span><span class="s2">&quot;今天北京天气晴朗&quot;</span><span class="p">)</span>
+    
+    <span class="n">result</span> <span class="o">=</span> <span class="n">retriever</span><span class="o">.</span><span class="n">retrieve</span><span class="p">(</span><span class="s2">&quot;AI Agent 的核心是什么？&quot;</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  检索结果：</span><span class="se">\n</span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># 测试 4：多轮对话记忆</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">📝 测试 4：多轮对话记忆&quot;</span><span class="p">)</span>
+    <span class="n">agent</span> <span class="o">=</span> <span class="n">MemoryAgent</span><span class="p">()</span>
+    
+    <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">agent</span><span class="o">.</span><span class="n">chat</span><span class="p">(</span><span class="s2">&quot;我叫张三，我喜欢 Python&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  用户：我叫张三，我喜欢 Python&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  助手：</span><span class="si">{</span><span class="n">response</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">agent</span><span class="o">.</span><span class="n">chat</span><span class="p">(</span><span class="s2">&quot;我叫什么名字？我喜欢什么？&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  用户：我叫什么名字？我喜欢什么？&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  助手：</span><span class="si">{</span><span class="n">response</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  注：如果 Agent 答对了，说明记忆系统正常工作 ✅&quot;</span><span class="p">)</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✅ 测试完成！现在运行 python day09_practice_validator.py 验收&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+<button class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="返回顶部">⬆</button>
+<script>window.addEventListener("scroll",function(){  var btn=document.querySelector(".back-top");  if(btn)btn.style.display=window.scrollY>300?"block":"none";});</script>
+</body>
+</html>

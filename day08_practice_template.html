@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐍 Day08 Practice Template</title>
+    <style>
+        
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height:1.6; color:#333;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding:0;
+}
+.nav-sidebar {
+    width:250px; min-width:250px;
+    background: #181825;
+    color: #ffffff;
+    padding: 20px 15px;
+    font-size:14px;
+    overflow-y:auto;
+    height:100vh;
+    position:sticky; top:0;
+    display:flex; flex-direction:column;
+    gap:2px;
+}
+.nav-sidebar h3 {
+    color:#f5c2e7; font-size:15px; margin:18px 0 8px 0;
+    border-bottom:1px solid #45475a; padding-bottom:6px;
+}
+.nav-sidebar h3:first-child { margin-top:0; }
+.nav-sidebar h4 {
+    color:#a6e3a1; font-size:13px; margin:14px 0 4px 0;
+    font-weight:600;
+}
+.nav-sidebar a {
+    color:#89dceb; display:block; padding:5px 12px; font-size:13px;
+    border-radius:4px; text-decoration:none; transition:background 0.2s, color 0.2s;
+}
+.nav-sidebar a:hover {
+    background:#313244; color:#ffffff; text-decoration:none;
+}
+.nav-sidebar a.active {
+    background:#45475a; color:#ffffff; font-weight:700;
+    border-left:3px solid #f5c2e7; padding-left:9px;
+}
+.nav-wrapper { display:flex; min-height:100vh; }
+.main-content {
+    flex:1; min-width:0;
+    margin:20px 20px 20px 0; background:white; border-radius:10px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    overflow:hidden;
+}
+/* 返回顶部按钮 */
+.back-top {
+    position:fixed; bottom:30px; right:30px;
+    background:#667eea; color:white; border:none;
+    width:48px; height:48px; border-radius:50%;
+    cursor:pointer; font-size:20px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.3); display:none; z-index:999;
+    transition:background 0.3s;
+}
+.back-top:hover { background:#764ba2; }
+
+/* ── 内容区样式 ── */
+.header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color:white; padding:40px; text-align:center;
+}
+.header h1 { font-size:2.2em; margin-bottom:10px; text-shadow:2px 2px 4px rgba(0,0,0,0.2); }
+.header .meta { font-size:1.1em; opacity:0.9; }
+.content { padding:40px; }
+h1 { color:#667eea; border-bottom:3px solid #667eea; padding-bottom:10px; margin-top:30px; margin-bottom:20px; }
+h2 { color:#764ba2; margin-top:25px; margin-bottom:15px; border-left:5px solid #764ba2; padding-left:15px; }
+h3 { color:#555; margin-top:20px; margin-bottom:10px; }
+p { margin-bottom:15px; }
+.styled-table {
+    width:100%; border-collapse:collapse; margin:20px 0;
+    box-shadow:0 2px 15px rgba(0,0,0,0.1); border-radius:8px; overflow:hidden;
+}
+.styled-table thead { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white; }
+.styled-table th, .styled-table td { padding:12px 15px; text-align:left; border-bottom:1px solid #ddd; }
+.styled-table tbody tr:hover { background-color:#f5f5f5; }
+.styled-table tbody tr:nth-of-type(even) { background-color:#f9f9f9; }
+.code-block {
+    background:#282c34; color:#abb2bf; padding:15px;
+    border-radius:8px; overflow-x:auto; margin:15px 0;
+    box-shadow:0 4px 6px rgba(0,0,0,0.1);
+}
+code { background:#f4f4f4; padding:2px 6px; border-radius:3px; font-family:'Courier New',monospace; color:#e83e8c; }
+.code-block code { background:transparent; color:inherit; padding:0; }
+.note-block {
+    background:#fff3cd; border-left:5px solid #ffc107;
+    padding:15px; margin:15px 0; border-radius:4px;
+}
+ul, ol { margin-left:25px; margin-bottom:15px; }
+li { margin-bottom:8px; }
+a { color:#667eea; text-decoration:none; transition:color 0.3s; }
+a:hover { color:#764ba2; text-decoration:underline; }
+hr { border:none; height:2px; background:linear-gradient(to right,#667eea,#764ba2); margin:30px 0; }
+pre { position:relative; overflow-x:auto; }
+@media print { body { background:white; padding:0; } .main-content { box-shadow:none; } .nav-sidebar { display:none; } .back-top { display:none; } }
+@media (max-width:900px) {
+    .nav-sidebar { width:200px; min-width:200px; font-size:13px; padding:15px 10px; }
+    .header h1 { font-size:1.6em; }
+    .content { padding:20px; }
+}
+@media (max-width:650px) {
+    .nav-wrapper { flex-direction:column; }
+    .nav-sidebar { width:100%; min-width:100%; height:auto; position:relative; flex-direction:row; flex-wrap:wrap; gap:5px; padding:10px; }
+    .nav-sidebar h3, .nav-sidebar h4 { display:none; }
+}
+
+        pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: #49483e }
+.highlight { background: #272822; color: #F8F8F2 }
+.highlight .c { color: #959077 } /* Comment */
+.highlight .err { color: #ED007E; background-color: #1E0010 } /* Error */
+.highlight .esc { color: #F8F8F2 } /* Escape */
+.highlight .g { color: #F8F8F2 } /* Generic */
+.highlight .k { color: #66D9EF } /* Keyword */
+.highlight .l { color: #AE81FF } /* Literal */
+.highlight .n { color: #F8F8F2 } /* Name */
+.highlight .o { color: #FF4689 } /* Operator */
+.highlight .x { color: #F8F8F2 } /* Other */
+.highlight .p { color: #F8F8F2 } /* Punctuation */
+.highlight .ch { color: #959077 } /* Comment.Hashbang */
+.highlight .cm { color: #959077 } /* Comment.Multiline */
+.highlight .cp { color: #959077 } /* Comment.Preproc */
+.highlight .cpf { color: #959077 } /* Comment.PreprocFile */
+.highlight .c1 { color: #959077 } /* Comment.Single */
+.highlight .cs { color: #959077 } /* Comment.Special */
+.highlight .gd { color: #FF4689 } /* Generic.Deleted */
+.highlight .ge { color: #F8F8F2; font-style: italic } /* Generic.Emph */
+.highlight .ges { color: #F8F8F2; font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.highlight .gr { color: #F8F8F2 } /* Generic.Error */
+.highlight .gh { color: #F8F8F2 } /* Generic.Heading */
+.highlight .gi { color: #A6E22E } /* Generic.Inserted */
+.highlight .go { color: #66D9EF } /* Generic.Output */
+.highlight .gp { color: #FF4689; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { color: #F8F8F2; font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #959077 } /* Generic.Subheading */
+.highlight .gt { color: #F8F8F2 } /* Generic.Traceback */
+.highlight .kc { color: #66D9EF } /* Keyword.Constant */
+.highlight .kd { color: #66D9EF } /* Keyword.Declaration */
+.highlight .kn { color: #FF4689 } /* Keyword.Namespace */
+.highlight .kp { color: #66D9EF } /* Keyword.Pseudo */
+.highlight .kr { color: #66D9EF } /* Keyword.Reserved */
+.highlight .kt { color: #66D9EF } /* Keyword.Type */
+.highlight .ld { color: #E6DB74 } /* Literal.Date */
+.highlight .m { color: #AE81FF } /* Literal.Number */
+.highlight .s { color: #E6DB74 } /* Literal.String */
+.highlight .na { color: #A6E22E } /* Name.Attribute */
+.highlight .nb { color: #F8F8F2 } /* Name.Builtin */
+.highlight .nc { color: #A6E22E } /* Name.Class */
+.highlight .no { color: #66D9EF } /* Name.Constant */
+.highlight .nd { color: #A6E22E } /* Name.Decorator */
+.highlight .ni { color: #F8F8F2 } /* Name.Entity */
+.highlight .ne { color: #A6E22E } /* Name.Exception */
+.highlight .nf { color: #A6E22E } /* Name.Function */
+.highlight .nl { color: #F8F8F2 } /* Name.Label */
+.highlight .nn { color: #F8F8F2 } /* Name.Namespace */
+.highlight .nx { color: #A6E22E } /* Name.Other */
+.highlight .py { color: #F8F8F2 } /* Name.Property */
+.highlight .nt { color: #FF4689 } /* Name.Tag */
+.highlight .nv { color: #F8F8F2 } /* Name.Variable */
+.highlight .ow { color: #FF4689 } /* Operator.Word */
+.highlight .pm { color: #F8F8F2 } /* Punctuation.Marker */
+.highlight .w { color: #F8F8F2 } /* Text.Whitespace */
+.highlight .mb { color: #AE81FF } /* Literal.Number.Bin */
+.highlight .mf { color: #AE81FF } /* Literal.Number.Float */
+.highlight .mh { color: #AE81FF } /* Literal.Number.Hex */
+.highlight .mi { color: #AE81FF } /* Literal.Number.Integer */
+.highlight .mo { color: #AE81FF } /* Literal.Number.Oct */
+.highlight .sa { color: #E6DB74 } /* Literal.String.Affix */
+.highlight .sb { color: #E6DB74 } /* Literal.String.Backtick */
+.highlight .sc { color: #E6DB74 } /* Literal.String.Char */
+.highlight .dl { color: #E6DB74 } /* Literal.String.Delimiter */
+.highlight .sd { color: #E6DB74 } /* Literal.String.Doc */
+.highlight .s2 { color: #E6DB74 } /* Literal.String.Double */
+.highlight .se { color: #AE81FF } /* Literal.String.Escape */
+.highlight .sh { color: #E6DB74 } /* Literal.String.Heredoc */
+.highlight .si { color: #E6DB74 } /* Literal.String.Interpol */
+.highlight .sx { color: #E6DB74 } /* Literal.String.Other */
+.highlight .sr { color: #E6DB74 } /* Literal.String.Regex */
+.highlight .s1 { color: #E6DB74 } /* Literal.String.Single */
+.highlight .ss { color: #E6DB74 } /* Literal.String.Symbol */
+.highlight .bp { color: #F8F8F2 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #A6E22E } /* Name.Function.Magic */
+.highlight .vc { color: #F8F8F2 } /* Name.Variable.Class */
+.highlight .vg { color: #F8F8F2 } /* Name.Variable.Global */
+.highlight .vi { color: #F8F8F2 } /* Name.Variable.Instance */
+.highlight .vm { color: #F8F8F2 } /* Name.Variable.Magic */
+.highlight .il { color: #AE81FF } /* Literal.Number.Integer.Long */
+.highlight { background:#282c34; border-radius:8px; padding:15px; overflow-x:auto; margin:15px 0; }
+.highlight pre { margin:0; }
+
+        
+    .file-info {
+        background:#f0f0f0; padding:10px 15px; border-radius:6px;
+        margin-bottom:15px; font-size:14px; color:#666;
+        display:flex; align-items:center; justify-content:space-between;
+        flex-wrap:wrap; gap:8px;
+    }
+    .file-info .info-left { display:flex; align-items:center; gap:8px; }
+    .download-btn {
+        display:inline-flex; align-items:center; gap:5px;
+        background:#4caf50; color:#fff; border:none;
+        padding:6px 14px; border-radius:4px; font-size:13px;
+        text-decoration:none; cursor:pointer; white-space:nowrap;
+        transition: background 0.2s;
+    }
+    .download-btn:hover { background:#388e3c; }
+    
+    </style>
+</head>
+<body>
+<div class="nav-wrapper">
+<div class="nav-sidebar">
+<h3>资源导航</h3>
+<a class="" href="index.html">学习路线图 (主页)</a>
+<a class="" href="ACCEPTANCE_CRITERIA.html">验收标准</a>
+<h4>实战教程</h4>
+<a class="" href="tutorial_01_decorators.html">装饰器 8 步教程</a>
+<a class="" href="tutorial_02_async.html">异步 9 步教程</a>
+<h4>Day 1-3 (基础)</h4>
+<a class="" href="day01_practice_template.html">Day 1 - 模板</a>
+<a class="" href="day01_practice_validator.html">Day 1 - 验收</a>
+<a class="" href="day02_practice_template.html">Day 2 - 模板</a>
+<a class="" href="day02_practice_validator.html">Day 2 - 验收</a>
+<a class="" href="day03_practice_template.html">Day 3 - 模板</a>
+<a class="" href="day03_practice_validator.html">Day 3 - 验收</a>
+<h4>Day 4-5 (LLM)</h4>
+<a class="" href="day04_practice_template.html">Day 4 - 模板</a>
+<a class="" href="day04_practice_validator.html">Day 4 - 验收</a>
+<a class="" href="day05_practice_template.html">Day 5 - 模板</a>
+<a class="" href="day05_practice_validator.html">Day 5 - 验收</a>
+<h4>Day 6-7 (Agent)</h4>
+<a class="" href="day06_practice_template.html">Day 6 - 模板</a>
+<a class="" href="day06_practice_validator.html">Day 6 - 验收</a>
+<a class="" href="day07_practice_template.html">Day 7 - 模板</a>
+<a class="" href="day07_practice_validator.html">Day 7 - 验收</a>
+<h4>Day 8-10 (高级)</h4>
+<a class="active" href="day08_practice_template.html">Day 8 - 模板</a>
+<a class="" href="day09_practice_template.html">Day 9 - 模板</a>
+<a class="" href="day10_practice_template.html">Day 10 - 模板</a>
+</div>
+<div class="main-content">
+    <div class="header"><h1>🐍 Day08 Practice Template</h1></div>
+    <div class="content">
+        <div class="file-info"><div class="info-left">📄 文件: <code>day08_practice_template.py</code></div><a class="download-btn" href="day08_practice_template.py" download>⬇ 下载 .py 文件</a></div>
+<div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Day 8 练习：实现一个 MCP Server + 在 Agent 中集成 MCP 工具</span>
+<span class="sd">验收标准：</span>
+<span class="sd">1. 使用 mcp Python SDK 创建 MCP Server</span>
+<span class="sd">2. 定义了至少 2 个 Tool</span>
+<span class="sd">3. Tool 有清晰的 name、description、inputSchema</span>
+<span class="sd">4. Agent 能连接 MCP Server 并列出工具</span>
+<span class="sd">5. Agent 能调用 MCP 工具并获取结果</span>
+<span class="sd">6. 工具函数有超时控制</span>
+
+<span class="sd">安装依赖：</span>
+<span class="sd">    pip install mcp</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
+
+
+<span class="c1"># ==================== 任务 1：用 MCP SDK 定义工具 ====================</span>
+
+<span class="c1"># TODO 1.1：安装 mcp 库</span>
+<span class="c1"># pip install mcp</span>
+
+<span class="c1"># 如果你已经安装了 mcp，可以用 mcp SDK 的方式定义工具：</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">from mcp.server import Server</span>
+<span class="sd">from mcp.types import Tool, TextContent</span>
+
+<span class="sd"># 创建 MCP Server 实例</span>
+<span class="sd">mcp_server = Server(&quot;my-agent-tools&quot;)</span>
+
+<span class="sd">@mcp_server.tool()</span>
+<span class="sd">async def calculator(expression: str) -&gt; str:</span>
+<span class="sd">    \&quot;\&quot;\&quot;执行四则运算\&quot;\&quot;\&quot;</span>
+<span class="sd">    try:</span>
+<span class="sd">        return str(eval(expression, {&quot;__builtins__&quot;: {}}, {}))</span>
+<span class="sd">    except Exception as e:</span>
+<span class="sd">        return f&quot;错误: {e}&quot;</span>
+
+<span class="sd">@mcp_server.tool()</span>
+<span class="sd">async def read_file(path: str) -&gt; str:</span>
+<span class="sd">    \&quot;\&quot;\&quot;读取文件内容\&quot;\&quot;\&quot;</span>
+<span class="sd">    try:</span>
+<span class="sd">        with open(path, &quot;r&quot;) as f:</span>
+<span class="sd">            return f.read()</span>
+<span class="sd">    except Exception as e:</span>
+<span class="sd">        return f&quot;读取文件失败: {e}&quot;</span>
+
+<span class="sd">@mcp_server.tool()</span>
+<span class="sd">async def write_file(path: str, content: str) -&gt; str:</span>
+<span class="sd">    \&quot;\&quot;\&quot;写入文件\&quot;\&quot;\&quot;</span>
+<span class="sd">    try:</span>
+<span class="sd">        with open(path, &quot;w&quot;) as f:</span>
+<span class="sd">            f.write(content)</span>
+<span class="sd">        return f&quot;文件已写入: {path}&quot;</span>
+<span class="sd">    except Exception as e:</span>
+<span class="sd">        return f&quot;写入文件失败: {e}&quot;</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="c1"># ==================== 任务 2：模拟 MCP Server（不依赖 SDK） ====================</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MockMCPServer</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;模拟 MCP Server（用于学习和测试，不依赖 mcp SDK）&quot;&quot;&quot;</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tools</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">tool</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">description</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;注册工具的装饰器（模拟 MCP SDK 的 @server.tool()）&quot;&quot;&quot;</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">decorator</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
+            
+            <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+            <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                <span class="c1"># 超时控制</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait_for</span><span class="p">(</span>
+                        <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">if</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">iscoroutine</span><span class="p">(</span><span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+                        <span class="k">else</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
+                        <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span>
+                    <span class="p">)</span>
+                    <span class="k">return</span> <span class="n">result</span>
+                <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="s2">&quot;工具执行超时&quot;</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;工具执行错误: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            
+            <span class="c1"># 注册到工具表</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tools</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">description</span><span class="p">,</span>
+                <span class="s2">&quot;function&quot;</span><span class="p">:</span> <span class="n">wrapper</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="k">return</span> <span class="n">wrapper</span>
+        <span class="k">return</span> <span class="n">decorator</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_tool_list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;获取工具列表（OpenAI Function Calling 格式）&quot;&quot;&quot;</span>
+        <span class="c1"># TODO 2.1：实现工具列表生成</span>
+        <span class="k">pass</span>
+    
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">call_tool</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">arguments</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;调用工具&quot;&quot;&quot;</span>
+        <span class="c1"># TODO 2.2：实现工具调用</span>
+        <span class="k">pass</span>
+
+
+<span class="c1"># TODO 2.3：创建 MCP Server 并注册工具</span>
+<span class="c1"># 提示：</span>
+<span class="c1"># server = MockMCPServer(&quot;my-tools&quot;)</span>
+<span class="c1"># @server.tool(&quot;calculator&quot;, &quot;执行四则运算&quot;)</span>
+<span class="c1"># async def calculator(expression: str):</span>
+<span class="c1">#     ...</span>
+
+<span class="n">mcp_server</span> <span class="o">=</span> <span class="n">MockMCPServer</span><span class="p">(</span><span class="s2">&quot;my-agent-tools&quot;</span><span class="p">)</span>
+
+
+<span class="c1"># ==================== 任务 3：实现 MCP 客户端 ====================</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MCPClient</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;MCP 客户端：连接 MCP Server 并调用工具&quot;&quot;&quot;</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">server</span> <span class="o">=</span> <span class="n">mcp_server</span>  <span class="c1"># 模拟连接</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tools_cache</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;连接 MCP Server&quot;&quot;&quot;</span>
+        <span class="c1"># TODO 3.1：实现连接逻辑</span>
+        <span class="c1"># 真实场景：通过 stdio 或 HTTP 连接</span>
+        <span class="c1"># 模拟场景：直接引用本地 server 对象</span>
+        <span class="k">pass</span>
+    
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">list_tools</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;列出所有可用的工具&quot;&quot;&quot;</span>
+        <span class="c1"># TODO 3.2：实现工具列表获取</span>
+        <span class="k">pass</span>
+    
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">call_tool</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">arguments</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;调用指定工具&quot;&quot;&quot;</span>
+        <span class="c1"># TODO 3.3：实现工具调用</span>
+        <span class="k">pass</span>
+
+
+<span class="c1"># ==================== 任务 4：Agent 集成 MCP 工具 ====================</span>
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">agent_with_mcp</span><span class="p">(</span><span class="n">user_input</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">mcp_client</span><span class="p">:</span> <span class="n">MCPClient</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    集成 MCP 工具的 Agent</span>
+<span class="sd">    </span>
+<span class="sd">    流程：</span>
+<span class="sd">    1. 从 MCP Client 获取可用工具列表</span>
+<span class="sd">    2. 将工具列表转换为 Function Calling 格式</span>
+<span class="sd">    3. 执行 ReAct 循环（和 Day 4/5 类似）</span>
+<span class="sd">    4. 当需要工具时，通过 MCP Client 调用</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO 4.1：获取工具列表</span>
+    <span class="n">tools</span> <span class="o">=</span> <span class="k">await</span> <span class="n">mcp_client</span><span class="o">.</span><span class="n">list_tools</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;📋 可用工具: </span><span class="si">{</span><span class="p">[</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">tools</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># TODO 4.2：模拟 ReAct 循环 + MCP 调用</span>
+    <span class="c1"># 提示：这是 Day 6 的 ReAct + Day 4 的 Function Calling + MCP Client</span>
+    <span class="k">pass</span>
+
+
+<span class="c1"># ==================== 主函数 ====================</span>
+
+<span class="c1"># TODO 5.1：注册工具到 MCP Server</span>
+<span class="c1"># 提示：参考任务 2</span>
+
+<span class="nd">@mcp_server</span><span class="o">.</span><span class="n">tool</span><span class="p">(</span><span class="s2">&quot;calculator&quot;</span><span class="p">,</span> <span class="s2">&quot;执行四则运算&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">calculator</span><span class="p">(</span><span class="n">expression</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="nb">eval</span><span class="p">(</span><span class="n">expression</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;__builtins__&quot;</span><span class="p">:</span> <span class="p">{}},</span> <span class="p">{}))</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;错误: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+
+
+<span class="nd">@mcp_server</span><span class="o">.</span><span class="n">tool</span><span class="p">(</span><span class="s2">&quot;read_note&quot;</span><span class="p">,</span> <span class="s2">&quot;读取笔记文件&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">read_note</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;读取失败: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Day 8 练习：MCP Server&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+    
+    <span class="c1"># 测试 1：查看 MCP Server 中的工具</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">📝 测试 1：查看注册的工具&quot;</span><span class="p">)</span>
+    <span class="n">tool_list</span> <span class="o">=</span> <span class="n">mcp_server</span><span class="o">.</span><span class="n">get_tool_list</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;注册了 </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">tool_list</span><span class="p">)</span><span class="si">}</span><span class="s2"> 个工具：&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tool_list</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  🔧 </span><span class="si">{</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">t</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;description&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;无描述&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># 测试 2：调用 MCP 工具</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">📝 测试 2：调用 MCP 工具&quot;</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">mcp_server</span><span class="o">.</span><span class="n">call_tool</span><span class="p">(</span><span class="s2">&quot;calculator&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;expression&quot;</span><span class="p">:</span> <span class="s2">&quot;3+5*2&quot;</span><span class="p">})</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  calculator(3+5*2) = </span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># 测试 3：Agent 集成</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">📝 测试 3：Agent 集成 MCP&quot;</span><span class="p">)</span>
+    <span class="n">client</span> <span class="o">=</span> <span class="n">MCPClient</span><span class="p">()</span>
+    
+    <span class="c1"># 模拟问题</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">agent_with_mcp</span><span class="p">(</span><span class="s2">&quot;帮我计算 10 + 20&quot;</span><span class="p">,</span> <span class="n">client</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Agent 回答: </span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✅ 所有测试完成！现在运行 python day08_practice_validator.py 验收&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+<button class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="返回顶部">⬆</button>
+<script>window.addEventListener("scroll",function(){  var btn=document.querySelector(".back-top");  if(btn)btn.style.display=window.scrollY>300?"block":"none";});</script>
+</body>
+</html>

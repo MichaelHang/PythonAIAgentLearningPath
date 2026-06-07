@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐍 Tutorial 01 Decorators</title>
+    <style>
+        
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height:1.6; color:#333;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding:0;
+}
+.nav-sidebar {
+    width:250px; min-width:250px;
+    background: #181825;
+    color: #ffffff;
+    padding: 20px 15px;
+    font-size:14px;
+    overflow-y:auto;
+    height:100vh;
+    position:sticky; top:0;
+    display:flex; flex-direction:column;
+    gap:2px;
+}
+.nav-sidebar h3 {
+    color:#f5c2e7; font-size:15px; margin:18px 0 8px 0;
+    border-bottom:1px solid #45475a; padding-bottom:6px;
+}
+.nav-sidebar h3:first-child { margin-top:0; }
+.nav-sidebar h4 {
+    color:#a6e3a1; font-size:13px; margin:14px 0 4px 0;
+    font-weight:600;
+}
+.nav-sidebar a {
+    color:#89dceb; display:block; padding:5px 12px; font-size:13px;
+    border-radius:4px; text-decoration:none; transition:background 0.2s, color 0.2s;
+}
+.nav-sidebar a:hover {
+    background:#313244; color:#ffffff; text-decoration:none;
+}
+.nav-sidebar a.active {
+    background:#45475a; color:#ffffff; font-weight:700;
+    border-left:3px solid #f5c2e7; padding-left:9px;
+}
+.nav-wrapper { display:flex; min-height:100vh; }
+.main-content {
+    flex:1; min-width:0;
+    margin:20px 20px 20px 0; background:white; border-radius:10px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    overflow:hidden;
+}
+/* 返回顶部按钮 */
+.back-top {
+    position:fixed; bottom:30px; right:30px;
+    background:#667eea; color:white; border:none;
+    width:48px; height:48px; border-radius:50%;
+    cursor:pointer; font-size:20px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.3); display:none; z-index:999;
+    transition:background 0.3s;
+}
+.back-top:hover { background:#764ba2; }
+
+/* ── 内容区样式 ── */
+.header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color:white; padding:40px; text-align:center;
+}
+.header h1 { font-size:2.2em; margin-bottom:10px; text-shadow:2px 2px 4px rgba(0,0,0,0.2); }
+.header .meta { font-size:1.1em; opacity:0.9; }
+.content { padding:40px; }
+h1 { color:#667eea; border-bottom:3px solid #667eea; padding-bottom:10px; margin-top:30px; margin-bottom:20px; }
+h2 { color:#764ba2; margin-top:25px; margin-bottom:15px; border-left:5px solid #764ba2; padding-left:15px; }
+h3 { color:#555; margin-top:20px; margin-bottom:10px; }
+p { margin-bottom:15px; }
+.styled-table {
+    width:100%; border-collapse:collapse; margin:20px 0;
+    box-shadow:0 2px 15px rgba(0,0,0,0.1); border-radius:8px; overflow:hidden;
+}
+.styled-table thead { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white; }
+.styled-table th, .styled-table td { padding:12px 15px; text-align:left; border-bottom:1px solid #ddd; }
+.styled-table tbody tr:hover { background-color:#f5f5f5; }
+.styled-table tbody tr:nth-of-type(even) { background-color:#f9f9f9; }
+.code-block {
+    background:#282c34; color:#abb2bf; padding:15px;
+    border-radius:8px; overflow-x:auto; margin:15px 0;
+    box-shadow:0 4px 6px rgba(0,0,0,0.1);
+}
+code { background:#f4f4f4; padding:2px 6px; border-radius:3px; font-family:'Courier New',monospace; color:#e83e8c; }
+.code-block code { background:transparent; color:inherit; padding:0; }
+.note-block {
+    background:#fff3cd; border-left:5px solid #ffc107;
+    padding:15px; margin:15px 0; border-radius:4px;
+}
+ul, ol { margin-left:25px; margin-bottom:15px; }
+li { margin-bottom:8px; }
+a { color:#667eea; text-decoration:none; transition:color 0.3s; }
+a:hover { color:#764ba2; text-decoration:underline; }
+hr { border:none; height:2px; background:linear-gradient(to right,#667eea,#764ba2); margin:30px 0; }
+pre { position:relative; overflow-x:auto; }
+@media print { body { background:white; padding:0; } .main-content { box-shadow:none; } .nav-sidebar { display:none; } .back-top { display:none; } }
+@media (max-width:900px) {
+    .nav-sidebar { width:200px; min-width:200px; font-size:13px; padding:15px 10px; }
+    .header h1 { font-size:1.6em; }
+    .content { padding:20px; }
+}
+@media (max-width:650px) {
+    .nav-wrapper { flex-direction:column; }
+    .nav-sidebar { width:100%; min-width:100%; height:auto; position:relative; flex-direction:row; flex-wrap:wrap; gap:5px; padding:10px; }
+    .nav-sidebar h3, .nav-sidebar h4 { display:none; }
+}
+
+        pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: #49483e }
+.highlight { background: #272822; color: #F8F8F2 }
+.highlight .c { color: #959077 } /* Comment */
+.highlight .err { color: #ED007E; background-color: #1E0010 } /* Error */
+.highlight .esc { color: #F8F8F2 } /* Escape */
+.highlight .g { color: #F8F8F2 } /* Generic */
+.highlight .k { color: #66D9EF } /* Keyword */
+.highlight .l { color: #AE81FF } /* Literal */
+.highlight .n { color: #F8F8F2 } /* Name */
+.highlight .o { color: #FF4689 } /* Operator */
+.highlight .x { color: #F8F8F2 } /* Other */
+.highlight .p { color: #F8F8F2 } /* Punctuation */
+.highlight .ch { color: #959077 } /* Comment.Hashbang */
+.highlight .cm { color: #959077 } /* Comment.Multiline */
+.highlight .cp { color: #959077 } /* Comment.Preproc */
+.highlight .cpf { color: #959077 } /* Comment.PreprocFile */
+.highlight .c1 { color: #959077 } /* Comment.Single */
+.highlight .cs { color: #959077 } /* Comment.Special */
+.highlight .gd { color: #FF4689 } /* Generic.Deleted */
+.highlight .ge { color: #F8F8F2; font-style: italic } /* Generic.Emph */
+.highlight .ges { color: #F8F8F2; font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.highlight .gr { color: #F8F8F2 } /* Generic.Error */
+.highlight .gh { color: #F8F8F2 } /* Generic.Heading */
+.highlight .gi { color: #A6E22E } /* Generic.Inserted */
+.highlight .go { color: #66D9EF } /* Generic.Output */
+.highlight .gp { color: #FF4689; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { color: #F8F8F2; font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #959077 } /* Generic.Subheading */
+.highlight .gt { color: #F8F8F2 } /* Generic.Traceback */
+.highlight .kc { color: #66D9EF } /* Keyword.Constant */
+.highlight .kd { color: #66D9EF } /* Keyword.Declaration */
+.highlight .kn { color: #FF4689 } /* Keyword.Namespace */
+.highlight .kp { color: #66D9EF } /* Keyword.Pseudo */
+.highlight .kr { color: #66D9EF } /* Keyword.Reserved */
+.highlight .kt { color: #66D9EF } /* Keyword.Type */
+.highlight .ld { color: #E6DB74 } /* Literal.Date */
+.highlight .m { color: #AE81FF } /* Literal.Number */
+.highlight .s { color: #E6DB74 } /* Literal.String */
+.highlight .na { color: #A6E22E } /* Name.Attribute */
+.highlight .nb { color: #F8F8F2 } /* Name.Builtin */
+.highlight .nc { color: #A6E22E } /* Name.Class */
+.highlight .no { color: #66D9EF } /* Name.Constant */
+.highlight .nd { color: #A6E22E } /* Name.Decorator */
+.highlight .ni { color: #F8F8F2 } /* Name.Entity */
+.highlight .ne { color: #A6E22E } /* Name.Exception */
+.highlight .nf { color: #A6E22E } /* Name.Function */
+.highlight .nl { color: #F8F8F2 } /* Name.Label */
+.highlight .nn { color: #F8F8F2 } /* Name.Namespace */
+.highlight .nx { color: #A6E22E } /* Name.Other */
+.highlight .py { color: #F8F8F2 } /* Name.Property */
+.highlight .nt { color: #FF4689 } /* Name.Tag */
+.highlight .nv { color: #F8F8F2 } /* Name.Variable */
+.highlight .ow { color: #FF4689 } /* Operator.Word */
+.highlight .pm { color: #F8F8F2 } /* Punctuation.Marker */
+.highlight .w { color: #F8F8F2 } /* Text.Whitespace */
+.highlight .mb { color: #AE81FF } /* Literal.Number.Bin */
+.highlight .mf { color: #AE81FF } /* Literal.Number.Float */
+.highlight .mh { color: #AE81FF } /* Literal.Number.Hex */
+.highlight .mi { color: #AE81FF } /* Literal.Number.Integer */
+.highlight .mo { color: #AE81FF } /* Literal.Number.Oct */
+.highlight .sa { color: #E6DB74 } /* Literal.String.Affix */
+.highlight .sb { color: #E6DB74 } /* Literal.String.Backtick */
+.highlight .sc { color: #E6DB74 } /* Literal.String.Char */
+.highlight .dl { color: #E6DB74 } /* Literal.String.Delimiter */
+.highlight .sd { color: #E6DB74 } /* Literal.String.Doc */
+.highlight .s2 { color: #E6DB74 } /* Literal.String.Double */
+.highlight .se { color: #AE81FF } /* Literal.String.Escape */
+.highlight .sh { color: #E6DB74 } /* Literal.String.Heredoc */
+.highlight .si { color: #E6DB74 } /* Literal.String.Interpol */
+.highlight .sx { color: #E6DB74 } /* Literal.String.Other */
+.highlight .sr { color: #E6DB74 } /* Literal.String.Regex */
+.highlight .s1 { color: #E6DB74 } /* Literal.String.Single */
+.highlight .ss { color: #E6DB74 } /* Literal.String.Symbol */
+.highlight .bp { color: #F8F8F2 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #A6E22E } /* Name.Function.Magic */
+.highlight .vc { color: #F8F8F2 } /* Name.Variable.Class */
+.highlight .vg { color: #F8F8F2 } /* Name.Variable.Global */
+.highlight .vi { color: #F8F8F2 } /* Name.Variable.Instance */
+.highlight .vm { color: #F8F8F2 } /* Name.Variable.Magic */
+.highlight .il { color: #AE81FF } /* Literal.Number.Integer.Long */
+.highlight { background:#282c34; border-radius:8px; padding:15px; overflow-x:auto; margin:15px 0; }
+.highlight pre { margin:0; }
+
+        
+    .file-info {
+        background:#f0f0f0; padding:10px 15px; border-radius:6px;
+        margin-bottom:15px; font-size:14px; color:#666;
+        display:flex; align-items:center; justify-content:space-between;
+        flex-wrap:wrap; gap:8px;
+    }
+    .file-info .info-left { display:flex; align-items:center; gap:8px; }
+    .download-btn {
+        display:inline-flex; align-items:center; gap:5px;
+        background:#4caf50; color:#fff; border:none;
+        padding:6px 14px; border-radius:4px; font-size:13px;
+        text-decoration:none; cursor:pointer; white-space:nowrap;
+        transition: background 0.2s;
+    }
+    .download-btn:hover { background:#388e3c; }
+    
+    </style>
+</head>
+<body>
+<div class="nav-wrapper">
+<div class="nav-sidebar">
+<h3>资源导航</h3>
+<a class="" href="index.html">学习路线图 (主页)</a>
+<a class="" href="ACCEPTANCE_CRITERIA.html">验收标准</a>
+<h4>实战教程</h4>
+<a class="active" href="tutorial_01_decorators.html">装饰器 8 步教程</a>
+<a class="" href="tutorial_02_async.html">异步 9 步教程</a>
+<h4>Day 1-3 (基础)</h4>
+<a class="" href="day01_practice_template.html">Day 1 - 模板</a>
+<a class="" href="day01_practice_validator.html">Day 1 - 验收</a>
+<a class="" href="day02_practice_template.html">Day 2 - 模板</a>
+<a class="" href="day02_practice_validator.html">Day 2 - 验收</a>
+<a class="" href="day03_practice_template.html">Day 3 - 模板</a>
+<a class="" href="day03_practice_validator.html">Day 3 - 验收</a>
+<h4>Day 4-5 (LLM)</h4>
+<a class="" href="day04_practice_template.html">Day 4 - 模板</a>
+<a class="" href="day04_practice_validator.html">Day 4 - 验收</a>
+<a class="" href="day05_practice_template.html">Day 5 - 模板</a>
+<a class="" href="day05_practice_validator.html">Day 5 - 验收</a>
+<h4>Day 6-7 (Agent)</h4>
+<a class="" href="day06_practice_template.html">Day 6 - 模板</a>
+<a class="" href="day06_practice_validator.html">Day 6 - 验收</a>
+<a class="" href="day07_practice_template.html">Day 7 - 模板</a>
+<a class="" href="day07_practice_validator.html">Day 7 - 验收</a>
+<h4>Day 8-10 (高级)</h4>
+<a class="" href="day08_practice_template.html">Day 8 - 模板</a>
+<a class="" href="day09_practice_template.html">Day 9 - 模板</a>
+<a class="" href="day10_practice_template.html">Day 10 - 模板</a>
+</div>
+<div class="main-content">
+    <div class="header"><h1>🐍 Tutorial 01 Decorators</h1></div>
+    <div class="content">
+        <div class="file-info"><div class="info-left">📄 文件: <code>tutorial_01_decorators.py</code></div><a class="download-btn" href="tutorial_01_decorators.py" download>⬇ 下载 .py 文件</a></div>
+<div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">============================================================</span>
+<span class="sd">Python 装饰器 零基础实战教程</span>
+<span class="sd">============================================================</span>
+<span class="sd">目标：从&quot;完全不懂&quot;到&quot;能在 AI Agent 里用装饰器注册工具&quot;</span>
+
+<span class="sd">运行方式：python tutorial_01_decorators.py</span>
+<span class="sd">学习方式：从上到下逐步阅读，每步都输出结果，理解后再看下一步</span>
+
+<span class="sd">核心理解（一句话）：装饰器 = 接受一个函数，返回一个新函数</span>
+<span class="sd">类比：就像给手机套壳 —— 手机还是那个手机，但多了保护/外观功能</span>
+<span class="sd">============================================================</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;第 1 步：理解「函数是一等公民」—— 函数可以当参数传递&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">打招呼</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;你好，</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">！&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">加感叹</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;接收一个函数作为参数，调用它并加感叹号&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;！！！&quot;</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">加感叹</span><span class="p">(</span><span class="n">打招呼</span><span class="p">,</span> <span class="s2">&quot;hangbo&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;结果：</span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;👉 看到了吗？「打招呼」这个函数被当作参数传给了「加感叹」&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;第 2 步：函数内部可以定义函数，也可以返回函数&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">创建乘法器</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;这个函数返回一个新函数！&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">乘n</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">n</span>
+    <span class="k">return</span> <span class="n">乘n</span>  <span class="c1"># 注意：返回的是函数本身，不是调用的结果</span>
+
+<span class="n">乘3</span> <span class="o">=</span> <span class="n">创建乘法器</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">乘5</span> <span class="o">=</span> <span class="n">创建乘法器</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;乘3(10) = </span><span class="si">{</span><span class="n">乘3</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;乘5(10) = </span><span class="si">{</span><span class="n">乘5</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;👉 创建乘法器(3) 返回了一个「把任何数乘以3」的函数&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;第 3 步：最简单的装饰器 —— 组合上面两个概念&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">计时装饰器</span><span class="p">(</span><span class="n">原函数</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;包装一个函数，让它执行时自动打印耗时&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">包装函数</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">开始</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">结果</span> <span class="o">=</span> <span class="n">原函数</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">耗时</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">开始</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  ⏱ </span><span class="si">{</span><span class="n">原函数</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> 执行耗时：</span><span class="si">{</span><span class="n">耗时</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> 秒&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">结果</span>
+    <span class="k">return</span> <span class="n">包装函数</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">慢速加法</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+
+<span class="c1"># 方式一：手动包装（理解原理）</span>
+<span class="n">慢速加法_计时版</span> <span class="o">=</span> <span class="n">计时装饰器</span><span class="p">(</span><span class="n">慢速加法</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;手动包装：&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;结果：</span><span class="si">{</span><span class="n">慢速加法_计时版</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;第 4 步：@ 语法糖 —— 让代码更优雅&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+
+<span class="nd">@计时装饰器</span>  <span class="c1"># 这一行等价于：慢速乘法 = 计时装饰器(慢速乘法)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">慢速乘法</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">a</span> <span class="o">*</span> <span class="n">b</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;@语法糖：&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;结果：</span><span class="si">{</span><span class="n">慢速乘法</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">7</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;👉 @计时装饰器 放在 def 上面，Python 会自动完成包装&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;第 5 步：装饰器的致命陷阱 —— functools.wraps&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">坏装饰器</span><span class="p">(</span><span class="n">原函数</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;不带 wraps 的装饰器（有 bug）&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">包装</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">原函数</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">包装</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">好装饰器</span><span class="p">(</span><span class="n">原函数</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;带 wraps 的装饰器（推荐）&quot;&quot;&quot;</span>
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">原函数</span><span class="p">)</span>  <span class="c1"># 保留原函数的元信息</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">包装</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">原函数</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">包装</span>
+
+<span class="nd">@坏装饰器</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">函数A</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;这是函数A的文档&quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+<span class="nd">@好装饰器</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">函数B</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;这是函数B的文档&quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;函数A.__name__ = </span><span class="si">{</span><span class="n">函数A</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>   <span class="c1"># 输出&quot;包装&quot;，丢失了原名！</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;函数A.__doc__  = </span><span class="si">{</span><span class="n">函数A</span><span class="o">.</span><span class="vm">__doc__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>    <span class="c1"># None！</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;函数B.__name__ = </span><span class="si">{</span><span class="n">函数B</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>   <span class="c1"># 正确：函数B</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;函数B.__doc__  = </span><span class="si">{</span><span class="n">函数B</span><span class="o">.</span><span class="vm">__doc__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>    <span class="c1"># 正确：文档</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;👉 写装饰器永远加 @functools.wraps(原函数)，否则丢失函数名和文档&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;第 6 步：带参数的装饰器 —— 进阶必备&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+
+<span class="c1"># 需求：有时候想重试 3 次，有时候想重试 5 次</span>
+<span class="c1"># 需要「装饰器工厂」：一个返回装饰器的函数</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">重试</span><span class="p">(</span><span class="n">最大次数</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">等待秒</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;装饰器工厂：根据参数创建不同的重试装饰器&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">装饰器</span><span class="p">(</span><span class="n">原函数</span><span class="p">):</span>
+        <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">原函数</span><span class="p">)</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">包装</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">最大次数</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">原函数</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">最大次数</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="k">raise</span>  <span class="c1"># 最后一次还失败就抛出</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  重试 </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">最大次数</span><span class="si">}</span><span class="s2">：</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">等待秒</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">包装</span>
+    <span class="k">return</span> <span class="n">装饰器</span>
+
+<span class="nd">@重试</span><span class="p">(</span><span class="n">最大次数</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">等待秒</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">不稳定的网络请求</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">调用次数</span>
+    <span class="n">调用次数</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">调用次数</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="s2">&quot;网络断开&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;数据获取成功&quot;</span>
+
+<span class="n">调用次数</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;结果：</span><span class="si">{</span><span class="n">不稳定的网络请求</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;第 7 步：类装饰器 —— 另一种写法&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">记录调用次数</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;用类做装饰器，可以保存状态（调用了多少次）&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">原函数</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">原函数</span> <span class="o">=</span> <span class="n">原函数</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">次数</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">次数</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">原函数</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> 已被调用 </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">次数</span><span class="si">}</span><span class="s2"> 次&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">原函数</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="nd">@记录调用次数</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">计算平方</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;计算平方(5) = </span><span class="si">{</span><span class="n">计算平方</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;计算平方(6) = </span><span class="si">{</span><span class="n">计算平方</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;计算平方(7) = </span><span class="si">{</span><span class="n">计算平方</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;第 8 步：AI Agent 实战 —— 工具注册装饰器&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;这是你未来 AI Agent 的核心机制之一！&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="c1"># 模拟 Agent 的工具注册表</span>
+<span class="n">工具注册表</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">工具</span><span class="p">(</span><span class="n">名称</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">描述</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;装饰器：把 Python 函数注册为 Agent 可用的工具&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">装饰器</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+        <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">包装</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">工具注册表</span><span class="p">[</span><span class="n">名称</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;函数&quot;</span><span class="p">:</span> <span class="n">包装</span><span class="p">,</span>
+            <span class="s2">&quot;描述&quot;</span><span class="p">:</span> <span class="n">描述</span><span class="p">,</span>
+            <span class="s2">&quot;参数&quot;</span><span class="p">:</span> <span class="n">func</span><span class="o">.</span><span class="vm">__code__</span><span class="o">.</span><span class="n">co_varnames</span><span class="p">[:</span><span class="n">func</span><span class="o">.</span><span class="vm">__code__</span><span class="o">.</span><span class="n">co_argcount</span><span class="p">]</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">包装</span>
+    <span class="k">return</span> <span class="n">装饰器</span>
+
+<span class="c1"># 注册工具 —— 看！和写普通函数一样简单</span>
+<span class="nd">@工具</span><span class="p">(</span><span class="s2">&quot;计算器&quot;</span><span class="p">,</span> <span class="s2">&quot;执行四则运算，例如：计算 3 + 5 * 2&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">计算</span><span class="p">(</span><span class="n">表达式</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">eval</span><span class="p">(</span><span class="n">表达式</span><span class="p">)</span>  <span class="c1"># 生产环境用 ast.literal_eval 更安全</span>
+
+<span class="nd">@工具</span><span class="p">(</span><span class="s2">&quot;天气查询&quot;</span><span class="p">,</span> <span class="s2">&quot;查询指定城市的天气&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">查天气</span><span class="p">(</span><span class="n">城市</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="c1"># 模拟 API 调用</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;城市&quot;</span><span class="p">:</span> <span class="n">城市</span><span class="p">,</span> <span class="s2">&quot;温度&quot;</span><span class="p">:</span> <span class="s2">&quot;25°C&quot;</span><span class="p">,</span> <span class="s2">&quot;天气&quot;</span><span class="p">:</span> <span class="s2">&quot;晴&quot;</span><span class="p">}</span>
+
+<span class="nd">@工具</span><span class="p">(</span><span class="s2">&quot;文件搜索&quot;</span><span class="p">,</span> <span class="s2">&quot;搜索包含关键词的文件&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">搜文件</span><span class="p">(</span><span class="n">关键词</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;main.py&quot;</span><span class="p">,</span> <span class="s2">&quot;config.py&quot;</span><span class="p">,</span> <span class="s2">&quot;agent.py&quot;</span><span class="p">]</span>
+
+<span class="c1"># 打印注册表</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;已注册的工具：&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">名称</span><span class="p">,</span> <span class="n">信息</span> <span class="ow">in</span> <span class="n">工具注册表</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  🔧 </span><span class="si">{</span><span class="n">名称</span><span class="si">}</span><span class="s2">：</span><span class="si">{</span><span class="n">信息</span><span class="p">[</span><span class="s1">&#39;描述&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;     参数：</span><span class="si">{</span><span class="n">信息</span><span class="p">[</span><span class="s1">&#39;参数&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="c1"># 调用工具</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;计算(3+5*2) = </span><span class="si">{</span><span class="n">计算</span><span class="p">(</span><span class="s1">&#39;3+5*2&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;查天气(&#39;北京&#39;) = </span><span class="si">{</span><span class="n">查天气</span><span class="p">(</span><span class="s1">&#39;北京&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;总结：装饰器核心要点&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">1. 装饰器本质：接受函数 → 返回新函数（第1-2步）</span>
+<span class="s2">2. 基本写法：def 装饰器(func): ... return 包装函数（第3步）</span>
+<span class="s2">3. @语法糖：@装饰器名 放在 def 上一行（第4步）</span>
+<span class="s2">4. 必须加 @functools.wraps(原函数)（第5步）</span>
+<span class="s2">5. 带参数：三层嵌套，最外层接收参数（第6步）</span>
+<span class="s2">6. AI Agent 应用：用装饰器注册工具（第8步）</span>
+
+<span class="s2">学完这个，去看 Day 2 的 Pydantic 和高级 typing，</span>
+<span class="s2">你会发现自己能写出更规范的代码！</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+<button class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="返回顶部">⬆</button>
+<script>window.addEventListener("scroll",function(){  var btn=document.querySelector(".back-top");  if(btn)btn.style.display=window.scrollY>300?"block":"none";});</script>
+</body>
+</html>

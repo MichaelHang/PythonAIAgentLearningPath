@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐍 Day01 Practice Validator</title>
+    <style>
+        
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height:1.6; color:#333;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding:0;
+}
+.nav-sidebar {
+    width:250px; min-width:250px;
+    background: #181825;
+    color: #ffffff;
+    padding: 20px 15px;
+    font-size:14px;
+    overflow-y:auto;
+    height:100vh;
+    position:sticky; top:0;
+    display:flex; flex-direction:column;
+    gap:2px;
+}
+.nav-sidebar h3 {
+    color:#f5c2e7; font-size:15px; margin:18px 0 8px 0;
+    border-bottom:1px solid #45475a; padding-bottom:6px;
+}
+.nav-sidebar h3:first-child { margin-top:0; }
+.nav-sidebar h4 {
+    color:#a6e3a1; font-size:13px; margin:14px 0 4px 0;
+    font-weight:600;
+}
+.nav-sidebar a {
+    color:#89dceb; display:block; padding:5px 12px; font-size:13px;
+    border-radius:4px; text-decoration:none; transition:background 0.2s, color 0.2s;
+}
+.nav-sidebar a:hover {
+    background:#313244; color:#ffffff; text-decoration:none;
+}
+.nav-sidebar a.active {
+    background:#45475a; color:#ffffff; font-weight:700;
+    border-left:3px solid #f5c2e7; padding-left:9px;
+}
+.nav-wrapper { display:flex; min-height:100vh; }
+.main-content {
+    flex:1; min-width:0;
+    margin:20px 20px 20px 0; background:white; border-radius:10px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    overflow:hidden;
+}
+/* 返回顶部按钮 */
+.back-top {
+    position:fixed; bottom:30px; right:30px;
+    background:#667eea; color:white; border:none;
+    width:48px; height:48px; border-radius:50%;
+    cursor:pointer; font-size:20px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.3); display:none; z-index:999;
+    transition:background 0.3s;
+}
+.back-top:hover { background:#764ba2; }
+
+/* ── 内容区样式 ── */
+.header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color:white; padding:40px; text-align:center;
+}
+.header h1 { font-size:2.2em; margin-bottom:10px; text-shadow:2px 2px 4px rgba(0,0,0,0.2); }
+.header .meta { font-size:1.1em; opacity:0.9; }
+.content { padding:40px; }
+h1 { color:#667eea; border-bottom:3px solid #667eea; padding-bottom:10px; margin-top:30px; margin-bottom:20px; }
+h2 { color:#764ba2; margin-top:25px; margin-bottom:15px; border-left:5px solid #764ba2; padding-left:15px; }
+h3 { color:#555; margin-top:20px; margin-bottom:10px; }
+p { margin-bottom:15px; }
+.styled-table {
+    width:100%; border-collapse:collapse; margin:20px 0;
+    box-shadow:0 2px 15px rgba(0,0,0,0.1); border-radius:8px; overflow:hidden;
+}
+.styled-table thead { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white; }
+.styled-table th, .styled-table td { padding:12px 15px; text-align:left; border-bottom:1px solid #ddd; }
+.styled-table tbody tr:hover { background-color:#f5f5f5; }
+.styled-table tbody tr:nth-of-type(even) { background-color:#f9f9f9; }
+.code-block {
+    background:#282c34; color:#abb2bf; padding:15px;
+    border-radius:8px; overflow-x:auto; margin:15px 0;
+    box-shadow:0 4px 6px rgba(0,0,0,0.1);
+}
+code { background:#f4f4f4; padding:2px 6px; border-radius:3px; font-family:'Courier New',monospace; color:#e83e8c; }
+.code-block code { background:transparent; color:inherit; padding:0; }
+.note-block {
+    background:#fff3cd; border-left:5px solid #ffc107;
+    padding:15px; margin:15px 0; border-radius:4px;
+}
+ul, ol { margin-left:25px; margin-bottom:15px; }
+li { margin-bottom:8px; }
+a { color:#667eea; text-decoration:none; transition:color 0.3s; }
+a:hover { color:#764ba2; text-decoration:underline; }
+hr { border:none; height:2px; background:linear-gradient(to right,#667eea,#764ba2); margin:30px 0; }
+pre { position:relative; overflow-x:auto; }
+@media print { body { background:white; padding:0; } .main-content { box-shadow:none; } .nav-sidebar { display:none; } .back-top { display:none; } }
+@media (max-width:900px) {
+    .nav-sidebar { width:200px; min-width:200px; font-size:13px; padding:15px 10px; }
+    .header h1 { font-size:1.6em; }
+    .content { padding:20px; }
+}
+@media (max-width:650px) {
+    .nav-wrapper { flex-direction:column; }
+    .nav-sidebar { width:100%; min-width:100%; height:auto; position:relative; flex-direction:row; flex-wrap:wrap; gap:5px; padding:10px; }
+    .nav-sidebar h3, .nav-sidebar h4 { display:none; }
+}
+
+        pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: #49483e }
+.highlight { background: #272822; color: #F8F8F2 }
+.highlight .c { color: #959077 } /* Comment */
+.highlight .err { color: #ED007E; background-color: #1E0010 } /* Error */
+.highlight .esc { color: #F8F8F2 } /* Escape */
+.highlight .g { color: #F8F8F2 } /* Generic */
+.highlight .k { color: #66D9EF } /* Keyword */
+.highlight .l { color: #AE81FF } /* Literal */
+.highlight .n { color: #F8F8F2 } /* Name */
+.highlight .o { color: #FF4689 } /* Operator */
+.highlight .x { color: #F8F8F2 } /* Other */
+.highlight .p { color: #F8F8F2 } /* Punctuation */
+.highlight .ch { color: #959077 } /* Comment.Hashbang */
+.highlight .cm { color: #959077 } /* Comment.Multiline */
+.highlight .cp { color: #959077 } /* Comment.Preproc */
+.highlight .cpf { color: #959077 } /* Comment.PreprocFile */
+.highlight .c1 { color: #959077 } /* Comment.Single */
+.highlight .cs { color: #959077 } /* Comment.Special */
+.highlight .gd { color: #FF4689 } /* Generic.Deleted */
+.highlight .ge { color: #F8F8F2; font-style: italic } /* Generic.Emph */
+.highlight .ges { color: #F8F8F2; font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.highlight .gr { color: #F8F8F2 } /* Generic.Error */
+.highlight .gh { color: #F8F8F2 } /* Generic.Heading */
+.highlight .gi { color: #A6E22E } /* Generic.Inserted */
+.highlight .go { color: #66D9EF } /* Generic.Output */
+.highlight .gp { color: #FF4689; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { color: #F8F8F2; font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #959077 } /* Generic.Subheading */
+.highlight .gt { color: #F8F8F2 } /* Generic.Traceback */
+.highlight .kc { color: #66D9EF } /* Keyword.Constant */
+.highlight .kd { color: #66D9EF } /* Keyword.Declaration */
+.highlight .kn { color: #FF4689 } /* Keyword.Namespace */
+.highlight .kp { color: #66D9EF } /* Keyword.Pseudo */
+.highlight .kr { color: #66D9EF } /* Keyword.Reserved */
+.highlight .kt { color: #66D9EF } /* Keyword.Type */
+.highlight .ld { color: #E6DB74 } /* Literal.Date */
+.highlight .m { color: #AE81FF } /* Literal.Number */
+.highlight .s { color: #E6DB74 } /* Literal.String */
+.highlight .na { color: #A6E22E } /* Name.Attribute */
+.highlight .nb { color: #F8F8F2 } /* Name.Builtin */
+.highlight .nc { color: #A6E22E } /* Name.Class */
+.highlight .no { color: #66D9EF } /* Name.Constant */
+.highlight .nd { color: #A6E22E } /* Name.Decorator */
+.highlight .ni { color: #F8F8F2 } /* Name.Entity */
+.highlight .ne { color: #A6E22E } /* Name.Exception */
+.highlight .nf { color: #A6E22E } /* Name.Function */
+.highlight .nl { color: #F8F8F2 } /* Name.Label */
+.highlight .nn { color: #F8F8F2 } /* Name.Namespace */
+.highlight .nx { color: #A6E22E } /* Name.Other */
+.highlight .py { color: #F8F8F2 } /* Name.Property */
+.highlight .nt { color: #FF4689 } /* Name.Tag */
+.highlight .nv { color: #F8F8F2 } /* Name.Variable */
+.highlight .ow { color: #FF4689 } /* Operator.Word */
+.highlight .pm { color: #F8F8F2 } /* Punctuation.Marker */
+.highlight .w { color: #F8F8F2 } /* Text.Whitespace */
+.highlight .mb { color: #AE81FF } /* Literal.Number.Bin */
+.highlight .mf { color: #AE81FF } /* Literal.Number.Float */
+.highlight .mh { color: #AE81FF } /* Literal.Number.Hex */
+.highlight .mi { color: #AE81FF } /* Literal.Number.Integer */
+.highlight .mo { color: #AE81FF } /* Literal.Number.Oct */
+.highlight .sa { color: #E6DB74 } /* Literal.String.Affix */
+.highlight .sb { color: #E6DB74 } /* Literal.String.Backtick */
+.highlight .sc { color: #E6DB74 } /* Literal.String.Char */
+.highlight .dl { color: #E6DB74 } /* Literal.String.Delimiter */
+.highlight .sd { color: #E6DB74 } /* Literal.String.Doc */
+.highlight .s2 { color: #E6DB74 } /* Literal.String.Double */
+.highlight .se { color: #AE81FF } /* Literal.String.Escape */
+.highlight .sh { color: #E6DB74 } /* Literal.String.Heredoc */
+.highlight .si { color: #E6DB74 } /* Literal.String.Interpol */
+.highlight .sx { color: #E6DB74 } /* Literal.String.Other */
+.highlight .sr { color: #E6DB74 } /* Literal.String.Regex */
+.highlight .s1 { color: #E6DB74 } /* Literal.String.Single */
+.highlight .ss { color: #E6DB74 } /* Literal.String.Symbol */
+.highlight .bp { color: #F8F8F2 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #A6E22E } /* Name.Function.Magic */
+.highlight .vc { color: #F8F8F2 } /* Name.Variable.Class */
+.highlight .vg { color: #F8F8F2 } /* Name.Variable.Global */
+.highlight .vi { color: #F8F8F2 } /* Name.Variable.Instance */
+.highlight .vm { color: #F8F8F2 } /* Name.Variable.Magic */
+.highlight .il { color: #AE81FF } /* Literal.Number.Integer.Long */
+.highlight { background:#282c34; border-radius:8px; padding:15px; overflow-x:auto; margin:15px 0; }
+.highlight pre { margin:0; }
+
+        
+    .file-info {
+        background:#f0f0f0; padding:10px 15px; border-radius:6px;
+        margin-bottom:15px; font-size:14px; color:#666;
+        display:flex; align-items:center; justify-content:space-between;
+        flex-wrap:wrap; gap:8px;
+    }
+    .file-info .info-left { display:flex; align-items:center; gap:8px; }
+    .download-btn {
+        display:inline-flex; align-items:center; gap:5px;
+        background:#4caf50; color:#fff; border:none;
+        padding:6px 14px; border-radius:4px; font-size:13px;
+        text-decoration:none; cursor:pointer; white-space:nowrap;
+        transition: background 0.2s;
+    }
+    .download-btn:hover { background:#388e3c; }
+    
+    </style>
+</head>
+<body>
+<div class="nav-wrapper">
+<div class="nav-sidebar">
+<h3>资源导航</h3>
+<a class="" href="index.html">学习路线图 (主页)</a>
+<a class="" href="ACCEPTANCE_CRITERIA.html">验收标准</a>
+<h4>实战教程</h4>
+<a class="" href="tutorial_01_decorators.html">装饰器 8 步教程</a>
+<a class="" href="tutorial_02_async.html">异步 9 步教程</a>
+<h4>Day 1-3 (基础)</h4>
+<a class="" href="day01_practice_template.html">Day 1 - 模板</a>
+<a class="active" href="day01_practice_validator.html">Day 1 - 验收</a>
+<a class="" href="day02_practice_template.html">Day 2 - 模板</a>
+<a class="" href="day02_practice_validator.html">Day 2 - 验收</a>
+<a class="" href="day03_practice_template.html">Day 3 - 模板</a>
+<a class="" href="day03_practice_validator.html">Day 3 - 验收</a>
+<h4>Day 4-5 (LLM)</h4>
+<a class="" href="day04_practice_template.html">Day 4 - 模板</a>
+<a class="" href="day04_practice_validator.html">Day 4 - 验收</a>
+<a class="" href="day05_practice_template.html">Day 5 - 模板</a>
+<a class="" href="day05_practice_validator.html">Day 5 - 验收</a>
+<h4>Day 6-7 (Agent)</h4>
+<a class="" href="day06_practice_template.html">Day 6 - 模板</a>
+<a class="" href="day06_practice_validator.html">Day 6 - 验收</a>
+<a class="" href="day07_practice_template.html">Day 7 - 模板</a>
+<a class="" href="day07_practice_validator.html">Day 7 - 验收</a>
+<h4>Day 8-10 (高级)</h4>
+<a class="" href="day08_practice_template.html">Day 8 - 模板</a>
+<a class="" href="day09_practice_template.html">Day 9 - 模板</a>
+<a class="" href="day10_practice_template.html">Day 10 - 模板</a>
+</div>
+<div class="main-content">
+    <div class="header"><h1>🐍 Day01 Practice Validator</h1></div>
+    <div class="content">
+        <div class="file-info"><div class="info-left">📄 文件: <code>day01_practice_validator.py</code></div><a class="download-btn" href="day01_practice_validator.py" download>⬇ 下载 .py 文件</a></div>
+<div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Day 1 练习项目验收脚本</span>
+<span class="sd">异步批量调用多个 API（模拟 Agent 多工具并发调用）</span>
+
+<span class="sd">运行方式：python day01_practice_validator.py</span>
+<span class="sd">功能：自动检测你的练习代码并提供反馈</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">importlib.util</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">70</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;📋 Day 1 练习项目验收工具&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">70</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="c1"># ========================================</span>
+<span class="c1"># 第 1 步：检查是否有练习代码文件</span>
+<span class="c1"># ========================================</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;【第 1 步】检查练习代码文件...&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">70</span><span class="p">)</span>
+
+<span class="n">练习文件列表</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;day01_practice.py&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;practice_day01.py&quot;</span><span class="p">,</span> 
+    <span class="s2">&quot;async_practice.py&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;day1.py&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">用户代码文件</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="k">for</span> <span class="n">文件名</span> <span class="ow">in</span> <span class="n">练习文件列表</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">Path</span><span class="p">(</span><span class="n">文件名</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="n">用户代码文件</span> <span class="o">=</span> <span class="n">文件名</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✅ 找到练习文件：</span><span class="si">{</span><span class="n">文件名</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">break</span>
+
+<span class="k">if</span> <span class="n">用户代码文件</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;❌ 未找到练习代码文件&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;请创建以下名称之一的文件：&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">文件名</span> <span class="ow">in</span> <span class="n">练习文件列表</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   - </span><span class="si">{</span><span class="n">文件名</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;💡 如果文件名不同，请手动修改本脚本的「练习文件列表」&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;📂 将加载：</span><span class="si">{</span><span class="n">用户代码文件</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">()</span>
+
+<span class="c1"># ========================================</span>
+<span class="c1"># 第 2 步：加载用户的代码</span>
+<span class="c1"># ========================================</span>
+
+<span class="k">if</span> <span class="n">用户代码文件</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;【第 2 步】加载并分析你的代码...&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">70</span><span class="p">)</span>
+    
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># 动态加载用户的 Python 文件</span>
+        <span class="n">spec</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spec_from_file_location</span><span class="p">(</span><span class="s2">&quot;user_code&quot;</span><span class="p">,</span> <span class="n">用户代码文件</span><span class="p">)</span>
+        <span class="n">用户模块</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">module_from_spec</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">exec_module</span><span class="p">(</span><span class="n">用户模块</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✅ 代码加载成功！没有语法错误&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># 分析模块中有哪些函数/类</span>
+        <span class="n">所有函数</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">用户模块</span><span class="p">)</span> <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">用户模块</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;📊 发现 </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">所有函数</span><span class="p">)</span><span class="si">}</span><span class="s2"> 个可调用对象：</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">所有函数</span><span class="p">[:</span><span class="mi">10</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">()</span>
+        
+    <span class="k">except</span> <span class="ne">SyntaxError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;❌ 语法错误：</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;请修复语法错误后重新运行本脚本&quot;</span><span class="p">)</span>
+        <span class="n">用户模块</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;❌ 加载失败：</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">用户模块</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">用户模块</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="c1"># ========================================</span>
+<span class="c1"># 第 3 步：性能验收测试</span>
+<span class="c1"># ========================================</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;【第 3 步】性能验收测试（同步 vs 异步）&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">70</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;一个正确的异步实现应该比同步实现快很多！&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">模拟API调用</span><span class="p">(</span><span class="n">名称</span><span class="p">,</span> <span class="n">延迟</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;模拟 API 调用&quot;&quot;&quot;</span>
+    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">延迟</span><span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">名称</span><span class="si">}</span><span class="s2"> 返回结果（延迟 </span><span class="si">{</span><span class="n">延迟</span><span class="si">}</span><span class="s2">s）&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">测试同步调用</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;测试同步方式的耗时&quot;&quot;&quot;</span>
+    <span class="n">开始</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    
+    <span class="n">结果1</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">模拟API调用</span><span class="p">(</span><span class="s2">&quot;API-1&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">结果2</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">模拟API调用</span><span class="p">(</span><span class="s2">&quot;API-2&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">结果3</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">模拟API调用</span><span class="p">(</span><span class="s2">&quot;API-3&quot;</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">))</span>
+    
+    <span class="n">耗时</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">开始</span>
+    <span class="k">return</span> <span class="n">耗时</span><span class="p">,</span> <span class="p">[</span><span class="n">结果1</span><span class="p">,</span> <span class="n">结果2</span><span class="p">,</span> <span class="n">结果3</span><span class="p">]</span>
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">测试异步调用</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;测试异步方式的耗时&quot;&quot;&quot;</span>
+    <span class="n">开始</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    
+    <span class="n">结果们</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+        <span class="n">模拟API调用</span><span class="p">(</span><span class="s2">&quot;API-1&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+        <span class="n">模拟API调用</span><span class="p">(</span><span class="s2">&quot;API-2&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="n">模拟API调用</span><span class="p">(</span><span class="s2">&quot;API-3&quot;</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">),</span>
+    <span class="p">)</span>
+    
+    <span class="n">耗时</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">开始</span>
+    <span class="k">return</span> <span class="n">耗时</span><span class="p">,</span> <span class="n">结果们</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  🔍 测试 1：同步调用（作为基准）&quot;</span><span class="p">)</span>
+<span class="n">同步耗时</span><span class="p">,</span> <span class="n">同步结果</span> <span class="o">=</span> <span class="n">测试同步调用</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;     结果：</span><span class="si">{</span><span class="n">同步耗时</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> 秒&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;     预期：~4.5 秒（1 + 2 + 1.5）&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  🔍 测试 2：异步并发调用（应该是这样）&quot;</span><span class="p">)</span>
+<span class="n">异步耗时</span><span class="p">,</span> <span class="n">异步结果</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">测试异步调用</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;     结果：</span><span class="si">{</span><span class="n">异步耗时</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> 秒&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;     预期：~2.0 秒（取最长的延迟）&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  📊 性能对比：&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;     同步：</span><span class="si">{</span><span class="n">同步耗时</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> 秒&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;     异步：</span><span class="si">{</span><span class="n">异步耗时</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> 秒&quot;</span><span class="p">)</span>
+<span class="n">提升</span> <span class="o">=</span> <span class="p">(</span><span class="n">同步耗时</span> <span class="o">-</span> <span class="n">异步耗时</span><span class="p">)</span> <span class="o">/</span> <span class="n">同步耗时</span> <span class="o">*</span> <span class="mi">100</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;     性能提升：</span><span class="si">{</span><span class="n">提升</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="n">异步耗时</span> <span class="o">&lt;</span> <span class="n">同步耗时</span> <span class="o">*</span> <span class="mf">0.6</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  ✅ 验收通过！异步版本明显快于同步版本&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  ⚠️ 异步版本可能不正确，耗时没有显著减少&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     检查是否真的使用了 asyncio.gather() 或 create_task()&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="c1"># ========================================</span>
+<span class="c1"># 第 4 步：代码质量检查</span>
+<span class="c1"># ========================================</span>
+
+<span class="k">if</span> <span class="n">用户模块</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;【第 4 步】代码质量检查&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">70</span><span class="p">)</span>
+    
+    <span class="n">评分</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">总分</span> <span class="o">=</span> <span class="mi">0</span>
+    
+    <span class="c1"># 检查 1：是否使用了 async/await</span>
+    <span class="n">总分</span> <span class="o">+=</span> <span class="mi">20</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  🔍 检查 1：是否使用了 async def 定义异步函数？（20 分）&quot;</span><span class="p">)</span>
+    
+    <span class="n">异步函数列表</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">用户模块</span><span class="p">):</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">用户模块</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">and</span> <span class="n">inspect</span><span class="o">.</span><span class="n">iscoroutinefunction</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+            <span class="n">异步函数列表</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">异步函数列表</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;     ✅ 发现 </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">异步函数列表</span><span class="p">)</span><span class="si">}</span><span class="s2"> 个异步函数：</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">异步函数列表</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">评分</span> <span class="o">+=</span> <span class="mi">20</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     ❌ 未找到异步函数（使用 async def 定义的函数）&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     💡 提示：确保你的函数用 async def 定义&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">()</span>
+    
+    <span class="c1"># 检查 2：是否使用了 asyncio.gather() 或 create_task()</span>
+    <span class="n">总分</span> <span class="o">+=</span> <span class="mi">20</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  🔍 检查 2：是否使用了 asyncio.gather() 或 create_task()？（20 分）&quot;</span><span class="p">)</span>
+    
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">用户代码文件</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">代码内容</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        
+        <span class="k">if</span> <span class="s2">&quot;asyncio.gather&quot;</span> <span class="ow">in</span> <span class="n">代码内容</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     ✅ 使用了 asyncio.gather()&quot;</span><span class="p">)</span>
+            <span class="n">评分</span> <span class="o">+=</span> <span class="mi">20</span>
+        <span class="k">elif</span> <span class="s2">&quot;create_task&quot;</span> <span class="ow">in</span> <span class="n">代码内容</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     ✅ 使用了 asyncio.create_task()&quot;</span><span class="p">)</span>
+            <span class="n">评分</span> <span class="o">+=</span> <span class="mi">20</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     ❌ 未找到 asyncio.gather() 或 create_task()&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     💡 提示：并发执行多个任务需要用这两个方法之一&quot;</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     ⚠️ 无法读取代码文件&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">()</span>
+    
+    <span class="c1"># 检查 3：是否有错误处理（try/except）</span>
+    <span class="n">总分</span> <span class="o">+=</span> <span class="mi">15</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  🔍 检查 3：是否有错误处理（try/except）？（15 分）&quot;</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="s2">&quot;try&quot;</span> <span class="ow">in</span> <span class="n">代码内容</span> <span class="ow">and</span> <span class="s2">&quot;except&quot;</span> <span class="ow">in</span> <span class="n">代码内容</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     ✅ 有错误处理&quot;</span><span class="p">)</span>
+        <span class="n">评分</span> <span class="o">+=</span> <span class="mi">15</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     ⚠️ 未找到错误处理&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     💡 提示：真实 API 调用可能失败，应该加 try/except&quot;</span><span class="p">)</span>
+    <span class="n">评分</span> <span class="o">+=</span> <span class="mi">15</span>
+    <span class="nb">print</span><span class="p">()</span>
+    
+    <span class="c1"># 检查 4：是否有超时控制（asyncio.timeout）</span>
+    <span class="n">总分</span> <span class="o">+=</span> <span class="mi">15</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  🔍 检查 4：是否有超时控制（asyncio.timeout）？（15 分）&quot;</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="s2">&quot;timeout&quot;</span> <span class="ow">in</span> <span class="n">代码内容</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     ✅ 有超时控制&quot;</span><span class="p">)</span>
+        <span class="n">评分</span> <span class="o">+=</span> <span class="mi">15</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     ⚠️ 未找到超时控制&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     💡 提示：API 调用可能卡死，应该用 async with asyncio.timeout():&quot;</span><span class="p">)</span>
+    <span class="n">评分</span> <span class="o">+=</span> <span class="mi">15</span>
+    <span class="nb">print</span><span class="p">()</span>
+    
+    <span class="c1"># 检查 5：是否有类型注解</span>
+    <span class="n">总分</span> <span class="o">+=</span> <span class="mi">10</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  🔍 检查 5：是否有类型注解？（10 分）&quot;</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="s2">&quot;:&quot;</span> <span class="ow">in</span> <span class="n">代码内容</span> <span class="ow">and</span> <span class="s2">&quot;-&gt;&quot;</span> <span class="ow">in</span> <span class="n">代码内容</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     ✅ 有类型注解&quot;</span><span class="p">)</span>
+        <span class="n">评分</span> <span class="o">+=</span> <span class="mi">10</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     ⚠️ 未找到类型注解&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     💡 提示：类型注解可以帮助 IDE 提供更好的提示&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">()</span>
+    
+    <span class="c1"># 检查 6：是否有文档字符串（docstring）</span>
+    <span class="n">总分</span> <span class="o">+=</span> <span class="mi">10</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  🔍 检查 6：是否有文档字符串（docstring）？（10 分）&quot;</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="s1">&#39;&quot;&quot;&quot;&#39;</span> <span class="ow">in</span> <span class="n">代码内容</span> <span class="ow">or</span> <span class="s2">&quot;&#39;&#39;&#39;&quot;</span> <span class="ow">in</span> <span class="n">代码内容</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     ✅ 有文档字符串&quot;</span><span class="p">)</span>
+        <span class="n">评分</span> <span class="o">+=</span> <span class="mi">10</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     ⚠️ 未找到文档字符串&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     💡 提示：在函数内部第一行用三引号写文档&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">()</span>
+    
+    <span class="c1"># 检查 7：是否使用了 time.sleep()（常见错误）</span>
+    <span class="n">总分</span> <span class="o">+=</span> <span class="mi">10</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  🔍 检查 7：是否错误地在异步函数中使用了 time.sleep()？（扣分项）&quot;</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="s2">&quot;time.sleep&quot;</span> <span class="ow">in</span> <span class="n">代码内容</span> <span class="ow">and</span> <span class="s2">&quot;async def&quot;</span> <span class="ow">in</span> <span class="n">代码内容</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     ❌ 发现 time.sleep()！这会阻塞事件循环！&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     💡 应该改为 await asyncio.sleep()&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;     ✅ 未误用 time.sleep()&quot;</span><span class="p">)</span>
+        <span class="n">评分</span> <span class="o">+=</span> <span class="mi">10</span>
+    <span class="nb">print</span><span class="p">()</span>
+    
+    <span class="c1"># 总结评分</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  &quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">70</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  📈 代码质量评分：</span><span class="si">{</span><span class="n">评分</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">总分</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  &quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">70</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">()</span>
+    
+    <span class="k">if</span> <span class="n">评分</span> <span class="o">&gt;=</span> <span class="n">总分</span> <span class="o">*</span> <span class="mf">0.8</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  🎉 优秀！代码质量很高&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">评分</span> <span class="o">&gt;=</span> <span class="n">总分</span> <span class="o">*</span> <span class="mf">0.6</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  👍 良好！还可以改进&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  💪 需要努力！建议参考教程并重写&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">()</span>
+
+<span class="c1"># ========================================</span>
+<span class="c1"># 第 5 步：提供参考实现</span>
+<span class="c1"># ========================================</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;【第 5 步】提供参考实现（如果卡住了可以参考）&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">70</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;以下是一个正确的实现示例：&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;```python</span>
+<span class="s2">import asyncio</span>
+<span class="s2">import time</span>
+<span class="s2">from typing import List, Dict, Any</span>
+
+<span class="s2">async def 调用API(api名称: str, 参数: Dict[str, Any], 延迟: float = 1.0) -&gt; Dict[str, Any]:</span>
+<span class="s2">    </span><span class="se">\&quot;\&quot;\&quot;</span><span class="s2">调用单个 API（异步）</span><span class="se">\&quot;\&quot;\&quot;</span>
+<span class="s2">    print(f&quot;  🔧 正在调用 </span><span class="si">{api名称}</span><span class="s2">...&quot;)</span>
+<span class="s2">    try:</span>
+<span class="s2">        async with asyncio.timeout(5):  # 超时控制</span>
+<span class="s2">            await asyncio.sleep(延迟)  # 模拟网络延迟</span>
+<span class="s2">            result = {</span>
+<span class="s2">                &quot;api&quot;: api名称,</span>
+<span class="s2">                &quot;params&quot;: 参数,</span>
+<span class="s2">                &quot;result&quot;: f&quot;处理结果：</span><span class="si">{参数}</span><span class="s2">&quot;,</span>
+<span class="s2">                &quot;耗时&quot;: 延迟</span>
+<span class="s2">            }</span>
+<span class="s2">            print(f&quot;  ✅ </span><span class="si">{api名称}</span><span class="s2"> 调用成功&quot;)</span>
+<span class="s2">            return result</span>
+<span class="s2">    except asyncio.TimeoutError:</span>
+<span class="s2">        print(f&quot;  ❌ </span><span class="si">{api名称}</span><span class="s2"> 调用超时&quot;)</span>
+<span class="s2">        return {&quot;error&quot;: &quot;timeout&quot;}</span>
+<span class="s2">    except Exception as e:</span>
+<span class="s2">        print(f&quot;  ❌ </span><span class="si">{api名称}</span><span class="s2"> 调用失败：</span><span class="si">{e}</span><span class="s2">&quot;)</span>
+<span class="s2">        return {&quot;error&quot;: str(e)}</span>
+
+<span class="s2">async def 批量调用API_异步(api列表: List[Dict[str, Any]]) -&gt; List[Dict[str, Any]]:</span>
+<span class="s2">    </span><span class="se">\&quot;\&quot;\&quot;</span><span class="s2">异步并发调用多个 API</span><span class="se">\&quot;\&quot;\&quot;</span>
+<span class="s2">    print(f&quot;🚀 开始异步并发调用 {len(api列表)} 个 API...&quot;)</span>
+<span class="s2">    开始时间 = time.time()</span>
+<span class="s2">    </span>
+<span class="s2">    # 使用 gather 并发执行</span>
+<span class="s2">    results = await asyncio.gather(</span>
+<span class="s2">        *(调用API(api[&quot;name&quot;], api[&quot;params&quot;], api.get(&quot;delay&quot;, 1.0)) for api in api列表),</span>
+<span class="s2">        return_exceptions=True  # 即使有异常也不中断</span>
+<span class="s2">    )</span>
+<span class="s2">    </span>
+<span class="s2">    总耗时 = time.time() - 开始时间</span>
+<span class="s2">    print(f&quot;✅ 全部完成！总耗时：</span><span class="si">{总耗时:.2f}</span><span class="s2"> 秒&quot;)</span>
+<span class="s2">    return results</span>
+
+<span class="s2">def 批量调用API_同步(api列表: List[Dict[str, Any]]) -&gt; List[Dict[str, Any]]:</span>
+<span class="s2">    </span><span class="se">\&quot;\&quot;\&quot;</span><span class="s2">同步逐个调用多个 API（作为对比）</span><span class="se">\&quot;\&quot;\&quot;</span>
+<span class="s2">    print(f&quot;🐢 开始同步逐个调用 {len(api列表)} 个 API...&quot;)</span>
+<span class="s2">    开始时间 = time.time()</span>
+<span class="s2">    </span>
+<span class="s2">    results = []</span>
+<span class="s2">    for api in api列表:</span>
+<span class="s2">        print(f&quot;  🔧 正在调用 </span><span class="si">{api[&#39;name&#39;]}</span><span class="s2">...&quot;)</span>
+<span class="s2">        time.sleep(api.get(&quot;delay&quot;, 1.0))  # ❌ 真实代码中不要用 time.sleep</span>
+<span class="s2">        results.append({</span>
+<span class="s2">            &quot;api&quot;: api[&quot;name&quot;],</span>
+<span class="s2">            &quot;result&quot;: f&quot;处理结果：</span><span class="si">{api[&#39;params&#39;]}</span><span class="s2">&quot;</span>
+<span class="s2">        })</span>
+<span class="s2">        print(f&quot;  ✅ </span><span class="si">{api[&#39;name&#39;]}</span><span class="s2"> 调用成功&quot;)</span>
+<span class="s2">    </span>
+<span class="s2">    总耗时 = time.time() - 开始时间</span>
+<span class="s2">    print(f&quot;✅ 全部完成！总耗时：</span><span class="si">{总耗时:.2f}</span><span class="s2"> 秒&quot;)</span>
+<span class="s2">    return results</span>
+
+<span class="s2"># 主函数</span>
+<span class="s2">async def main():</span>
+<span class="s2">    # 准备测试数据</span>
+<span class="s2">    api列表 = [</span>
+<span class="s2">        {&quot;name&quot;: &quot;天气API&quot;, &quot;params&quot;: {&quot;city&quot;: &quot;北京&quot;}, &quot;delay&quot;: 2.0},</span>
+<span class="s2">        {&quot;name&quot;: &quot;翻译API&quot;, &quot;params&quot;: {&quot;text&quot;: &quot;Hello&quot;}, &quot;delay&quot;: 1.5},</span>
+<span class="s2">        {&quot;name&quot;: &quot;搜索API&quot;, &quot;params&quot;: {&quot;query&quot;: &quot;AI Agent&quot;}, &quot;delay&quot;: 1.0},</span>
+<span class="s2">        {&quot;name&quot;: &quot;计算API&quot;, &quot;params&quot;: {&quot;expr&quot;: &quot;2+3*4&quot;}, &quot;delay&quot;: 0.5},</span>
+<span class="s2">    ]</span>
+<span class="s2">    </span>
+<span class="s2">    print(&quot;=&quot; * 70)</span>
+<span class="s2">    print(&quot;测试 1：同步调用（慢）&quot;)</span>
+<span class="s2">    print(&quot;=&quot; * 70)</span>
+<span class="s2">    同步结果 = 批量调用API_同步(api列表)</span>
+<span class="s2">    print()</span>
+<span class="s2">    </span>
+<span class="s2">    print(&quot;=&quot; * 70)</span>
+<span class="s2">    print(&quot;测试 2：异步并发调用（快）&quot;)</span>
+<span class="s2">    print(&quot;=&quot; * 70)</span>
+<span class="s2">    异步结果 = await 批量调用API_异步(api列表)</span>
+<span class="s2">    print()</span>
+<span class="s2">    </span>
+<span class="s2">    print(&quot;=&quot; * 70)</span>
+<span class="s2">    print(&quot;结果对比&quot;)</span>
+<span class="s2">    print(&quot;=&quot; * 70)</span>
+<span class="s2">    for i, (同步, 异步) in enumerate(zip(同步结果, 异步结果)):</span>
+<span class="s2">        print(f&quot;{i+1}. </span><span class="si">{api列表[i][&#39;name&#39;]}</span><span class="s2">&quot;)</span>
+<span class="s2">        print(f&quot;   同步：</span><span class="si">{同步}</span><span class="s2">&quot;)</span>
+<span class="s2">        print(f&quot;   异步：</span><span class="si">{异步}</span><span class="s2">&quot;)</span>
+
+<span class="s2">if __name__ == &quot;__main__&quot;:</span>
+<span class="s2">    asyncio.run(main())</span>
+<span class="s2">```&quot;&quot;&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">70</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;📋 验收总结&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">70</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✅ 你的练习项目正确的标志：&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  1. 使用了 async/await 语法&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  2. 使用了 asyncio.gather() 或 create_task() 实现并发&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  3. 异步版本比同步版本快至少 30%&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  4. 有错误处理（try/except）&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  5. 有超时控制（asyncio.timeout）&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  6. 没有在异步函数中使用 time.sleep()&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;🎯 下一步：&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  如果通过了本验收，继续 Day 2 的学习！&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  如果未通过，参考上面的代码示例并重写你的练习。&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">70</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+<button class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="返回顶部">⬆</button>
+<script>window.addEventListener("scroll",function(){  var btn=document.querySelector(".back-top");  if(btn)btn.style.display=window.scrollY>300?"block":"none";});</script>
+</body>
+</html>

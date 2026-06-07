@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📋 练习验收标准 — Python AI Agent 15 天学习路线图</title>
+    <style>
+        
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height:1.6; color:#333;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding:0;
+}
+.nav-sidebar {
+    width:250px; min-width:250px;
+    background: #181825;
+    color: #ffffff;
+    padding: 20px 15px;
+    font-size:14px;
+    overflow-y:auto;
+    height:100vh;
+    position:sticky; top:0;
+    display:flex; flex-direction:column;
+    gap:2px;
+}
+.nav-sidebar h3 {
+    color:#f5c2e7; font-size:15px; margin:18px 0 8px 0;
+    border-bottom:1px solid #45475a; padding-bottom:6px;
+}
+.nav-sidebar h3:first-child { margin-top:0; }
+.nav-sidebar h4 {
+    color:#a6e3a1; font-size:13px; margin:14px 0 4px 0;
+    font-weight:600;
+}
+.nav-sidebar a {
+    color:#89dceb; display:block; padding:5px 12px; font-size:13px;
+    border-radius:4px; text-decoration:none; transition:background 0.2s, color 0.2s;
+}
+.nav-sidebar a:hover {
+    background:#313244; color:#ffffff; text-decoration:none;
+}
+.nav-sidebar a.active {
+    background:#45475a; color:#ffffff; font-weight:700;
+    border-left:3px solid #f5c2e7; padding-left:9px;
+}
+.nav-wrapper { display:flex; min-height:100vh; }
+.main-content {
+    flex:1; min-width:0;
+    margin:20px 20px 20px 0; background:white; border-radius:10px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    overflow:hidden;
+}
+/* 返回顶部按钮 */
+.back-top {
+    position:fixed; bottom:30px; right:30px;
+    background:#667eea; color:white; border:none;
+    width:48px; height:48px; border-radius:50%;
+    cursor:pointer; font-size:20px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.3); display:none; z-index:999;
+    transition:background 0.3s;
+}
+.back-top:hover { background:#764ba2; }
+
+/* ── 内容区样式 ── */
+.header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color:white; padding:40px; text-align:center;
+}
+.header h1 { font-size:2.2em; margin-bottom:10px; text-shadow:2px 2px 4px rgba(0,0,0,0.2); }
+.header .meta { font-size:1.1em; opacity:0.9; }
+.content { padding:40px; }
+h1 { color:#667eea; border-bottom:3px solid #667eea; padding-bottom:10px; margin-top:30px; margin-bottom:20px; }
+h2 { color:#764ba2; margin-top:25px; margin-bottom:15px; border-left:5px solid #764ba2; padding-left:15px; }
+h3 { color:#555; margin-top:20px; margin-bottom:10px; }
+p { margin-bottom:15px; }
+.styled-table {
+    width:100%; border-collapse:collapse; margin:20px 0;
+    box-shadow:0 2px 15px rgba(0,0,0,0.1); border-radius:8px; overflow:hidden;
+}
+.styled-table thead { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white; }
+.styled-table th, .styled-table td { padding:12px 15px; text-align:left; border-bottom:1px solid #ddd; }
+.styled-table tbody tr:hover { background-color:#f5f5f5; }
+.styled-table tbody tr:nth-of-type(even) { background-color:#f9f9f9; }
+.code-block {
+    background:#282c34; color:#abb2bf; padding:15px;
+    border-radius:8px; overflow-x:auto; margin:15px 0;
+    box-shadow:0 4px 6px rgba(0,0,0,0.1);
+}
+code { background:#f4f4f4; padding:2px 6px; border-radius:3px; font-family:'Courier New',monospace; color:#e83e8c; }
+.code-block code { background:transparent; color:inherit; padding:0; }
+.note-block {
+    background:#fff3cd; border-left:5px solid #ffc107;
+    padding:15px; margin:15px 0; border-radius:4px;
+}
+ul, ol { margin-left:25px; margin-bottom:15px; }
+li { margin-bottom:8px; }
+a { color:#667eea; text-decoration:none; transition:color 0.3s; }
+a:hover { color:#764ba2; text-decoration:underline; }
+hr { border:none; height:2px; background:linear-gradient(to right,#667eea,#764ba2); margin:30px 0; }
+pre { position:relative; overflow-x:auto; }
+@media print { body { background:white; padding:0; } .main-content { box-shadow:none; } .nav-sidebar { display:none; } .back-top { display:none; } }
+@media (max-width:900px) {
+    .nav-sidebar { width:200px; min-width:200px; font-size:13px; padding:15px 10px; }
+    .header h1 { font-size:1.6em; }
+    .content { padding:20px; }
+}
+@media (max-width:650px) {
+    .nav-wrapper { flex-direction:column; }
+    .nav-sidebar { width:100%; min-width:100%; height:auto; position:relative; flex-direction:row; flex-wrap:wrap; gap:5px; padding:10px; }
+    .nav-sidebar h3, .nav-sidebar h4 { display:none; }
+}
+
+        
+        
+    </style>
+</head>
+<body>
+<div class="nav-wrapper">
+<div class="nav-sidebar">
+<h3>资源导航</h3>
+<a class="" href="index.html">学习路线图 (主页)</a>
+<a class="active" href="ACCEPTANCE_CRITERIA.html">验收标准</a>
+<h4>实战教程</h4>
+<a class="" href="tutorial_01_decorators.html">装饰器 8 步教程</a>
+<a class="" href="tutorial_02_async.html">异步 9 步教程</a>
+<h4>Day 1-3 (基础)</h4>
+<a class="" href="day01_practice_template.html">Day 1 - 模板</a>
+<a class="" href="day01_practice_validator.html">Day 1 - 验收</a>
+<a class="" href="day02_practice_template.html">Day 2 - 模板</a>
+<a class="" href="day02_practice_validator.html">Day 2 - 验收</a>
+<a class="" href="day03_practice_template.html">Day 3 - 模板</a>
+<a class="" href="day03_practice_validator.html">Day 3 - 验收</a>
+<h4>Day 4-5 (LLM)</h4>
+<a class="" href="day04_practice_template.html">Day 4 - 模板</a>
+<a class="" href="day04_practice_validator.html">Day 4 - 验收</a>
+<a class="" href="day05_practice_template.html">Day 5 - 模板</a>
+<a class="" href="day05_practice_validator.html">Day 5 - 验收</a>
+<h4>Day 6-7 (Agent)</h4>
+<a class="" href="day06_practice_template.html">Day 6 - 模板</a>
+<a class="" href="day06_practice_validator.html">Day 6 - 验收</a>
+<a class="" href="day07_practice_template.html">Day 7 - 模板</a>
+<a class="" href="day07_practice_validator.html">Day 7 - 验收</a>
+<h4>Day 8-10 (高级)</h4>
+<a class="" href="day08_practice_template.html">Day 8 - 模板</a>
+<a class="" href="day09_practice_template.html">Day 9 - 模板</a>
+<a class="" href="day10_practice_template.html">Day 10 - 模板</a>
+</div>
+<div class="main-content">
+    
+    <div class="content">
+        <h1 id="ai-agent">📋 AI Agent 学习路线验收标准文档</h1>
+<p>本文档详细说明每个练习项目的验收标准、验证方法和预期结果。</p>
+<hr/>
+<h2 id="day-1">📅 Day 1：异步编程核心</h2>
+<h3 id="api-agent">练习项目：异步批量调用多个 API（模拟 Agent 多工具并发调用）</h3>
+<h4 id="6">✅ 验收标准（6 条）</h4>
+<table class="styled-table">
+<thead>
+<tr>
+<th>序号</th>
+<th>验收标准</th>
+<th>验证方法</th>
+<th>分值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>使用了 <code>async/await</code> 语法</strong></td>
+<td>代码中用 <code>async def</code> 定义函数，用 <code>await</code> 调用异步操作</td>
+<td>20 分</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>使用了 <code>asyncio.gather()</code> 或 <code>create_task()</code></strong></td>
+<td>并发执行多个任务，不是逐个 <code>await</code></td>
+<td>20 分</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>异步版本比同步版本快至少 30%</strong></td>
+<td>运行同步和异步两个版本，对比耗时</td>
+<td>20 分</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>有错误处理（<code>try/except</code>）</strong></td>
+<td>捕获可能的异常（超时、网络错误等）</td>
+<td>15 分</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>有超时控制（<code>asyncio.timeout</code>）</strong></td>
+<td>使用 <code>async with asyncio.timeout(秒数):</code></td>
+<td>15 分</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>没有在异步函数中误用 <code>time.sleep()</code></strong></td>
+<td>全文搜索 <code>time.sleep</code>，如果和 <code>async</code> 同时出现则扣分</td>
+<td>10 分</td>
+</tr>
+</tbody>
+</table>
+<p><strong>总分：100 分</strong>
+- <strong>80-100 分</strong>：✅ 验收通过，继续 Day 2
+- <strong>60-79 分</strong>：⚠️ 基本通过，但有改进空间
+- <strong>60 分以下</strong>：❌ 未通过，需要重做</p>
+<h4 id="_1">🔍 验收方式</h4>
+<div class="codehilite"><pre class="code-block"><span></span><code><span class="c1"># 方式 1：自动验收脚本（推荐）</span>
+python<span class="w"> </span>day01_practice_validator.py
+
+<span class="c1"># 方式 2：手动运行你的练习代码</span>
+python<span class="w"> </span>your_file.py
+<span class="c1"># 观察输出：异步总耗时应明显小于同步总耗时</span>
+</code></pre></div>
+<h4 id="_2">📊 预期性能指标</h4>
+<table class="styled-table">
+<thead>
+<tr>
+<th>调用方式</th>
+<th>5 个 API 的延迟</th>
+<th>预期总耗时</th>
+<th>性能提升</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>同步（逐个）</td>
+<td>1s × 5</td>
+<td>~5s</td>
+<td>-</td>
+</tr>
+<tr>
+<td>异步（并发）</td>
+<td>最长的延迟</td>
+<td>~1s</td>
+<td><strong>~80%</strong></td>
+</tr>
+</tbody>
+</table>
+<h4 id="_3">💡 完整标准答案</h4>
+<p>参考文件 <code>tutorial_02_async.py</code>（运行它跟着学）</p>
+<hr/>
+<h2 id="day-2">📅 Day 2：类型系统与装饰器进阶</h2>
+<h3 id="pydantic-tool-schema">练习项目：用 Pydantic 定义 Tool Schema，并用装饰器实现工具注册机制</h3>
+<h4 id="8">✅ 验收标准（8 条）</h4>
+<table class="styled-table">
+<thead>
+<tr>
+<th>序号</th>
+<th>验收标准</th>
+<th>验证方法</th>
+<th>分值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>使用 Pydantic v2 定义输入/输出 Schema</strong></td>
+<td>定义了继承 <code>BaseModel</code> 的类</td>
+<td>15 分</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>实现了 <code>@工具</code> 装饰器（三层嵌套）</strong></td>
+<td>装饰器工厂函数，接受名称/描述参数</td>
+<td>15 分</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>装饰器内正确使用 <code>@functools.wraps</code></strong></td>
+<td>保留原函数的 <code>__name__</code> 和 <code>__doc__</code></td>
+<td>15 分</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>装饰器将函数注册到全局工具注册表</strong></td>
+<td>存在 <code>工具注册表</code> 字典，有注册逻辑</td>
+<td>10 分</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>注册了至少 3 个不同功能的工具</strong></td>
+<td>用 <code>@工具</code> 装饰了至少 3 个函数</td>
+<td>15 分</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>包装函数内有输入/输出 Pydantic 验证</strong></td>
+<td>用 <code>模型.model_validate()</code> 或类似方法</td>
+<td>10 分</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>代码有类型注解</strong></td>
+<td>函数有 <code>-&gt;</code> 返回值类型注解</td>
+<td>10 分</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>代码可运行，工具可被调用</strong></td>
+<td>运行 <code>python 你的文件.py</code> 无报错</td>
+<td>10 分</td>
+</tr>
+</tbody>
+</table>
+<p><strong>总分：100 分</strong>
+- <strong>80-100 分</strong>：✅ 验收通过
+- <strong>60-79 分</strong>：⚠️ 基本通过
+- <strong>60 分以下</strong>：❌ 未通过</p>
+<h4 id="_4">🔍 验收方式</h4>
+<div class="codehilite"><pre class="code-block"><span></span><code><span class="c1"># 自动验收脚本</span>
+python<span class="w"> </span>day02_practice_validator.py
+
+<span class="c1"># 指定文件</span>
+python<span class="w"> </span>day02_practice_validator.py<span class="w"> </span>--file<span class="w"> </span>my_practice.py
+</code></pre></div>
+<h4 id="_5">💡 关键检查点</h4>
+<div class="codehilite"><pre class="code-block"><span></span><code><span class="c1"># ✅ 正确的装饰器写法</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">工具</span><span class="p">(</span><span class="n">名称</span><span class="p">,</span> <span class="n">描述</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">装饰器</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+        <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>   <span class="c1"># ← 必须有！</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">包装</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="c1"># 输入验证</span>
+            <span class="n">输入</span> <span class="o">=</span> <span class="n">输入模型</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="c1"># 调用原函数</span>
+            <span class="n">结果</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">**</span><span class="n">输入</span><span class="o">.</span><span class="n">model_dump</span><span class="p">())</span>
+            <span class="c1"># 输出验证</span>
+            <span class="k">return</span> <span class="n">输出模型</span><span class="p">(</span><span class="o">**</span><span class="n">结果</span><span class="p">)</span>
+        <span class="c1"># 注册</span>
+        <span class="n">工具注册表</span><span class="p">[</span><span class="n">名称</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"函数"</span><span class="p">:</span> <span class="n">包装</span><span class="p">,</span> <span class="s2">"描述"</span><span class="p">:</span> <span class="n">描述</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">包装</span>
+    <span class="k">return</span> <span class="n">装饰器</span>
+</code></pre></div>
+<h4 id="_6">💡 完整标准答案</h4>
+<p>参考文件 <code>tutorial_01_decorators.py</code>（第 8 步：AI Agent 实战）</p>
+<hr/>
+<h2 id="day-3">📅 Day 3：生成器、迭代器与上下文管理器</h2>
+<h3 id="llm">练习项目：实现一个流式 LLM 响应的异步生成器包装器</h3>
+<h4 id="8_1">✅ 验收标准（8 条）</h4>
+<table class="styled-table">
+<thead>
+<tr>
+<th>序号</th>
+<th>验收标准</th>
+<th>验证方法</th>
+<th>分值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>实现了同步生成器（<code>def</code> + <code>yield</code>）</strong></td>
+<td>函数内用 <code>yield</code> 产出值，不是 <code>return</code></td>
+<td>10 分</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>实现了异步生成器（<code>async def</code> + <code>yield</code>）</strong></td>
+<td>异步函数内用 <code>yield</code></td>
+<td>15 分</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>流式输出：多次 <code>yield</code>，不是一次返回</strong></td>
+<td>生成器函数内有至少 2 个 <code>yield</code></td>
+<td>15 分</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>实现了同步上下文管理器（<code>__enter__</code>/<code>__exit__</code>）</strong></td>
+<td>定义了包含这两个方法的类</td>
+<td>10 分</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>或使用了 <code>@contextmanager</code> 实现上下文管理器</strong></td>
+<td>函数用 <code>@contextmanager</code> 装饰</td>
+<td>10 分</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>实现了异步上下文管理器（<code>__aenter__</code>/<code>__aexit__</code>）</strong></td>
+<td>定义了包含这两个方法的类</td>
+<td>15 分</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>或使用了 <code>@asynccontextmanager</code></strong></td>
+<td>异步函数用 <code>@asynccontextmanager</code> 装饰</td>
+<td>10 分</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>代码可运行，生成器可被 <code>for</code>/<code>async for</code> 迭代</strong></td>
+<td>运行无报错</td>
+<td>15 分</td>
+</tr>
+</tbody>
+</table>
+<p><strong>总分：100 分</strong></p>
+<h4 id="_7">🔍 验收方式</h4>
+<div class="codehilite"><pre class="code-block"><span></span><code>python<span class="w"> </span>day03_practice_validator.py
+</code></pre></div>
+<h4 id="_8">💡 关键代码示例</h4>
+<div class="codehilite"><pre class="code-block"><span></span><code><span class="c1"># 异步生成器（核心）</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">流式输出</span><span class="p">(</span><span class="n">提示词</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+    <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"我"</span><span class="p">,</span> <span class="s2">"喜欢"</span><span class="p">,</span> <span class="s2">"写代码"</span><span class="p">]:</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>   <span class="c1"># 模拟延迟</span>
+        <span class="k">yield</span> <span class="n">chunk</span>                     <span class="c1"># ← 多次 yield</span>
+
+<span class="c1"># 使用</span>
+<span class="k">async</span> <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">流式输出</span><span class="p">(</span><span class="s2">"Hello"</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">chunk</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">""</span><span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="day-4llm-api-prompt">📅 Day 4：LLM API 调用与 Prompt 工程</h2>
+<h3 id="function-calling-llm">练习项目：实现支持 Function Calling 的 LLM 客户端</h3>
+<h4 id="_9">✅ 验收标准</h4>
+<table class="styled-table">
+<thead>
+<tr>
+<th>序号</th>
+<th>验收标准</th>
+<th>验证方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>能调用 LLM API（OpenAI 兼容格式）</strong></td>
+<td>用 <code>aiohttp</code>/<code>httpx</code> 发送异步 HTTP 请求</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>请求格式正确：包含 <code>messages</code>、<code>model</code> 字段</strong></td>
+<td>检查请求体结构</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>能解析 LLM 返回的 JSON 响应</strong></td>
+<td>用 <code>response.json()</code> 解析</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>实现了 Function Calling：发送 <code>tools</code> 参数</strong></td>
+<td>请求体包含 <code>tools</code> 字段（OpenAI 格式）</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>能解析 LLM 的 <code>tool_calls</code> 响应</strong></td>
+<td>从响应中提取 <code>function.name</code> 和 <code>function.arguments</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>能根据 <code>tool_calls</code> 执行对应函数</strong></td>
+<td>调用本地 Python 函数，传入解析后的参数</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>将函数执行结果返回给 LLM（追加 <code>role: tool</code> 消息）</strong></td>
+<td>构造正确的消息格式</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>有错误处理：JSON 解析失败重试</strong></td>
+<td><code>try/except</code> + 重试逻辑</td>
+</tr>
+</tbody>
+</table>
+<h4 id="_10">🔍 验收方式</h4>
+<div class="codehilite"><pre class="code-block"><span></span><code><span class="c1"># 需要有 API Key 才能完整测试</span>
+<span class="c1"># 可以先用 mock 模式测试逻辑</span>
+
+python<span class="w"> </span>your_day04_practice.py
+<span class="c1"># 预期：LLM 会选择调用工具 → 执行工具 → LLM 根据结果生成最终回答</span>
+</code></pre></div>
+<h4 id="_11">💡 关键流程</h4>
+<div class="codehilite"><pre class="code-block"><span></span><code><span class="err">用户提问</span>
+<span class="w">  </span><span class="err">↓</span>
+<span class="err">构造</span><span class="w"> </span><span class="n">messages</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">tools</span><span class="err">，调用</span><span class="w"> </span><span class="n">LLM</span><span class="w"> </span><span class="n">API</span>
+<span class="w">  </span><span class="err">↓</span>
+<span class="n">LLM</span><span class="w"> </span><span class="err">返回</span><span class="w"> </span><span class="n">tool_calls</span><span class="err">？（是</span><span class="o">/</span><span class="err">否）</span>
+<span class="w">  </span><span class="err">├─</span><span class="w"> </span><span class="err">是</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="err">解析</span><span class="w"> </span><span class="n">tool_calls</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="err">执行对应函数</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="err">结果追加到</span><span class="w"> </span><span class="n">messages</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="err">再次调用</span><span class="w"> </span><span class="n">LLM</span>
+<span class="w">  </span><span class="err">└─</span><span class="w"> </span><span class="err">否</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="err">返回最终回答</span>
+</code></pre></div>
+<hr/>
+<h2 id="day-5-ai">📅 Day 5：阶段一实战——命令行 AI 助手</h2>
+<h3 id="pydantic-function-calling">练习项目：综合练习，集成异步 + Pydantic + Function Calling + 流式输出</h3>
+<h4 id="_12">✅ 验收标准（手动检查清单）</h4>
+<ul>
+<li>[ ] 用户在命令行输入自然语言，程序能理解意图</li>
+<li>[ ] 支持至少 2 个工具调用（如：计算器、天气查询）</li>
+<li>[ ] 工具调用使用 Function Calling 机制（不是关键词匹配）</li>
+<li>[ ] 异步并发处理多个工具调用（<code>asyncio.gather</code>）</li>
+<li>[ ] LLM 响应支持流式输出（<code>yield</code> chunk by chunk）</li>
+<li>[ ] 所有数据结构用 Pydantic 定义</li>
+<li>[ ] 有基本的错误处理（API 失败、工具执行失败）</li>
+<li>[ ] 代码有类型注解</li>
+</ul>
+<h4 id="_13">🔍 验收方式</h4>
+<div class="codehilite"><pre class="code-block"><span></span><code><span class="c1"># 运行命令行助手</span>
+python<span class="w"> </span>your_cli_agent.py
+
+<span class="c1"># 测试对话</span>
+&gt;<span class="w"> </span>帮我计算<span class="w"> </span><span class="m">3</span><span class="w"> </span>+<span class="w"> </span><span class="m">5</span><span class="w"> </span>*<span class="w"> </span><span class="m">2</span>
+<span class="c1"># 预期：Agent 调用计算器工具，返回 13</span>
+
+&gt;<span class="w"> </span>北京今天天气怎么样？
+<span class="c1"># 预期：Agent 调用天气查询工具，返回天气信息</span>
+</code></pre></div>
+<hr/>
+<h2 id="day-6agent">📅 Day 6：Agent 架构原理（核心！）</h2>
+<h3 id="python-react-agent">练习项目：不依赖框架，纯 Python 手写一个 ReAct Agent 循环</h3>
+<h4 id="8_2">✅ 验收标准（8 条）</h4>
+<table class="styled-table">
+<thead>
+<tr>
+<th>序号</th>
+<th>验收标准</th>
+<th>验证方法</th>
+<th>分值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>实现了 ReAct 主循环（for/while + max_steps）</strong></td>
+<td>有循环结构，有步数上限</td>
+<td>15 分</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>循环内正确构建 ReAct Prompt</strong></td>
+<td>Prompt 包含 Thought/Action/Action Input/Observation 格式说明</td>
+<td>10 分</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>能解析 LLM 返回的 ReAct 格式</strong></td>
+<td>用正则或字符串方法提取 Action 和 Action Input</td>
+<td>15 分</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>能根据 Action 执行对应工具</strong></td>
+<td>有 <code>execute_tool()</code> 函数</td>
+<td>10 分</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>工具执行结果加入下一步的 Prompt</strong></td>
+<td>拼接 Observation 到下一次请求</td>
+<td>10 分</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>能识别"Final Answer"并终止循环</strong></td>
+<td>解析到 Final Answer 后 <code>return</code></td>
+<td>15 分</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>使用了 <code>async/await</code>（异步 LLM 调用）</strong></td>
+<td>主函数是 <code>async def</code>，内部用 <code>await</code></td>
+<td>15 分</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>代码可运行，Agent 能完成多步推理任务</strong></td>
+<td>运行后 Agent 能正确使用工具并给出答案</td>
+<td>10 分</td>
+</tr>
+</tbody>
+</table>
+<p><strong>总分：100 分</strong></p>
+<h4 id="_14">🔍 验收方式</h4>
+<div class="codehilite"><pre class="code-block"><span></span><code>python<span class="w"> </span>day06_practice_validator.py
+</code></pre></div>
+<h4 id="react">💡 ReAct 循环伪代码</h4>
+<div class="codehilite"><pre class="code-block"><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">react_agent</span><span class="p">(</span><span class="n">user_input</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">):</span>
+    <span class="n">messages</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"system"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="n">SYSTEM_PROMPT</span><span class="p">}]</span>
+    <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"user"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="n">user_input</span><span class="p">})</span>
+
+    <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_steps</span><span class="p">):</span>
+        <span class="c1"># 1. 调用 LLM</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">llm_chat</span><span class="p">(</span><span class="n">messages</span><span class="p">)</span>
+
+        <span class="c1"># 2. 解析响应</span>
+        <span class="n">thought</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">action_input</span> <span class="o">=</span> <span class="n">parse_react_response</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+
+        <span class="c1"># 3. 如果是 Final Answer，返回</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">action</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">action_input</span>  <span class="c1"># 最终答案</span>
+
+        <span class="c1"># 4. 执行工具</span>
+        <span class="n">observation</span> <span class="o">=</span> <span class="k">await</span> <span class="n">execute_tool</span><span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">action_input</span><span class="p">)</span>
+
+        <span class="c1"># 5. 把结果加入 messages</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"assistant"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="n">response</span><span class="p">})</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"user"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Observation: </span><span class="si">{</span><span class="n">observation</span><span class="si">}</span><span class="s2">"</span><span class="p">})</span>
+
+    <span class="k">return</span> <span class="s2">"达到最大步数限制"</span>
+</code></pre></div>
+<hr/>
+<h2 id="day-7langgraph">📅 Day 7：LangGraph 入门</h2>
+<h3 id="langgraph-react-agent">练习项目：用 LangGraph 实现带条件分支的 ReAct Agent</h3>
+<h4 id="_15">✅ 验收标准（手动检查清单）</h4>
+<ul>
+<li>[ ] 使用 <code>StateGraph</code> 定义 Agent 状态</li>
+<li>[ ] 定义了至少 2 个 Node（如：<code>call_model</code>、<code>call_tool</code>）</li>
+<li>[ ] 定义了 Edge（如：<code>call_model</code> → <code>call_tool</code> 或 <code>END</code>）</li>
+<li>[ ] 使用了 <code>add_conditional_edges</code>（条件路由）</li>
+<li>[ ] State 类型用 TypedDict 或 Pydantic 模型定义</li>
+<li>[ ] Agent 能完成多步推理（和 Day 6 功能相同，但用 LangGraph 实现）</li>
+<li>[ ] 代码可运行</li>
+</ul>
+<h4 id="_16">🔍 验收方式</h4>
+<div class="codehilite"><pre class="code-block"><span></span><code>python<span class="w"> </span>your_day07_practice.py
+
+<span class="c1"># 预期输出类似 Day 6，但内部是用 LangGraph 驱动的</span>
+</code></pre></div>
+<h4 id="_17">💡 关键代码框架</h4>
+<div class="codehilite"><pre class="code-block"><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">langgraph.graph</span><span class="w"> </span><span class="kn">import</span> <span class="n">StateGraph</span><span class="p">,</span> <span class="n">END</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">AgentState</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
+    <span class="n">messages</span><span class="p">:</span> <span class="nb">list</span>
+    <span class="c1"># 其他状态字段</span>
+
+<span class="n">graph</span> <span class="o">=</span> <span class="n">StateGraph</span><span class="p">(</span><span class="n">AgentState</span><span class="p">)</span>
+<span class="n">graph</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">"call_model"</span><span class="p">,</span> <span class="n">call_model</span><span class="p">)</span>
+<span class="n">graph</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">"call_tool"</span><span class="p">,</span> <span class="n">call_tool</span><span class="p">)</span>
+<span class="n">graph</span><span class="o">.</span><span class="n">add_conditional_edges</span><span class="p">(</span><span class="s2">"call_model"</span><span class="p">,</span> <span class="n">should_continue</span><span class="p">)</span>
+<span class="n">graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">"call_tool"</span><span class="p">,</span> <span class="s2">"call_model"</span><span class="p">)</span>
+</code></pre></div>
+<hr/>
+<h2 id="day-8-mcp">📅 Day 8：工具系统与 MCP 协议</h2>
+<h3 id="mcp-server-agent">练习项目：写一个简单的 MCP Server，在 Agent 中调用</h3>
+<h4 id="_18">✅ 验收标准（手动检查清单）</h4>
+<ul>
+<li>[ ] 使用 <code>mcp</code> Python SDK 创建 MCP Server</li>
+<li>[ ] 定义了至少 2 个 Tool（用 <code>@server.tool()</code> 装饰器）</li>
+<li>[ ] Tool 有清晰的 <code>name</code>、<code>description</code>、<code>inputSchema</code></li>
+<li>[ ] MCP Server 能独立启动（用 <code>mcp run</code> 或代码启动）</li>
+<li>[ ] Agent 能连接到 MCP Server 并列出工具</li>
+<li>[ ] Agent 能调用 MCP 工具并获取结果</li>
+<li>[ ] 工具函数有超时控制</li>
+</ul>
+<h4 id="_19">🔍 验收方式</h4>
+<div class="codehilite"><pre class="code-block"><span></span><code><span class="c1"># 终端 1：启动 MCP Server</span>
+mcp<span class="w"> </span>run<span class="w"> </span>your_mcp_server.py
+
+<span class="c1"># 终端 2：运行 Agent（连接到 MCP Server）</span>
+python<span class="w"> </span>your_day08_agent.py
+</code></pre></div>
+<hr/>
+<h2 id="day-9-rag">📅 Day 9：记忆系统与 RAG</h2>
+<h3 id="agent">练习项目：实现能记住对话历史、并能从文档库检索知识的 Agent</h3>
+<h4 id="_20">✅ 验收标准（手动检查清单）</h4>
+<ul>
+<li>[ ] 实现了短期记忆（最近 N 轮对话历史）</li>
+<li>[ ] 对话历史超出限制时，有裁剪/压缩策略（滑动窗口或摘要）</li>
+<li>[ ] 实现了长期记忆（向量存储，如 ChromaDB/FAISS）</li>
+<li>[ ] 能对新输入做向量检索，找到相关历史记忆</li>
+<li>[ ] RAG：能从文档库检索相关知识，注入到 Prompt</li>
+<li>[ ] Embedding 使用合理（中文用 <code>bge-large-zh</code> 或 OpenAI embedding）</li>
+<li>[ ] 多轮对话测试：Agent 能"记住"之前说过的话</li>
+</ul>
+<h4 id="_21">🔍 验收方式</h4>
+<div class="codehilite"><pre class="code-block"><span></span><code>python<span class="w"> </span>your_day09_agent.py
+
+<span class="c1"># 测试多轮对话</span>
+&gt;<span class="w"> </span>我叫张三
+✅<span class="w"> </span>Agent：你好张三！
+
+&gt;<span class="w"> </span>我叫什么名字？
+✅<span class="w"> </span>Agent：你叫张三。（从对话历史检索到）
+</code></pre></div>
+<hr/>
+<h2 id="day-10-agent">📅 Day 10：阶段二实战——多工具 Agent</h2>
+<h3 id="langgraph-agent">练习项目：用 LangGraph 构建多工具 Agent</h3>
+<h4 id="_22">✅ 验收标准（手动检查清单）</h4>
+<ul>
+<li>[ ] 集成了至少 4 个工具（计算器、网页搜索、文件读写、代码执行）</li>
+<li>[ ] 使用 LangGraph 的 <code>ToolNode</code> 或手写的工具执行节点</li>
+<li>[ ] ReAct 循环 + 条件路由（继续推理 or 调用工具 or 结束）</li>
+<li>[ ] 对话记忆：短期（最近 10 轮）+ 长期（向量存储）</li>
+<li>[ ] 流式输出（用 <code>astream_events()</code> 或类似方法）</li>
+<li>[ ] 错误恢复：工具调用失败自动重试或降级</li>
+<li>[ ] Token 消耗有记录（每次 LLM 调用记录 token 数）</li>
+</ul>
+<hr/>
+<h2 id="day-11-15">📅 Day 11-15：完整项目实战</h2>
+<h3 id="agent_1">项目：智能开发助手 Agent</h3>
+<h4 id="_23">✅ 验收标准（项目交付清单）</h4>
+<p><strong>Day 11-12：核心开发</strong>
+- [ ] 项目有清晰的目录结构
+- [ ] FastAPI 后端框架搭建完成
+- [ ] Agent 核心循环实现（ReAct 或 LangGraph）
+- [ ] 工具系统：至少 4 个可用工具</p>
+<p><strong>Day 13：Web UI</strong>
+- [ ] FastAPI + SSE（Server-sent Events）实现流式 API
+- [ ] 简单 Web 前端（Streamlit / Gradio / 纯 HTML+JS）
+- [ ] Agent 思考过程可视化（显示 Thought、Action、Observation）</p>
+<p><strong>Day 14：测试与部署</strong>
+- [ ] 单元测试（pytest + pytest-asyncio）
+- [ ] Token 消耗统计与优化
+- [ ] Docker 容器化（Dockerfile + docker-compose.yml）
+- [ ] 部署到云服务器或本地运行</p>
+<p><strong>Day 15：文档</strong>
+- [ ] README.md：项目介绍、安装步骤、使用方法
+- [ ] 架构图（可以用 Markdown 画图或贴图）
+- [ ] 示例代码</p>
+<hr/>
+<h2 id="_24">📊 综合评分标准</h2>
+<table class="styled-table">
+<thead>
+<tr>
+<th>阶段</th>
+<th>天数</th>
+<th>通过分数</th>
+<th>目标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>阶段一</td>
+<td>Day 1-5</td>
+<td>每 day ≥ 60 分</td>
+<td>掌握 Python 高级特性 + LLM API</td>
+</tr>
+<tr>
+<td>阶段二</td>
+<td>Day 6-10</td>
+<td>每 day 完成检查清单</td>
+<td>掌握 Agent 架构</td>
+</tr>
+<tr>
+<td>阶段三</td>
+<td>Day 11-15</td>
+<td>项目交付清单完成 ≥ 80%</td>
+<td>完整可部署的 Agent</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="_25">🔧 使用验收脚本</h2>
+<table class="styled-table">
+<thead>
+<tr>
+<th>脚本名称</th>
+<th>对应日期</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>day01_practice_validator.py</code></td>
+<td>Day 1</td>
+<td>自动检查异步代码质量、性能对比</td>
+</tr>
+<tr>
+<td><code>day02_practice_validator.py</code></td>
+<td>Day 2</td>
+<td>检查 Pydantic Schema + 装饰器注册</td>
+</tr>
+<tr>
+<td><code>day03_practice_validator.py</code></td>
+<td>Day 3</td>
+<td>检查生成器 + 上下文管理器</td>
+</tr>
+<tr>
+<td><code>day04_practice_validator.py</code></td>
+<td>Day 4</td>
+<td>检查 Function Calling 流程</td>
+</tr>
+<tr>
+<td><code>day05_practice_validator.py</code></td>
+<td>Day 5</td>
+<td>检查命令行 AI 助手综合实现</td>
+</tr>
+<tr>
+<td><code>day06_practice_validator.py</code></td>
+<td>Day 6</td>
+<td>检查 ReAct Agent 循环逻辑 ⭐</td>
+</tr>
+<tr>
+<td><code>day07_practice_validator.py</code></td>
+<td>Day 7</td>
+<td>检查 LangGraph 图结构</td>
+</tr>
+</tbody>
+</table>
+<p><strong>使用方法</strong>：</p>
+<div class="codehilite"><pre class="code-block"><span></span><code><span class="c1"># 先用模板创建你的练习代码</span>
+<span class="c1"># （模板文件：day01_practice_template.py 等）</span>
+
+<span class="c1"># 编辑模板，完成所有 TODO</span>
+
+<span class="c1"># 运行验收脚本</span>
+python<span class="w"> </span>day01_practice_validator.py
+python<span class="w"> </span>day01_practice_validator.py<span class="w"> </span>--file<span class="w"> </span>my_code.py<span class="w">  </span><span class="c1"># 指定文件</span>
+</code></pre></div>
+<hr/>
+<h2 id="_26">💡 常见问题</h2>
+<h3 id="q1">Q1：验收脚本报错了，怎么办？</h3>
+<p>A：仔细阅读脚本输出的"改进建议"部分，逐项修改你的代码，然后重新运行验收脚本。</p>
+<h3 id="q2">Q2：我的代码能运行，但验收脚本不给满分？</h3>
+<p>A：验收脚本不仅检查"能运行"，还检查"最佳实践"（类型注解、错误处理、代码规范等）。根据建议改进即可。</p>
+<h3 id="q3day-8910">Q3：Day 8/9/10 没有自动验收脚本？</h3>
+<p>A：这些天的练习更综合，难以完全自动化验收。请按照文档中的"手动检查清单"逐项自查。</p>
+<h3 id="q4">Q4：我可以参考标准答案吗？</h3>
+<p>A：可以！每个 Day 的 <code>tutorial_xx.py</code> 或 <code>ACCEPTANCE_CRITERIA.md</code> 里都有标准答案。<strong>但建议先自己尝试</strong>，卡住了再看。</p>
+<hr/>
+<p><strong>祝你学习顺利！遇到任何问题，随时问我！</strong> 🚀</p>
+    </div>
+</div>
+</div>
+<button class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="返回顶部">⬆</button>
+<script>window.addEventListener("scroll",function(){  var btn=document.querySelector(".back-top");  if(btn)btn.style.display=window.scrollY>300?"block":"none";});</script>
+</body>
+</html>
