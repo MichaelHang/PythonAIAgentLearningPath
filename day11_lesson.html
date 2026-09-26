@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📖 Day04 Lesson</title>
+    <title>📖 Day11 Lesson</title>
     <style>
 
 
@@ -373,7 +373,7 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 <a class="" href="day03_practice_template.html">Day 3 - 模板</a>
 <a class="" href="day03_practice_validator.html">Day 3 - 验收</a>
 <h4>Day 4-5 (LLM)</h4>
-<a class="active" href="day04_lesson.html">Day 4 - 学习</a>
+<a class="" href="day04_lesson.html">Day 4 - 学习</a>
 <a class="" href="day04_practice_template.html">Day 4 - 模板</a>
 <a class="" href="day04_practice_validator.html">Day 4 - 验收</a>
 <a class="" href="day05_lesson.html">Day 5 - 学习</a>
@@ -397,7 +397,7 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 <a class="" href="day10_practice_template.html">Day 10 - 模板</a>
 <a class="" href="day10_practice_validator.html">Day 10 - 验收</a>
 <h4>Day 11-15 (项目实战)</h4>
-<a class="" href="day11_lesson.html">Day 11 - 学习</a>
+<a class="active" href="day11_lesson.html">Day 11 - 学习</a>
 <a class="" href="day12_lesson.html">Day 12 - 学习</a>
 <a class="" href="day13_lesson.html">Day 13 - 学习</a>
 <a class="" href="day14_lesson.html">Day 14 - 学习</a>
@@ -405,90 +405,84 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 <a class="" href="project_day11_15/README.md">项目脚手架</a>
 </div>
 <div class="main-content">
-    <div class="header"><h1>📖 Day 4 学习页：LLM API 调用与 Function Calling</h1></div>
+    <div class="header"><h1>📖 Day 11 学习页：项目设计与核心开发（上）：架构 + FastAPI</h1></div>
     <div class="content">
 
-<h1>Day 4：LLM API 调用与 Function Calling</h1>
+<h1>Day 11：项目设计与核心开发（上）——架构、FastAPI、Agent 核心循环</h1>
 <blockquote class="note-block">
-<p><strong>🎯 今日目标</strong>：跑通 Function Calling 完整闭环——让 LLM 自己决定调用哪个 Python 函数、
-你执行它、把结果喂回去、LLM 给出最终回答。这是"Agent 会用工具"的本质，今天用 mock 就能练，不需要 API Key。</p>
+<p><strong>🎯 今日目标</strong>：把 Day 1-10 写过的所有"零件"装进一个分层清晰的 FastAPI 服务，
+用 <code>curl</code> 对 <code>/chat</code> 发一条消息并拿到 Agent 的回答——你的 Agent 从此是一个服务，不再是一个脚本。</p>
 </blockquote>
-<div class="file-info"><div class="info-left">📚 本日资源：📝 <a href="day04_practice_template.html">练习模板</a> ｜ ✅ <a href="day04_practice_validator.html">验收脚本</a></div></div>
+<div class="file-info"><div class="info-left">🛠 项目脚手架：<a href="project_day11_15/README.md">project_day11_15/</a>（开发都在这个目录里） ｜ 📋 <a href="ACCEPTANCE_CRITERIA.html">验收清单</a></div></div>
 <h2>⏱ 今日安排（约 2 小时）</h2>
-<table class="styled-table"><thead><tr><th>时间</th><th>内容</th><th>方式</th></tr></thead><tbody><tr><td>30min</td><td><strong>理论学习</strong>：API 结构 + Function Calling 时序</td><td>阅读</td></tr><tr><td>40min</td><td><strong>Prompt 实验</strong>：System Prompt / Few-shot / ReAct 格式</td><td>编码实验</td></tr><tr><td>50min</td><td><strong>动手实操</strong>：完成练习模板 7 个 TODO</td><td>编码</td></tr></tbody></table>
+<table class="styled-table"><thead><tr><th>时间</th><th>内容</th><th>方式</th></tr></thead><tbody><tr><td>30min</td><td><strong>理论学习</strong>：从脚本到服务 + 分层架构</td><td>阅读</td></tr><tr><td>20min</td><td><strong>准备</strong>：跑通脚手架（装依赖 / 配 Key / 起服务）</td><td>操作</td></tr><tr><td>70min</td><td><strong>动手实操</strong>：完成 schemas / agent / main 的 TODO</td><td>编码</td></tr></tbody></table>
 
-<h2>📖 第一步：理论学习</h2>
+<h2>📖 第一步：从脚本到服务，最关键的变化是"状态"</h2>
+<p>Day 1-10 的脚本有个隐含前提：<strong>一次运行只有一个对话</strong>，所以全局变量装对话历史就够了。
+服务化之后完全不同——服务常驻运行，<strong>多个用户同时对话</strong>，张三的历史绝不能串给李四。
+所以第一课：状态必须按 <code>session_id</code> 隔离，这就是 <code>memory.py</code> 存在的意义。</p>
+<h3>1. 分层架构（脚手架已经搭好，你要能说清每一层为什么存在）</h3>
+<pre class="code-block"><code>project_day11_15/app/
+├── main.py      ← 路由层：只做 HTTP 与内部转换，保持"薄"
+├── schemas.py   ← 请求/响应模型（Pydantic）：HTTP 层的契约
+├── agent.py     ← 业务层：Agent 核心循环（今天的主战场）
+├── tools.py     ← 工具系统（Day 12 完善）
+├── memory.py    ← 会话记忆（Day 12 完善）
+├── llm.py       ← LLM 适配层（已写好，读懂即可）——换供应商只改这一个文件
+└── config.py    ← 配置中心（已写好）——Key/模型名/超时 单点管理</code></pre>
+<table class="styled-table"><thead><tr><th>分层原则</th><th>为什么</th></tr></thead><tbody><tr><td>路由层薄</td><td>main.py 只做参数校验和调用，读路由就知道全部功能；业务逻辑不藏在 HTTP 里</td></tr><tr><td>配置单点</td><td>所有 os.environ 收口在 config.py——找配置只看一个文件</td></tr><tr><td>供应商可替换</td><td>DeepSeek 换 Qwen/本地模型，只动 llm.py，其他层零改动</td></tr><tr><td>状态按会话隔离</td><td>memory.py 用 session_id 做键，杜绝用户间串话</td></tr></tbody></table>
+<h3>2. FastAPI 最小可用集（今天 main.py 要用到的全部）</h3>
+<pre class="code-block"><code>from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 
-<h3>1. OpenAI 兼容 API 的请求结构</h3>
-<p>DeepSeek / Qwen / Moonshot 都兼容这套格式。一次对话 = POST 一个 JSON：</p>
-<pre class="code-block"><code>POST https://api.deepseek.com/chat/completions
-Authorization: Bearer 你的KEY
+app = FastAPI(title="我的 Agent")
 
-{
-  "model": "deepseek-chat",
-  "messages": [
-    {"role": "system",    "content": "你是一个有用的助手"},   # 设定人设，放最前
-    {"role": "user",      "content": "北京今天天气怎么样？"},
-    {"role": "assistant", "content": null,
-      "tool_calls": [ ... ]},                                # LLM 请求调工具
-    {"role": "tool",      "content": "晴 25°C", "tool_call_id": "call_001"}  # 工具结果回传
-  ],
-  "tools": [ ... ]     # 告诉 LLM 有哪些工具可用
-}</code></pre>
-<h3>2. tools 参数：给 LLM 的"工具说明书"</h3>
-<pre class="code-block"><code>[
-  {
-    "type": "function",
-    "function": {
-      "name": "get_weather",
-      "description": "获取指定城市的天气信息",     # ← LLM 靠这句话决定选不选这个工具！
-      "parameters": {                            # ← JSON Schema，Day 2 的 Pydantic 可以自动生成
-        "type": "object",
-        "properties": {"city": {"type": "string", "description": "城市名称"}},
-        "required": ["city"]
-      }
-    }
-  }
-]</code></pre>
-<h3>3. Function Calling 完整时序（今天的核心）</h3>
-<pre class="code-block"><code>用户提问
-   │
-   ▼
-① 带 tools 调 LLM ──────────────► LLM 不直接回答，返回 tool_calls：
-   │                                {"name": "get_weather", "arguments": '{"city":"北京"}'}
-   ▼                                 注意：arguments 是 JSON 字符串，要 json.loads！
-② 你解析并执行真正的 Python 函数，得到结果 "晴 25°C"
-   │
-   ▼
-③ 把结果作为 role="tool" 消息追加进 messages（带上 tool_call_id）
-   │
-   ▼
-④ 再次调用 LLM ─────────────────► LLM 综合工具结果，给出最终回答
-   │
-   ▼
-⑤ 循环：如果第 ④ 步又返回 tool_calls，回到 ②，直到给出最终回答
-   （所以必须有 max_rounds 上限，防止无限烧钱）</code></pre>
-<h3>4. Prompt 工程三原则（今天顺手练）</h3>
-<table class="styled-table"><thead><tr><th>原则</th><th>做法</th></tr></thead><tbody><tr><td>System Prompt 精简</td><td>只放人设 + 工具使用规则；太长 LLM 会忽略后面的</td></tr><tr><td>Few-shot</td><td>在 prompt 里给 1-2 个输入→输出示例，格式遵循度大幅提升</td></tr><tr><td>格式约束</td><td>让 LLM 按固定格式输出（如 ReAct 的 Thought/Action），后面才好解析</td></tr></tbody></table>
+class ChatRequest(BaseModel):          # 请求体 = Pydantic 模型，自动校验
+    session_id: str = "default"
+    message: str
+
+@app.post("/chat")
+async def chat(req: ChatRequest):
+    try:
+        return {"answer": await 业务逻辑(req.message)}
+    except LLMError as e:              # 业务异常 → HTTP 状态码（不泄露 traceback）
+        raise HTTPException(status_code=503, detail=str(e))
+
+# 启动：uvicorn app.main:app --reload
+# 测试：curl -X POST http://127.0.0.1:8000/chat -H "Content-Type: application/json" -d '{"session_id": "s1", "message": "你好"}'
+# 交互式文档：http://127.0.0.1:8000/docs</code></pre>
+<h3>3. Agent 核心循环 = 你写过的东西组装起来</h3>
+<pre class="code-block"><code>run_agent(session_id, user_input):
+    memory = MEMORY.get(session_id)            # Day 9：会话隔离的记忆
+    memory.add("user", user_input)
+    messages = [system] + memory.to_api_format()
+    for 轮 in range(MAX_TOOL_ROUNDS):          # Day 4：有上限的 Function Calling 循环
+        resp = await llm.chat(messages, tools=get_tool_list())
+        有 tool_calls？
+        ├─ 是 → execute_tool 执行 → 结果以 role=tool 回填 → 下一轮
+        └─ 否 → 最终回答 → memory.add("assistant", 回答) → return</code></pre>
 <h2>🛠 第二步：动手实操</h2>
 <ol>
-<li><strong>打开模板</strong>：<a href="day04_practice_template.html">day04_practice_template.py</a>。两个工具已注册好，
-mock LLM 也写好了（不需要 Key），你实现 4 个核心函数：
+<li><strong>跑通脚手架</strong>：复制 <code>project_day11_15/</code> 为你的工作目录 →
+<code>pip install -r requirements.txt</code> → 配 <code>DEEPSEEK_API_KEY</code> →
+<code>uvicorn app.main:app --reload</code> → 浏览器开 <code>http://127.0.0.1:8000/docs</code> 看到 /health 正常。</li>
+<li><strong>读 README 的"设计约定"</strong>五条——接下来的 TODO 都在遵守它们。</li>
+<li><strong>Day 11 TODO</strong>（按顺序做）：
   <ul>
-  <li>TODO 1.2：<code>get_tools_for_api()</code> —— 把注册表转成上面的 tools 格式</li>
-  <li>TODO 3.1：<code>parse_tool_calls()</code> —— 从响应里取 tool_calls，<code>json.loads</code> 解析 arguments</li>
-  <li>TODO 3.2：<code>execute_tool_call()</code> —— 查注册表、执行、返回结果</li>
-  <li>TODO 4.1：<code>chat_with_function_calling()</code> —— 按上面的 ①→⑤ 时序写主循环（最有价值的一题）</li>
-  <li>TODO 5.1（可选）：有 DeepSeek Key 的话把 mock 换成真实 API</li>
+  <li><code>schemas.py</code> TODO 1.1/1.2：ToolCallRecord / ErrorResponse 模型</li>
+  <li><code>llm.py</code>：<strong>不用写</strong>，但通读一遍——它就是 tutorial_03 第 3/4 步的服务版</li>
+  <li><code>agent.py</code> TODO 4.1：核心循环（按伪代码写，这是今天的主菜）</li>
+  <li><code>main.py</code> TODO 5.1/5.2：/chat 路由 + 统一错误处理</li>
   </ul></li>
-<li><strong>运行自测</strong>：<code>python day04_practice_template.py</code>，两个问题都应打出最终回答。</li>
-<li><strong>验收</strong>：<code>python day04_practice_validator.py</code> —— 验收用构造好的 LLM 响应直接喂你的解析函数，
-并跑通你的完整闭环。</li>
+<li><strong>自测</strong>：<code>curl</code> 打 /chat——无 Key 时应收到 503 和清晰错误说明（这也是功能！）；
+有 Key 时问"你好"应得到回答，问"帮我计算 3 + 5 * 2"要等 Day 12 工具系统完成后才能走工具。</li>
 </ol>
+<h2>✅ 第三步：验收（Day 11 部分）</h2>
+<ul><li>uvicorn 能启动，<code>/docs</code> 可见且能直接调试</li><li><code>GET /health</code> 返回状态</li><li><code>POST /chat</code> 无 Key 时返回 503 + 人话错误（不裸崩、不泄露 traceback）</li><li>有 Key 时：普通问题得到回答，且第二轮能记住第一轮说过的内容（记忆已接入）</li><li>代码遵守五条设计约定（自查）</li><li>完整清单见 <a href="ACCEPTANCE_CRITERIA.html">验收标准文档</a> Day 11-15 交付清单</li></ul>
 <h2>⚠️ 避坑</h2>
-<ul><li>❌ <code>arguments</code> 是 JSON <strong>字符串</strong>不是字典——忘 json.loads 是新手第一坑</li><li>❌ 工具结果忘以 <code>role="tool"</code> 回传 → LLM 不知道工具说了什么，永远循环</li><li>❌ 主循环没有轮数上限 → LLM 反复要求调工具，token 烧个不停</li><li>✅ 真实 API 的 JSON 可能格式错误：json.loads 必须套 try/except + 重试</li><li>✅ 国内直连用 DeepSeek / Qwen / Moonshot，都有免费额度</li></ul>
+<ul><li>❌ 用全局变量装对话历史 → 多用户串台；必须 session_id 隔离（memory.py）</li><li>❌ 在 main.py 里写 Agent 循环 → 路由层膨胀到没法测；业务进 agent.py</li><li>❌ 把 LLM 的原始异常 traceback 直接返回给客户端 → 泄露内部信息；统一转 HTTPException</li><li>❌ 请求不设 max_tokens / 超时 → 费用和挂起风险（llm.py 已内置，别删）</li></ul>
 <h2>🔗 延伸资源</h2>
-<ul><li><a href="https://platform.openai.com/docs/guides/function-calling">OpenAI Function Calling 指南</a></li><li><a href="https://api-docs.deepseek.com/">DeepSeek API 文档</a>（免费额度）</li><li><a href="https://www.promptingguide.ai/zh">Prompt Engineering Guide（中文）</a></li><li><code>tutorial_03_real_api.py</code>：真实 API 实战教程——配好 Key 后把今天的 mock 换成真调用（限流/超时/重试都在里面）</li></ul>
+<ul><li><a href="https://fastapi.tiangolo.com/zh/tutorial/">FastAPI 官方教程（中文）</a></li><li><a href="https://fastapi.tiangolo.com/zh/tutorial/handling-errors/">FastAPI 错误处理</a></li></ul>
 
     </div>
 </div>

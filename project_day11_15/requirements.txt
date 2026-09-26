@@ -1,0 +1,10 @@
+fastapi>=0.110
+uvicorn[standard]>=0.29
+pydantic>=2.5
+aiohttp>=3.9
+
+# 可选（Day 12 长期记忆 / Day 14 测试）：
+# chromadb
+# pytest
+# pytest-asyncio
+# httpx  # 测试 FastAPI 接口用

@@ -1,0 +1,11 @@
+# 这些内容永远不该进镜像（体积/安全）
+__pycache__/
+*.pyc
+.env
+.venv/
+workspace/
+tests/
+.git/
+Dockerfile
+.dockerignore
+*.md

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📖 Day04 Lesson</title>
+    <title>📖 Day13 Lesson</title>
     <style>
 
 
@@ -373,7 +373,7 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 <a class="" href="day03_practice_template.html">Day 3 - 模板</a>
 <a class="" href="day03_practice_validator.html">Day 3 - 验收</a>
 <h4>Day 4-5 (LLM)</h4>
-<a class="active" href="day04_lesson.html">Day 4 - 学习</a>
+<a class="" href="day04_lesson.html">Day 4 - 学习</a>
 <a class="" href="day04_practice_template.html">Day 4 - 模板</a>
 <a class="" href="day04_practice_validator.html">Day 4 - 验收</a>
 <a class="" href="day05_lesson.html">Day 5 - 学习</a>
@@ -399,96 +399,66 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 <h4>Day 11-15 (项目实战)</h4>
 <a class="" href="day11_lesson.html">Day 11 - 学习</a>
 <a class="" href="day12_lesson.html">Day 12 - 学习</a>
-<a class="" href="day13_lesson.html">Day 13 - 学习</a>
+<a class="active" href="day13_lesson.html">Day 13 - 学习</a>
 <a class="" href="day14_lesson.html">Day 14 - 学习</a>
 <a class="" href="day15_lesson.html">Day 15 - 学习</a>
 <a class="" href="project_day11_15/README.md">项目脚手架</a>
 </div>
 <div class="main-content">
-    <div class="header"><h1>📖 Day 4 学习页：LLM API 调用与 Function Calling</h1></div>
+    <div class="header"><h1>📖 Day 13 学习页：Web UI + SSE 流式交互</h1></div>
     <div class="content">
 
-<h1>Day 4：LLM API 调用与 Function Calling</h1>
+<h1>Day 13：Web UI + SSE 流式交互</h1>
 <blockquote class="note-block">
-<p><strong>🎯 今日目标</strong>：跑通 Function Calling 完整闭环——让 LLM 自己决定调用哪个 Python 函数、
-你执行它、把结果喂回去、LLM 给出最终回答。这是"Agent 会用工具"的本质，今天用 mock 就能练，不需要 API Key。</p>
+<p><strong>🎯 今日目标</strong>：在浏览器里和你的 Agent 聊天，看到打字机式的流式回答和工具调用过程——
+服务端一个 SSE 接口 + 前端一个页面，全链路打通。</p>
 </blockquote>
-<div class="file-info"><div class="info-left">📚 本日资源：📝 <a href="day04_practice_template.html">练习模板</a> ｜ ✅ <a href="day04_practice_validator.html">验收脚本</a></div></div>
+<div class="file-info"><div class="info-left">🛠 项目脚手架：<a href="project_day11_15/README.md">project_day11_15/</a>（开发都在这个目录里） ｜ 📋 <a href="ACCEPTANCE_CRITERIA.html">验收清单</a></div></div>
 <h2>⏱ 今日安排（约 2 小时）</h2>
-<table class="styled-table"><thead><tr><th>时间</th><th>内容</th><th>方式</th></tr></thead><tbody><tr><td>30min</td><td><strong>理论学习</strong>：API 结构 + Function Calling 时序</td><td>阅读</td></tr><tr><td>40min</td><td><strong>Prompt 实验</strong>：System Prompt / Few-shot / ReAct 格式</td><td>编码实验</td></tr><tr><td>50min</td><td><strong>动手实操</strong>：完成练习模板 7 个 TODO</td><td>编码</td></tr></tbody></table>
+<table class="styled-table"><thead><tr><th>时间</th><th>内容</th><th>方式</th></tr></thead><tbody><tr><td>30min</td><td><strong>理论学习</strong>：SSE 协议 + 技术选型</td><td>阅读</td></tr><tr><td>60min</td><td><strong>动手实操</strong>：/chat/stream 接口 + 静态页挂载</td><td>编码</td></tr><tr><td>30min</td><td><strong>联调</strong>：浏览器聊天 + curl 看原始流</td><td>联调</td></tr></tbody></table>
 
 <h2>📖 第一步：理论学习</h2>
 
-<h3>1. OpenAI 兼容 API 的请求结构</h3>
-<p>DeepSeek / Qwen / Moonshot 都兼容这套格式。一次对话 = POST 一个 JSON：</p>
-<pre class="code-block"><code>POST https://api.deepseek.com/chat/completions
-Authorization: Bearer 你的KEY
+<h3>1. 为什么用 SSE（Server-Sent Events）而不是 WebSocket</h3>
+<table class="styled-table"><thead><tr><th></th><th>SSE</th><th>WebSocket</th></tr></thead><tbody><tr><td>方向</td><td>服务器 → 浏览器单向（Agent 场景够用：请求一次、回答流式推）</td><td>双向</td></tr><tr><td>协议</td><td>普通 HTTP，天然过网关/代理</td><td>独立协议，部分基础设施不友好</td></tr><tr><td>断线</td><td>浏览器自动重连</td><td>要自己实现</td></tr><tr><td>结论</td><td><strong>LLM 对话首选</strong></td><td>协同编辑/实时游戏才需要</td></tr></tbody></table>
+<p>SSE 的全部格式约定（你已经在 Day 3 见过生成器侧、tutorial_03 第 7 步见过解析侧）：
+响应头 <code>Content-Type: text/event-stream</code>；消息是一行行 <code>data: 内容</code>，
+<strong>每条消息后必须跟一个空行</strong>；约定 <code>data: [DONE]</code> 作为结束哨兵。</p>
 
-{
-  "model": "deepseek-chat",
-  "messages": [
-    {"role": "system",    "content": "你是一个有用的助手"},   # 设定人设，放最前
-    {"role": "user",      "content": "北京今天天气怎么样？"},
-    {"role": "assistant", "content": null,
-      "tool_calls": [ ... ]},                                # LLM 请求调工具
-    {"role": "tool",      "content": "晴 25°C", "tool_call_id": "call_001"}  # 工具结果回传
-  ],
-  "tools": [ ... ]     # 告诉 LLM 有哪些工具可用
-}</code></pre>
-<h3>2. tools 参数：给 LLM 的"工具说明书"</h3>
-<pre class="code-block"><code>[
-  {
-    "type": "function",
-    "function": {
-      "name": "get_weather",
-      "description": "获取指定城市的天气信息",     # ← LLM 靠这句话决定选不选这个工具！
-      "parameters": {                            # ← JSON Schema，Day 2 的 Pydantic 可以自动生成
-        "type": "object",
-        "properties": {"city": {"type": "string", "description": "城市名称"}},
-        "required": ["city"]
-      }
-    }
-  }
-]</code></pre>
-<h3>3. Function Calling 完整时序（今天的核心）</h3>
-<pre class="code-block"><code>用户提问
-   │
-   ▼
-① 带 tools 调 LLM ──────────────► LLM 不直接回答，返回 tool_calls：
-   │                                {"name": "get_weather", "arguments": '{"city":"北京"}'}
-   ▼                                 注意：arguments 是 JSON 字符串，要 json.loads！
-② 你解析并执行真正的 Python 函数，得到结果 "晴 25°C"
-   │
-   ▼
-③ 把结果作为 role="tool" 消息追加进 messages（带上 tool_call_id）
-   │
-   ▼
-④ 再次调用 LLM ─────────────────► LLM 综合工具结果，给出最终回答
-   │
-   ▼
-⑤ 循环：如果第 ④ 步又返回 tool_calls，回到 ②，直到给出最终回答
-   （所以必须有 max_rounds 上限，防止无限烧钱）</code></pre>
-<h3>4. Prompt 工程三原则（今天顺手练）</h3>
-<table class="styled-table"><thead><tr><th>原则</th><th>做法</th></tr></thead><tbody><tr><td>System Prompt 精简</td><td>只放人设 + 工具使用规则；太长 LLM 会忽略后面的</td></tr><tr><td>Few-shot</td><td>在 prompt 里给 1-2 个输入→输出示例，格式遵循度大幅提升</td></tr><tr><td>格式约束</td><td>让 LLM 按固定格式输出（如 ReAct 的 Thought/Action），后面才好解析</td></tr></tbody></table>
-<h2>🛠 第二步：动手实操</h2>
+<h3>2. 端到端数据流（今天要把三段管道接起来）</h3>
+<pre class="code-block"><code>浏览器 static/index.html            FastAPI /chat/stream           llm.chat_stream
+────────────────────────           ────────────────────           ──────────────
+fetch(POST).body.getReader()  ◄──  StreamingResponse(生成器)  ◄──  async generator
+按 \n\n 切分事件 → JSON.parse      工具轮次：非流式（要解析 tool_calls）   逐 chunk yield
+type=tool → 显示工具行              最终回答：流式（打字机）             data: {...}
+type=answer → 追加到气泡            data: [DONE] 结束</code></pre>
+<p>关键设计决策（main.py 的 TODO 里已写明）：<strong>工具轮次用非流式调用</strong>——
+因为中途需要解析 tool_calls 并执行；<strong>只有最终回答走流式</strong>。
+这是真实项目的常见做法：过程事件即时推送，答案打字机输出。</p>
+
+<h3>3. 已经给你的两块</h3>
+<ul><li><code>llm.py</code> 的 <code>chat_stream()</code>：适配层的流式版（SSE 解析已实现，通读一遍）</li><li><code>static/index.html</code>：完整的聊天前端（fetch + ReadableStream 消费 SSE，事件分 type=tool/answer 渲染）——不用改</li></ul>
+<h2>🛠 第二步：动手实操（都在 main.py）</h2>
 <ol>
-<li><strong>打开模板</strong>：<a href="day04_practice_template.html">day04_practice_template.py</a>。两个工具已注册好，
-mock LLM 也写好了（不需要 Key），你实现 4 个核心函数：
+<li><strong>TODO 6.1</strong>：实现 <code>POST /chat/stream</code>——按注释里的参考流程写一个异步生成器，
+用 <code>StreamingResponse(生成器, media_type="text/event-stream")</code> 返回。
+注意 SSE 的每条 data 行结尾要有<strong>两个换行</strong>，结束发 <code>data: [DONE]</code>。</li>
+<li><strong>TODO 6.2</strong>：挂载静态目录（<code>StaticFiles</code>，三行）——
+同源部署天然没有 CORS 问题；这也是不用跨域 EventSource 方案的原因。</li>
+<li><strong>联调</strong>：
   <ul>
-  <li>TODO 1.2：<code>get_tools_for_api()</code> —— 把注册表转成上面的 tools 格式</li>
-  <li>TODO 3.1：<code>parse_tool_calls()</code> —— 从响应里取 tool_calls，<code>json.loads</code> 解析 arguments</li>
-  <li>TODO 3.2：<code>execute_tool_call()</code> —— 查注册表、执行、返回结果</li>
-  <li>TODO 4.1：<code>chat_with_function_calling()</code> —— 按上面的 ①→⑤ 时序写主循环（最有价值的一题）</li>
-  <li>TODO 5.1（可选）：有 DeepSeek Key 的话把 mock 换成真实 API</li>
+  <li><code>curl -N -X POST http://127.0.0.1:8000/chat/stream -H "Content-Type: application/json" -d '{"session_id":"s1","message":"你好"}'</code>
+  （-N 禁用缓冲，能看到 data: 行一条条蹦出来）</li>
+  <li>浏览器开 <code>http://127.0.0.1:8000/static/index.html</code> 聊天——打字机效果 + 工具调用过程可见</li>
+  <li>问"帮我计算 3 + 5 * 2"——应先蹦出 🔧 工具行，再流式打出答案</li>
   </ul></li>
-<li><strong>运行自测</strong>：<code>python day04_practice_template.py</code>，两个问题都应打出最终回答。</li>
-<li><strong>验收</strong>：<code>python day04_practice_validator.py</code> —— 验收用构造好的 LLM 响应直接喂你的解析函数，
-并跑通你的完整闭环。</li>
 </ol>
+<h2>✅ 第三步：验收（Day 13 部分）</h2>
+<ul><li>curl -N 能看到完整的 SSE 事件序列（tool → answer×N → [DONE]）</li><li>浏览器聊天有打字机效果，工具调用过程以蓝色小条显示</li><li>断开网络/停服务后刷新页面有明确错误提示（不是白屏）</li><li>对照 <a href="ACCEPTANCE_CRITERIA.html">交付清单</a> Day 13 部分打勾</li></ul>
 <h2>⚠️ 避坑</h2>
-<ul><li>❌ <code>arguments</code> 是 JSON <strong>字符串</strong>不是字典——忘 json.loads 是新手第一坑</li><li>❌ 工具结果忘以 <code>role="tool"</code> 回传 → LLM 不知道工具说了什么，永远循环</li><li>❌ 主循环没有轮数上限 → LLM 反复要求调工具，token 烧个不停</li><li>✅ 真实 API 的 JSON 可能格式错误：json.loads 必须套 try/except + 重试</li><li>✅ 国内直连用 DeepSeek / Qwen / Moonshot，都有免费额度</li></ul>
+<ul><li>❌ 忘记 media_type="text/event-stream" → 浏览器当成普通响应，一次性吐出全部内容</li><li>❌ data 行后没有空行 → 事件永远不被分发（SSE 以空行分帧）</li><li>❌ 用 EventSource 消费 POST 接口 → EventSource 只支持 GET；用 fetch + ReadableStream（前端已给）</li><li>❌ 在 SSE 生成器里 print 调试 → 混进流里污染协议；用日志模块</li><li>❌ 忘记给生成器套 try/except → LLM 报错时流半途断掉，前端白屏</li></ul>
 <h2>🔗 延伸资源</h2>
-<ul><li><a href="https://platform.openai.com/docs/guides/function-calling">OpenAI Function Calling 指南</a></li><li><a href="https://api-docs.deepseek.com/">DeepSeek API 文档</a>（免费额度）</li><li><a href="https://www.promptingguide.ai/zh">Prompt Engineering Guide（中文）</a></li><li><code>tutorial_03_real_api.py</code>：真实 API 实战教程——配好 Key 后把今天的 mock 换成真调用（限流/超时/重试都在里面）</li></ul>
+<ul><li><a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Server-sent_events">MDN: Server-Sent Events</a></li><li><a href="https://fastapi.tiangolo.com/advanced/custom-response/#streamingresponse">FastAPI: StreamingResponse</a></li></ul>
 
     </div>
 </div>

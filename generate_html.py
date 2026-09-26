@@ -86,6 +86,12 @@ from pygments.formatters import HtmlFormatter
     ("day10_lesson.html", "Day 10 - 学习", None),
     ("day10_practice_template.html", "Day 10 - 模板", None),
     ("day10_practice_validator.html", "Day 10 - 验收", None),
+    ("day11_lesson.html", "Day 11 - 学习", "Day 11-15 (项目实战)"),
+    ("day12_lesson.html", "Day 12 - 学习", None),
+    ("day13_lesson.html", "Day 13 - 学习", None),
+    ("day14_lesson.html", "Day 14 - 学习", None),
+    ("day15_lesson.html", "Day 15 - 学习", None),
+    ("project_day11_15/README.md", "项目脚手架", None),
 ]
 
 

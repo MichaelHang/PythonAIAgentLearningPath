@@ -975,6 +975,433 @@ def day10() -> str:
 """
 
 
+def 项目导航() -> str:
+    """Day 11-12 学习页顶部的资源条（没有独立模板页，脚手架就是模板）"""
+    return (
+        '<div class="file-info"><div class="info-left">🛠 项目脚手架：<a href="project_day11_15/README.md">'
+        'project_day11_15/</a>（开发都在这个目录里） ｜ 📋 <a href="ACCEPTANCE_CRITERIA.html">验收清单</a>'
+        "</div></div>"
+    )
+
+
+def day11() -> str:
+    return f"""
+<h1>Day 11：项目设计与核心开发（上）——架构、FastAPI、Agent 核心循环</h1>
+<blockquote class="note-block">
+<p><strong>🎯 今日目标</strong>：把 Day 1-10 写过的所有"零件"装进一个分层清晰的 FastAPI 服务，
+用 <code>curl</code> 对 <code>/chat</code> 发一条消息并拿到 Agent 的回答——你的 Agent 从此是一个服务，不再是一个脚本。</p>
+</blockquote>
+{项目导航()}
+<h2>⏱ 今日安排（约 2 小时）</h2>
+{表头列(["时间", "内容", "方式"], [
+["30min", "<strong>理论学习</strong>：从脚本到服务 + 分层架构", "阅读"],
+["20min", "<strong>准备</strong>：跑通脚手架（装依赖 / 配 Key / 起服务）", "操作"],
+["70min", "<strong>动手实操</strong>：完成 schemas / agent / main 的 TODO", "编码"],
+])}
+
+<h2>📖 第一步：从脚本到服务，最关键的变化是"状态"</h2>
+<p>Day 1-10 的脚本有个隐含前提：<strong>一次运行只有一个对话</strong>，所以全局变量装对话历史就够了。
+服务化之后完全不同——服务常驻运行，<strong>多个用户同时对话</strong>，张三的历史绝不能串给李四。
+所以第一课：状态必须按 <code>session_id</code> 隔离，这就是 <code>memory.py</code> 存在的意义。</p>
+<h3>1. 分层架构（脚手架已经搭好，你要能说清每一层为什么存在）</h3>
+{code("""
+project_day11_15/app/
+├── main.py      ← 路由层：只做 HTTP 与内部转换，保持"薄"
+├── schemas.py   ← 请求/响应模型（Pydantic）：HTTP 层的契约
+├── agent.py     ← 业务层：Agent 核心循环（今天的主战场）
+├── tools.py     ← 工具系统（Day 12 完善）
+├── memory.py    ← 会话记忆（Day 12 完善）
+├── llm.py       ← LLM 适配层（已写好，读懂即可）——换供应商只改这一个文件
+└── config.py    ← 配置中心（已写好）——Key/模型名/超时 单点管理
+""")}
+{表头列(["分层原则", "为什么"], [
+["路由层薄", "main.py 只做参数校验和调用，读路由就知道全部功能；业务逻辑不藏在 HTTP 里"],
+["配置单点", "所有 os.environ 收口在 config.py——找配置只看一个文件"],
+["供应商可替换", "DeepSeek 换 Qwen/本地模型，只动 llm.py，其他层零改动"],
+["状态按会话隔离", "memory.py 用 session_id 做键，杜绝用户间串话"],
+])}
+<h3>2. FastAPI 最小可用集（今天 main.py 要用到的全部）</h3>
+{code("""
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+
+app = FastAPI(title="我的 Agent")
+
+class ChatRequest(BaseModel):          # 请求体 = Pydantic 模型，自动校验
+    session_id: str = "default"
+    message: str
+
+@app.post("/chat")
+async def chat(req: ChatRequest):
+    try:
+        return {"answer": await 业务逻辑(req.message)}
+    except LLMError as e:              # 业务异常 → HTTP 状态码（不泄露 traceback）
+        raise HTTPException(status_code=503, detail=str(e))
+
+# 启动：uvicorn app.main:app --reload
+# 测试：curl -X POST http://127.0.0.1:8000/chat -H "Content-Type: application/json" -d '{"session_id": "s1", "message": "你好"}'
+# 交互式文档：http://127.0.0.1:8000/docs
+""")}
+<h3>3. Agent 核心循环 = 你写过的东西组装起来</h3>
+{code("""
+run_agent(session_id, user_input):
+    memory = MEMORY.get(session_id)            # Day 9：会话隔离的记忆
+    memory.add("user", user_input)
+    messages = [system] + memory.to_api_format()
+    for 轮 in range(MAX_TOOL_ROUNDS):          # Day 4：有上限的 Function Calling 循环
+        resp = await llm.chat(messages, tools=get_tool_list())
+        有 tool_calls？
+        ├─ 是 → execute_tool 执行 → 结果以 role=tool 回填 → 下一轮
+        └─ 否 → 最终回答 → memory.add("assistant", 回答) → return
+""")}
+<h2>🛠 第二步：动手实操</h2>
+<ol>
+<li><strong>跑通脚手架</strong>：复制 <code>project_day11_15/</code> 为你的工作目录 →
+<code>pip install -r requirements.txt</code> → 配 <code>DEEPSEEK_API_KEY</code> →
+<code>uvicorn app.main:app --reload</code> → 浏览器开 <code>http://127.0.0.1:8000/docs</code> 看到 /health 正常。</li>
+<li><strong>读 README 的"设计约定"</strong>五条——接下来的 TODO 都在遵守它们。</li>
+<li><strong>Day 11 TODO</strong>（按顺序做）：
+  <ul>
+  <li><code>schemas.py</code> TODO 1.1/1.2：ToolCallRecord / ErrorResponse 模型</li>
+  <li><code>llm.py</code>：<strong>不用写</strong>，但通读一遍——它就是 tutorial_03 第 3/4 步的服务版</li>
+  <li><code>agent.py</code> TODO 4.1：核心循环（按伪代码写，这是今天的主菜）</li>
+  <li><code>main.py</code> TODO 5.1/5.2：/chat 路由 + 统一错误处理</li>
+  </ul></li>
+<li><strong>自测</strong>：<code>curl</code> 打 /chat——无 Key 时应收到 503 和清晰错误说明（这也是功能！）；
+有 Key 时问"你好"应得到回答，问"帮我计算 3 + 5 * 2"要等 Day 12 工具系统完成后才能走工具。</li>
+</ol>
+<h2>✅ 第三步：验收（Day 11 部分）</h2>
+{链接列表([
+"uvicorn 能启动，<code>/docs</code> 可见且能直接调试",
+"<code>GET /health</code> 返回状态",
+"<code>POST /chat</code> 无 Key 时返回 503 + 人话错误（不裸崩、不泄露 traceback）",
+"有 Key 时：普通问题得到回答，且第二轮能记住第一轮说过的内容（记忆已接入）",
+"代码遵守五条设计约定（自查）",
+"完整清单见 <a href=\"ACCEPTANCE_CRITERIA.html\">验收标准文档</a> Day 11-15 交付清单",
+])}
+<h2>⚠️ 避坑</h2>
+{链接列表([
+"❌ 用全局变量装对话历史 → 多用户串台；必须 session_id 隔离（memory.py）",
+"❌ 在 main.py 里写 Agent 循环 → 路由层膨胀到没法测；业务进 agent.py",
+"❌ 把 LLM 的原始异常 traceback 直接返回给客户端 → 泄露内部信息；统一转 HTTPException",
+"❌ 请求不设 max_tokens / 超时 → 费用和挂起风险（llm.py 已内置，别删）",
+])}
+<h2>🔗 延伸资源</h2>
+{链接列表([
+'<a href="https://fastapi.tiangolo.com/zh/tutorial/">FastAPI 官方教程（中文）</a>',
+'<a href="https://fastapi.tiangolo.com/zh/tutorial/handling-errors/">FastAPI 错误处理</a>',
+])}
+"""
+
+
+def day12() -> str:
+    return f"""
+<h1>Day 12：项目设计与核心开发（下）——工具、记忆、错误处理</h1>
+<blockquote class="note-block">
+<p><strong>🎯 今日目标</strong>：补齐脚手架的三块能力——带<strong>安全边界</strong>的工具系统、
+按会话隔离的记忆、三层错误处理。做完后问"帮我计算 3 + 5 * 2"应该真的走工具，
+而试图读工作区之外的文件会被拒。</p>
+</blockquote>
+{项目导航()}
+<h2>⏱ 今日安排（约 2 小时）</h2>
+{表头列(["时间", "内容", "方式"], [
+["25min", "<strong>理论学习</strong>：工具服务化 + 路径穿越攻击", "阅读"],
+["80min", "<strong>动手实操</strong>：tools / memory 全部 TODO", "编码"],
+["15min", "<strong>验收</strong>：四个场景逐项打勾", "验收"],
+])}
+
+<h2>📖 第一步：理论学习</h2>
+
+<h3>1. 工具系统的服务化：和 Day 2 差在哪</h3>
+<p>结构没变（注册表 + 装饰器），变的是<strong>约定</strong>：
+① 工具执行只有一个出口 <code>execute_tool()</code>——Agent 不许绕过它直接调函数（脚手架 README 设计约定第 3 条）；
+② <strong>工具失败不是异常</strong>，是返回给 LLM 的一条 Observation（"错误：文件不存在"），
+LLM 看到错误信息往往能自己纠正；③ 每个工具的 parameters 用 JSON Schema 描述——它们会原样进 Function Calling 请求。</p>
+
+<h3>2. 文件工具的安全边界（今天最重要的一节）</h3>
+<p>Agent 能读文件 = LLM 决定读哪个文件。恶意或幻觉的路径可能长这样：</p>
+{code("""
+用户：帮我看看系统里的密码文件
+LLM 调用：read_file({"path": "../../../etc/passwd"})   ← 路径穿越攻击！
+""")}
+<p>防御方法：<strong>所有路径先拼到工作区内，再 resolve，最后验证仍在工作区内</strong>——
+出界一律拒绝：</p>
+{code("""
+from pathlib import Path
+
+def 安全路径(workspace: Path, path: str) -> Path:
+    target = (workspace / path).resolve()          # 1. 拼接 + 解析（消化掉 ../）
+    target.relative_to(workspace.resolve())        # 2. 不在界内会直接抛异常
+    return target                                  # 3. 通过检查才允许读写
+""")}
+<p class="note-block">⚠️ 这是真实世界的教训：给 LLM 文件/Shell 权限时，永远假设它迟早会生成一个危险路径。
+白名单 + 边界校验是底线，"提示词里嘱咐它别乱读"不是防线。</p>
+
+<h3>3. 会话记忆服务化</h3>
+<p><code>MemoryStore</code> 用字典把 <code>session_id</code> 映射到独立的 <code>SessionMemory</code>。
+裁剪规则和 Day 9 一样（超限裁最旧、system 永远保留）。要建立的生产认知：
+进程内字典<strong>只适合单进程部署</strong>；多实例部署（k8s 起多个 pod）时字典不共享，要换 Redis——
+今天知道边界在哪即可，实现不换。</p>
+
+<h3>4. 错误处理三层（脚手架 README 设计约定第 4 条）</h3>
+{表头列(["层", "负责什么", "在哪实现"], [
+["LLM 适配层", "超时、429/5xx 重试、指数退避；配置类错误（401/无 Key）不重试直接上抛", "llm.py（已写好）"],
+["业务层", "工具失败转为 Observation 回传给 LLM 自纠；轮数上限", "agent.py"],
+["路由层", "LLMError → 503、未知异常 → 500，统一 JSON 错误格式，不泄露 traceback", "main.py"],
+])}
+<h2>🛠 第二步：动手实操</h2>
+<ol>
+<li><strong>tools.py</strong>：TODO 2.1（注册，几行）→ 2.2（tools 格式）→ 2.3（统一执行出口）→
+2.4（<strong>先写安全边界</strong>：实现 <code>_安全路径</code> 后，故意传 <code>../../secret.txt</code> 试一下，应被拒）
+→ 2.5（自选工具，如 write_file——同样必须过安全检查）。</li>
+<li><strong>memory.py</strong>：TODO 3.1/3.2（Day 9 原题）→ 3.3（get 不存在则创建）→ 3.4（clear 保留 system）。</li>
+<li><strong>联调</strong>：重启 uvicorn（--reload 会自动），测四个场景：
+  <ul>
+  <li>"帮我计算 3 + 5 * 2" → 回答含 13，且响应的 tool_calls 里有记录</li>
+  <li>在工作区放一个 <code>notes.md</code>，问"读一下 notes.md" → 回答含文件内容</li>
+  <li>问"读取 ../../README.md" → 拒绝（工具返回错误，LLM 转述）</li>
+  <li>换一个 session_id 问同样问题 → 回答不到上一个会话的内容（隔离生效）</li>
+  </ul></li>
+<li><strong>验收</strong>：按 <a href="ACCEPTANCE_CRITERIA.html">验收标准文档</a> Day 11-15 交付清单中
+Day 11-12 部分逐项打勾；四个场景全部通过即完成阶段三的主体。</li>
+</ol>
+<h2>⚠️ 避坑</h2>
+{链接列表([
+"❌ 先拼接后不 resolve 就判断 → <code>workspace/../secret</code> 绕过检查；必须 resolve 后再验证",
+"❌ 工具抛异常直接让请求 500 → 工具错误是正常业务，返回错误字符串让 LLM 自纠",
+"❌ read_file/write_file 只挡了读没挡写 → 写入危害更大；同一套 _安全路径 两边都用",
+"❌ 401/无 Key 返回 500 → 客户端没法区分是自己的配置问题还是服务挂了；503 + 明确说明",
+])}
+<h2>🔗 延伸资源</h2>
+{链接列表([
+'<a href="https://owasp.org/www-community/attacks/Path_Traversal">OWASP: Path Traversal</a>（今天防的攻击）',
+'<a href="https://fastapi.tiangolo.com/zh/tutorial/handling-errors/">FastAPI 错误处理</a>',
+])}
+<h2>🚀 下一站</h2>
+<p>Day 13 给这个服务加 Web UI 和 SSE 流式（脚手架 main.py 已留注释位），Day 14 pytest + Docker。
+均按 <a href="ACCEPTANCE_CRITERIA.html">交付清单</a> 在脚手架上继续。</p>
+"""
+
+
+def day13() -> str:
+    return f"""
+<h1>Day 13：Web UI + SSE 流式交互</h1>
+<blockquote class="note-block">
+<p><strong>🎯 今日目标</strong>：在浏览器里和你的 Agent 聊天，看到打字机式的流式回答和工具调用过程——
+服务端一个 SSE 接口 + 前端一个页面，全链路打通。</p>
+</blockquote>
+{项目导航()}
+<h2>⏱ 今日安排（约 2 小时）</h2>
+{表头列(["时间", "内容", "方式"], [
+["30min", "<strong>理论学习</strong>：SSE 协议 + 技术选型", "阅读"],
+["60min", "<strong>动手实操</strong>：/chat/stream 接口 + 静态页挂载", "编码"],
+["30min", "<strong>联调</strong>：浏览器聊天 + curl 看原始流", "联调"],
+])}
+
+<h2>📖 第一步：理论学习</h2>
+
+<h3>1. 为什么用 SSE（Server-Sent Events）而不是 WebSocket</h3>
+{表头列(["", "SSE", "WebSocket"], [
+["方向", "服务器 → 浏览器单向（Agent 场景够用：请求一次、回答流式推）", "双向"],
+["协议", "普通 HTTP，天然过网关/代理", "独立协议，部分基础设施不友好"],
+["断线", "浏览器自动重连", "要自己实现"],
+["结论", "<strong>LLM 对话首选</strong>", "协同编辑/实时游戏才需要"],
+])}
+<p>SSE 的全部格式约定（你已经在 Day 3 见过生成器侧、tutorial_03 第 7 步见过解析侧）：
+响应头 <code>Content-Type: text/event-stream</code>；消息是一行行 <code>data: 内容</code>，
+<strong>每条消息后必须跟一个空行</strong>；约定 <code>data: [DONE]</code> 作为结束哨兵。</p>
+
+<h3>2. 端到端数据流（今天要把三段管道接起来）</h3>
+{code("""
+浏览器 static/index.html            FastAPI /chat/stream           llm.chat_stream
+────────────────────────           ────────────────────           ──────────────
+fetch(POST).body.getReader()  ◄──  StreamingResponse(生成器)  ◄──  async generator
+按 \\n\\n 切分事件 → JSON.parse      工具轮次：非流式（要解析 tool_calls）   逐 chunk yield
+type=tool → 显示工具行              最终回答：流式（打字机）             data: {...}
+type=answer → 追加到气泡            data: [DONE] 结束
+""")}
+<p>关键设计决策（main.py 的 TODO 里已写明）：<strong>工具轮次用非流式调用</strong>——
+因为中途需要解析 tool_calls 并执行；<strong>只有最终回答走流式</strong>。
+这是真实项目的常见做法：过程事件即时推送，答案打字机输出。</p>
+
+<h3>3. 已经给你的两块</h3>
+{链接列表([
+"<code>llm.py</code> 的 <code>chat_stream()</code>：适配层的流式版（SSE 解析已实现，通读一遍）",
+"<code>static/index.html</code>：完整的聊天前端（fetch + ReadableStream 消费 SSE，事件分 type=tool/answer 渲染）——不用改",
+])}
+<h2>🛠 第二步：动手实操（都在 main.py）</h2>
+<ol>
+<li><strong>TODO 6.1</strong>：实现 <code>POST /chat/stream</code>——按注释里的参考流程写一个异步生成器，
+用 <code>StreamingResponse(生成器, media_type="text/event-stream")</code> 返回。
+注意 SSE 的每条 data 行结尾要有<strong>两个换行</strong>，结束发 <code>data: [DONE]</code>。</li>
+<li><strong>TODO 6.2</strong>：挂载静态目录（<code>StaticFiles</code>，三行）——
+同源部署天然没有 CORS 问题；这也是不用跨域 EventSource 方案的原因。</li>
+<li><strong>联调</strong>：
+  <ul>
+  <li><code>curl -N -X POST http://127.0.0.1:8000/chat/stream -H "Content-Type: application/json" -d '{{"session_id":"s1","message":"你好"}}'</code>
+  （-N 禁用缓冲，能看到 data: 行一条条蹦出来）</li>
+  <li>浏览器开 <code>http://127.0.0.1:8000/static/index.html</code> 聊天——打字机效果 + 工具调用过程可见</li>
+  <li>问"帮我计算 3 + 5 * 2"——应先蹦出 🔧 工具行，再流式打出答案</li>
+  </ul></li>
+</ol>
+<h2>✅ 第三步：验收（Day 13 部分）</h2>
+{链接列表([
+"curl -N 能看到完整的 SSE 事件序列（tool → answer×N → [DONE]）",
+"浏览器聊天有打字机效果，工具调用过程以蓝色小条显示",
+"断开网络/停服务后刷新页面有明确错误提示（不是白屏）",
+"对照 <a href=\"ACCEPTANCE_CRITERIA.html\">交付清单</a> Day 13 部分打勾",
+])}
+<h2>⚠️ 避坑</h2>
+{链接列表([
+"❌ 忘记 media_type=\"text/event-stream\" → 浏览器当成普通响应，一次性吐出全部内容",
+"❌ data 行后没有空行 → 事件永远不被分发（SSE 以空行分帧）",
+"❌ 用 EventSource 消费 POST 接口 → EventSource 只支持 GET；用 fetch + ReadableStream（前端已给）",
+"❌ 在 SSE 生成器里 print 调试 → 混进流里污染协议；用日志模块",
+"❌ 忘记给生成器套 try/except → LLM 报错时流半途断掉，前端白屏",
+])}
+<h2>🔗 延伸资源</h2>
+{链接列表([
+'<a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Server-sent_events">MDN: Server-Sent Events</a>',
+'<a href="https://fastapi.tiangolo.com/advanced/custom-response/#streamingresponse">FastAPI: StreamingResponse</a>',
+])}
+"""
+
+
+def day14() -> str:
+    return f"""
+<h1>Day 14：测试、优化与部署</h1>
+<blockquote class="note-block">
+<p><strong>🎯 今日目标</strong>：给项目装上"安全网"（pytest 测试套件，不花一分钱 API 费），
+再把整个服务装进 Docker 容器——<code>docker run</code> 一条命令在任何机器上跑起来。</p>
+</blockquote>
+{项目导航()}
+<h2>⏱ 今日安排（约 2 小时）</h2>
+{表头列(["时间", "内容", "方式"], [
+["25min", "<strong>理论学习</strong>：Agent 项目的测试策略 + Docker 基础", "阅读"],
+["60min", "<strong>测试</strong>：跑通 tests/ 三个测试文件，全部变绿", "编码"],
+["35min", "<strong>部署</strong>：docker build + docker run", "操作"],
+])}
+
+<h2>📖 第一步：Agent 项目怎么测（测试金字塔）</h2>
+{表头列(["层级", "测什么", "要不要 Key/网络"], [
+["单元测试", "memory 裁剪/隔离、tools 注册/安全路径——纯逻辑", "不要（tests/test_memory.py、test_tools.py）"],
+["API 集成测试", "路由 → Agent → 响应 全链路（<strong>monkeypatch 掉 LLM</strong>，返回固定回答）", "不要（tests/test_api.py）"],
+["真实冒烟测试", "打一次真实 API 验证配置", "要（手动跑一次即可，不进 CI）"],
+])}
+<p>核心技巧：<strong>monkeypatch 掉 LLM 调用</strong>——把 <code>llm.chat</code> 替换成返回固定响应的假函数，
+Agent 循环、记忆、路由全部真实跑，只有 LLM 是假的。测试快、稳、免费，
+而且能模拟各种 LLM 行为（正常回答 / 要求调工具 / 抛异常）。</p>
+
+<h3>Docker 三个关键点（Dockerfile 已给好，要能逐行讲清）</h3>
+{code("""
+FROM python:3.12-slim                 # 1. 瘦基础镜像
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY app ./app                        # 2. 依赖先装、代码后拷——层缓存：
+                                      #    改代码不触发重装依赖，重建快一个量级
+EXPOSE 8000
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+                                      # 3. --host 0.0.0.0：容器内必须监听所有网卡，
+                                      #    否则端口映射后外面访问不到（新手第一坑）
+""")}
+<p>环境变量在部署时的正确姿势：<code>docker run -e DEEPSEEK_API_KEY=sk-xxx ...</code>——
+Key 走环境变量进容器，<strong>永远不写进镜像</strong>（.dockerignore 已排除 .env）。</p>
+<h2>🛠 第二步：动手实操</h2>
+<ol>
+<li><strong>跑测试</strong>：<code>pip install pytest httpx</code> →
+<code>pytest tests/ -v</code>。Day 12 没完成的部分现在是红的——<strong>把 TODO 补完让它们变绿</strong>，
+这就是测试驱动。三个文件：test_memory（记忆/隔离）、test_tools（注册/安全路径，
+含 <code>../../etc/passwd</code> 必须被拒的用例）、test_api（monkeypatch LLM 的全链路）。</li>
+<li><strong>加一条你自己的测试</strong>（TODO 7.3）：往 tests/ 里补一个你认为最可能出 bug 的场景
+（比如：用户消息超长时记忆被正确裁剪）。</li>
+<li><strong>构建镜像</strong>：<code>docker build -t dev-agent .</code> →
+<code>docker run --rm -e DEEPSEEK_API_KEY=你的key -p 8000:8000 dev-agent</code> →
+浏览器开 <code>http://127.0.0.1:8000/static/index.html</code> 聊天。
+没有 Docker 环境就先跳过，读完 Dockerfile 能讲清每一行也算达标。</li>
+<li><strong>优化盘点</strong>（对照检查）：max_tokens 已设？历史已裁剪？相同请求有缓存思路？
+token 统计有入口？——都在前几天的代码里，确认没被删掉。</li>
+</ol>
+<h2>✅ 第三步：验收（Day 14 部分）</h2>
+{链接列表([
+"<code>pytest tests/ -v</code> 全绿（无 Key 环境也能全绿）",
+"docker run 后 <code>/health</code> 通、聊天可用（或能逐行讲清 Dockerfile）",
+"<code>.env</code> 和 <code>workspace/</code> 不在镜像里（<code>docker run ... ls /app</code> 自查）",
+"对照 <a href=\"ACCEPTANCE_CRITERIA.html\">交付清单</a> Day 14 部分打勾",
+])}
+<h2>⚠️ 避坑</h2>
+{链接列表([
+"❌ 集成测试直接打真实 API → 慢、贵、结果不稳定；monkeypatch 是标准做法",
+"❌ Dockerfile 里 COPY . . 且没有 .dockerignore → .env 里的 Key 进镜像 = 泄露密钥",
+"❌ uvicorn 忘了 --host 0.0.0.0 → 容器外永远访问不通",
+"❌ 异步测试直接 def → 拿不到事件循环；用 pytest-asyncio 或像 test_api 一样用 TestClient 同步壳",
+"❌ 一次都不跑测试就继续开发 → 回归只能靠手点；<code>pytest</code> 要变成肌肉记忆",
+])}
+<h2>🔗 延伸资源</h2>
+{链接列表([
+'<a href="https://fastapi.tiangolo.com/zh/tutorial/testing/">FastAPI 官方测试指南</a>',
+'<a href="https://docs.docker.com/get-started/docker-concepts/building-images/build-context-and-dockerfile/">Docker 构建概念</a>',
+])}
+"""
+
+
+def day15() -> str:
+    return f"""
+<h1>Day 15：总结、文档与延伸</h1>
+<blockquote class="note-block">
+<p><strong>🎯 今日目标</strong>：收尾不写代码——整理知识体系、补齐项目文档、规划进阶路线。
+这一天结束时，你手里应该有一个<strong>能部署、有测试、有文档</strong>的 Agent 项目，
+和一张刻在脑子里的知识地图。</p>
+</blockquote>
+{项目导航()}
+<h2>⏱ 今日安排（约 2 小时）</h2>
+{表头列(["时间", "内容", "方式"], [
+["40min", "<strong>知识收束</strong>：15 天知识地图自测", "复盘"],
+["50min", "<strong>项目文档</strong>：README + 架构图 + 使用示例", "写作"],
+["30min", "<strong>进阶路线</strong>：Multi-Agent / 评测 / 安全", "规划"],
+])}
+
+<h2>📖 第一步：15 天知识地图（合上材料自测）</h2>
+{表头列(["阶段", "你掌握的能力", "关键文件"], [
+["阶段一", "asyncio 并发、Pydantic Schema、装饰器注册、生成器流式、Function Calling 全流程", "day01-05 / tutorial 01-03"],
+["阶段二", "手写 ReAct、LangGraph 图模型、MCP 协议、记忆与 RAG、错误恢复", "day06-10"],
+["阶段三", "分层服务架构、SSE 流式、pytest 测试、Docker 部署", "project_day11_15/"],
+])}
+<p><strong>结业自查十问</strong>（答不上来的回对应学习页）：
+① 为什么 async 函数里不能用 time.sleep？② Pydantic 校验和安全过滤的区别？
+③ Function Calling 的完整时序？④ ReAct 循环为什么必须有 max_steps？
+⑤ LangGraph 的 Node/Edge/Conditional Edge 对应手写循环的哪些部分？
+⑥ MCP 解决了 M×N 什么问题？⑦ 短期记忆为什么要裁剪、system 为什么不能裁？
+⑧ 路径穿越怎么防？⑨ SSE 和 WebSocket 怎么选？⑩ 为什么测试要 monkeypatch 掉 LLM？</p>
+
+<h2>🛠 第二步：项目文档（交付清单的 Day 15 部分）</h2>
+{链接列表([
+"<strong>README</strong>：项目是什么 / 截图或 GIF / 安装步骤（含 Key 配置）/ 运行方式 / 接口说明 / 已知限制",
+"<strong>架构图</strong>：把 Day 11 的分层图画成正式版（可用 mermaid / draw.io / 截图）",
+"<strong>示例</strong>：至少 3 条端到端示例（普通对话 / 工具调用 / 记忆多轮），贴请求和响应",
+"<strong>README 里的 Day 11-15 任务表</strong>更新为实际完成情况",
+])}
+<h2>🚀 第三步：进阶路线（Day 15 之后）</h2>
+{表头列(["方向", "内容", "建议起点"], [
+["<strong>Multi-Agent</strong>", "AutoGen / CrewAI 多 Agent 协作：规划者-执行者、辩论、角色分工", "把本项目拆成'规划 Agent + 工具 Agent'两个角色"],
+["<strong>Agent 评测</strong>", "固定测试集 + 自动回归：工具选择对了吗？答案对了吗？成本多少？", "把 tests/ 思路扩展成几十条端到端用例"],
+["<strong>Agent 安全</strong>", "Prompt 注入防护、工具沙箱、最小权限、审计日志", "回顾 Day 12 路径穿越——再补一层输入过滤"],
+["<strong>生产化</strong>", "K8s 多副本（记忆换 Redis）、LangSmith/Langfuse 观测、灰度发布", "把进程内 MemoryStore 换成 Redis 接口"],
+["<strong>保持学习</strong>", "领域每周都在变——保持每周一篇论文/博客的阅读习惯", "Lilian Weng 博客 / 各框架 release note"],
+])}
+<h2>✅ 结业验收</h2>
+{链接列表([
+"<a href=\"ACCEPTANCE_CRITERIA.html\">交付清单</a> Day 11-15 全部打勾",
+"项目 README 完整，新人照着 5 分钟能跑起来",
+"pytest 全绿、docker run 可用",
+"合上材料能回答上面的十问",
+])}
+<blockquote class="note-block">
+<p><strong>最后提醒</strong>：15 天是启动时间，不是终点。框架会过时，但
+<strong>规划 → 工具调用 → 反思 → 迭代</strong>这个循环不会。把它刻在脑子里，任何新框架都不过是它的具象化。</p>
+</blockquote>
+"""
+
+
 课程 = [
     (1, "异步编程核心", day01, True),
     (2, "类型系统与装饰器进阶", day02, True),
@@ -986,6 +1413,11 @@ def day10() -> str:
     (8, "工具系统设计与 MCP 协议", day08, True),
     (9, "记忆系统与 RAG", day09, True),
     (10, "阶段二综合实战：多工具 Agent", day10, True),
+    (11, "项目设计与核心开发（上）：架构 + FastAPI", day11, False),
+    (12, "项目设计与核心开发（下）：工具 / 记忆 / 错误处理", day12, False),
+    (13, "Web UI + SSE 流式交互", day13, False),
+    (14, "测试、优化与部署", day14, False),
+    (15, "总结、文档与延伸", day15, False),
 ]
 
 

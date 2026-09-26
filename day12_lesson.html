@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📖 Day04 Lesson</title>
+    <title>📖 Day12 Lesson</title>
     <style>
 
 
@@ -373,7 +373,7 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 <a class="" href="day03_practice_template.html">Day 3 - 模板</a>
 <a class="" href="day03_practice_validator.html">Day 3 - 验收</a>
 <h4>Day 4-5 (LLM)</h4>
-<a class="active" href="day04_lesson.html">Day 4 - 学习</a>
+<a class="" href="day04_lesson.html">Day 4 - 学习</a>
 <a class="" href="day04_practice_template.html">Day 4 - 模板</a>
 <a class="" href="day04_practice_validator.html">Day 4 - 验收</a>
 <a class="" href="day05_lesson.html">Day 5 - 学习</a>
@@ -398,97 +398,80 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 <a class="" href="day10_practice_validator.html">Day 10 - 验收</a>
 <h4>Day 11-15 (项目实战)</h4>
 <a class="" href="day11_lesson.html">Day 11 - 学习</a>
-<a class="" href="day12_lesson.html">Day 12 - 学习</a>
+<a class="active" href="day12_lesson.html">Day 12 - 学习</a>
 <a class="" href="day13_lesson.html">Day 13 - 学习</a>
 <a class="" href="day14_lesson.html">Day 14 - 学习</a>
 <a class="" href="day15_lesson.html">Day 15 - 学习</a>
 <a class="" href="project_day11_15/README.md">项目脚手架</a>
 </div>
 <div class="main-content">
-    <div class="header"><h1>📖 Day 4 学习页：LLM API 调用与 Function Calling</h1></div>
+    <div class="header"><h1>📖 Day 12 学习页：项目设计与核心开发（下）：工具 / 记忆 / 错误处理</h1></div>
     <div class="content">
 
-<h1>Day 4：LLM API 调用与 Function Calling</h1>
+<h1>Day 12：项目设计与核心开发（下）——工具、记忆、错误处理</h1>
 <blockquote class="note-block">
-<p><strong>🎯 今日目标</strong>：跑通 Function Calling 完整闭环——让 LLM 自己决定调用哪个 Python 函数、
-你执行它、把结果喂回去、LLM 给出最终回答。这是"Agent 会用工具"的本质，今天用 mock 就能练，不需要 API Key。</p>
+<p><strong>🎯 今日目标</strong>：补齐脚手架的三块能力——带<strong>安全边界</strong>的工具系统、
+按会话隔离的记忆、三层错误处理。做完后问"帮我计算 3 + 5 * 2"应该真的走工具，
+而试图读工作区之外的文件会被拒。</p>
 </blockquote>
-<div class="file-info"><div class="info-left">📚 本日资源：📝 <a href="day04_practice_template.html">练习模板</a> ｜ ✅ <a href="day04_practice_validator.html">验收脚本</a></div></div>
+<div class="file-info"><div class="info-left">🛠 项目脚手架：<a href="project_day11_15/README.md">project_day11_15/</a>（开发都在这个目录里） ｜ 📋 <a href="ACCEPTANCE_CRITERIA.html">验收清单</a></div></div>
 <h2>⏱ 今日安排（约 2 小时）</h2>
-<table class="styled-table"><thead><tr><th>时间</th><th>内容</th><th>方式</th></tr></thead><tbody><tr><td>30min</td><td><strong>理论学习</strong>：API 结构 + Function Calling 时序</td><td>阅读</td></tr><tr><td>40min</td><td><strong>Prompt 实验</strong>：System Prompt / Few-shot / ReAct 格式</td><td>编码实验</td></tr><tr><td>50min</td><td><strong>动手实操</strong>：完成练习模板 7 个 TODO</td><td>编码</td></tr></tbody></table>
+<table class="styled-table"><thead><tr><th>时间</th><th>内容</th><th>方式</th></tr></thead><tbody><tr><td>25min</td><td><strong>理论学习</strong>：工具服务化 + 路径穿越攻击</td><td>阅读</td></tr><tr><td>80min</td><td><strong>动手实操</strong>：tools / memory 全部 TODO</td><td>编码</td></tr><tr><td>15min</td><td><strong>验收</strong>：四个场景逐项打勾</td><td>验收</td></tr></tbody></table>
 
 <h2>📖 第一步：理论学习</h2>
 
-<h3>1. OpenAI 兼容 API 的请求结构</h3>
-<p>DeepSeek / Qwen / Moonshot 都兼容这套格式。一次对话 = POST 一个 JSON：</p>
-<pre class="code-block"><code>POST https://api.deepseek.com/chat/completions
-Authorization: Bearer 你的KEY
+<h3>1. 工具系统的服务化：和 Day 2 差在哪</h3>
+<p>结构没变（注册表 + 装饰器），变的是<strong>约定</strong>：
+① 工具执行只有一个出口 <code>execute_tool()</code>——Agent 不许绕过它直接调函数（脚手架 README 设计约定第 3 条）；
+② <strong>工具失败不是异常</strong>，是返回给 LLM 的一条 Observation（"错误：文件不存在"），
+LLM 看到错误信息往往能自己纠正；③ 每个工具的 parameters 用 JSON Schema 描述——它们会原样进 Function Calling 请求。</p>
 
-{
-  "model": "deepseek-chat",
-  "messages": [
-    {"role": "system",    "content": "你是一个有用的助手"},   # 设定人设，放最前
-    {"role": "user",      "content": "北京今天天气怎么样？"},
-    {"role": "assistant", "content": null,
-      "tool_calls": [ ... ]},                                # LLM 请求调工具
-    {"role": "tool",      "content": "晴 25°C", "tool_call_id": "call_001"}  # 工具结果回传
-  ],
-  "tools": [ ... ]     # 告诉 LLM 有哪些工具可用
-}</code></pre>
-<h3>2. tools 参数：给 LLM 的"工具说明书"</h3>
-<pre class="code-block"><code>[
-  {
-    "type": "function",
-    "function": {
-      "name": "get_weather",
-      "description": "获取指定城市的天气信息",     # ← LLM 靠这句话决定选不选这个工具！
-      "parameters": {                            # ← JSON Schema，Day 2 的 Pydantic 可以自动生成
-        "type": "object",
-        "properties": {"city": {"type": "string", "description": "城市名称"}},
-        "required": ["city"]
-      }
-    }
-  }
-]</code></pre>
-<h3>3. Function Calling 完整时序（今天的核心）</h3>
-<pre class="code-block"><code>用户提问
-   │
-   ▼
-① 带 tools 调 LLM ──────────────► LLM 不直接回答，返回 tool_calls：
-   │                                {"name": "get_weather", "arguments": '{"city":"北京"}'}
-   ▼                                 注意：arguments 是 JSON 字符串，要 json.loads！
-② 你解析并执行真正的 Python 函数，得到结果 "晴 25°C"
-   │
-   ▼
-③ 把结果作为 role="tool" 消息追加进 messages（带上 tool_call_id）
-   │
-   ▼
-④ 再次调用 LLM ─────────────────► LLM 综合工具结果，给出最终回答
-   │
-   ▼
-⑤ 循环：如果第 ④ 步又返回 tool_calls，回到 ②，直到给出最终回答
-   （所以必须有 max_rounds 上限，防止无限烧钱）</code></pre>
-<h3>4. Prompt 工程三原则（今天顺手练）</h3>
-<table class="styled-table"><thead><tr><th>原则</th><th>做法</th></tr></thead><tbody><tr><td>System Prompt 精简</td><td>只放人设 + 工具使用规则；太长 LLM 会忽略后面的</td></tr><tr><td>Few-shot</td><td>在 prompt 里给 1-2 个输入→输出示例，格式遵循度大幅提升</td></tr><tr><td>格式约束</td><td>让 LLM 按固定格式输出（如 ReAct 的 Thought/Action），后面才好解析</td></tr></tbody></table>
+<h3>2. 文件工具的安全边界（今天最重要的一节）</h3>
+<p>Agent 能读文件 = LLM 决定读哪个文件。恶意或幻觉的路径可能长这样：</p>
+<pre class="code-block"><code>用户：帮我看看系统里的密码文件
+LLM 调用：read_file({"path": "../../../etc/passwd"})   ← 路径穿越攻击！</code></pre>
+<p>防御方法：<strong>所有路径先拼到工作区内，再 resolve，最后验证仍在工作区内</strong>——
+出界一律拒绝：</p>
+<pre class="code-block"><code>from pathlib import Path
+
+def 安全路径(workspace: Path, path: str) -&gt; Path:
+    target = (workspace / path).resolve()          # 1. 拼接 + 解析（消化掉 ../）
+    target.relative_to(workspace.resolve())        # 2. 不在界内会直接抛异常
+    return target                                  # 3. 通过检查才允许读写</code></pre>
+<p class="note-block">⚠️ 这是真实世界的教训：给 LLM 文件/Shell 权限时，永远假设它迟早会生成一个危险路径。
+白名单 + 边界校验是底线，"提示词里嘱咐它别乱读"不是防线。</p>
+
+<h3>3. 会话记忆服务化</h3>
+<p><code>MemoryStore</code> 用字典把 <code>session_id</code> 映射到独立的 <code>SessionMemory</code>。
+裁剪规则和 Day 9 一样（超限裁最旧、system 永远保留）。要建立的生产认知：
+进程内字典<strong>只适合单进程部署</strong>；多实例部署（k8s 起多个 pod）时字典不共享，要换 Redis——
+今天知道边界在哪即可，实现不换。</p>
+
+<h3>4. 错误处理三层（脚手架 README 设计约定第 4 条）</h3>
+<table class="styled-table"><thead><tr><th>层</th><th>负责什么</th><th>在哪实现</th></tr></thead><tbody><tr><td>LLM 适配层</td><td>超时、429/5xx 重试、指数退避；配置类错误（401/无 Key）不重试直接上抛</td><td>llm.py（已写好）</td></tr><tr><td>业务层</td><td>工具失败转为 Observation 回传给 LLM 自纠；轮数上限</td><td>agent.py</td></tr><tr><td>路由层</td><td>LLMError → 503、未知异常 → 500，统一 JSON 错误格式，不泄露 traceback</td><td>main.py</td></tr></tbody></table>
 <h2>🛠 第二步：动手实操</h2>
 <ol>
-<li><strong>打开模板</strong>：<a href="day04_practice_template.html">day04_practice_template.py</a>。两个工具已注册好，
-mock LLM 也写好了（不需要 Key），你实现 4 个核心函数：
+<li><strong>tools.py</strong>：TODO 2.1（注册，几行）→ 2.2（tools 格式）→ 2.3（统一执行出口）→
+2.4（<strong>先写安全边界</strong>：实现 <code>_安全路径</code> 后，故意传 <code>../../secret.txt</code> 试一下，应被拒）
+→ 2.5（自选工具，如 write_file——同样必须过安全检查）。</li>
+<li><strong>memory.py</strong>：TODO 3.1/3.2（Day 9 原题）→ 3.3（get 不存在则创建）→ 3.4（clear 保留 system）。</li>
+<li><strong>联调</strong>：重启 uvicorn（--reload 会自动），测四个场景：
   <ul>
-  <li>TODO 1.2：<code>get_tools_for_api()</code> —— 把注册表转成上面的 tools 格式</li>
-  <li>TODO 3.1：<code>parse_tool_calls()</code> —— 从响应里取 tool_calls，<code>json.loads</code> 解析 arguments</li>
-  <li>TODO 3.2：<code>execute_tool_call()</code> —— 查注册表、执行、返回结果</li>
-  <li>TODO 4.1：<code>chat_with_function_calling()</code> —— 按上面的 ①→⑤ 时序写主循环（最有价值的一题）</li>
-  <li>TODO 5.1（可选）：有 DeepSeek Key 的话把 mock 换成真实 API</li>
+  <li>"帮我计算 3 + 5 * 2" → 回答含 13，且响应的 tool_calls 里有记录</li>
+  <li>在工作区放一个 <code>notes.md</code>，问"读一下 notes.md" → 回答含文件内容</li>
+  <li>问"读取 ../../README.md" → 拒绝（工具返回错误，LLM 转述）</li>
+  <li>换一个 session_id 问同样问题 → 回答不到上一个会话的内容（隔离生效）</li>
   </ul></li>
-<li><strong>运行自测</strong>：<code>python day04_practice_template.py</code>，两个问题都应打出最终回答。</li>
-<li><strong>验收</strong>：<code>python day04_practice_validator.py</code> —— 验收用构造好的 LLM 响应直接喂你的解析函数，
-并跑通你的完整闭环。</li>
+<li><strong>验收</strong>：按 <a href="ACCEPTANCE_CRITERIA.html">验收标准文档</a> Day 11-15 交付清单中
+Day 11-12 部分逐项打勾；四个场景全部通过即完成阶段三的主体。</li>
 </ol>
 <h2>⚠️ 避坑</h2>
-<ul><li>❌ <code>arguments</code> 是 JSON <strong>字符串</strong>不是字典——忘 json.loads 是新手第一坑</li><li>❌ 工具结果忘以 <code>role="tool"</code> 回传 → LLM 不知道工具说了什么，永远循环</li><li>❌ 主循环没有轮数上限 → LLM 反复要求调工具，token 烧个不停</li><li>✅ 真实 API 的 JSON 可能格式错误：json.loads 必须套 try/except + 重试</li><li>✅ 国内直连用 DeepSeek / Qwen / Moonshot，都有免费额度</li></ul>
+<ul><li>❌ 先拼接后不 resolve 就判断 → <code>workspace/../secret</code> 绕过检查；必须 resolve 后再验证</li><li>❌ 工具抛异常直接让请求 500 → 工具错误是正常业务，返回错误字符串让 LLM 自纠</li><li>❌ read_file/write_file 只挡了读没挡写 → 写入危害更大；同一套 _安全路径 两边都用</li><li>❌ 401/无 Key 返回 500 → 客户端没法区分是自己的配置问题还是服务挂了；503 + 明确说明</li></ul>
 <h2>🔗 延伸资源</h2>
-<ul><li><a href="https://platform.openai.com/docs/guides/function-calling">OpenAI Function Calling 指南</a></li><li><a href="https://api-docs.deepseek.com/">DeepSeek API 文档</a>（免费额度）</li><li><a href="https://www.promptingguide.ai/zh">Prompt Engineering Guide（中文）</a></li><li><code>tutorial_03_real_api.py</code>：真实 API 实战教程——配好 Key 后把今天的 mock 换成真调用（限流/超时/重试都在里面）</li></ul>
+<ul><li><a href="https://owasp.org/www-community/attacks/Path_Traversal">OWASP: Path Traversal</a>（今天防的攻击）</li><li><a href="https://fastapi.tiangolo.com/zh/tutorial/handling-errors/">FastAPI 错误处理</a></li></ul>
+<h2>🚀 下一站</h2>
+<p>Day 13 给这个服务加 Web UI 和 SSE 流式（脚手架 main.py 已留注释位），Day 14 pytest + Docker。
+均按 <a href="ACCEPTANCE_CRITERIA.html">交付清单</a> 在脚手架上继续。</p>
 
     </div>
 </div>

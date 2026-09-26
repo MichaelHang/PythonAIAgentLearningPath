@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📖 Day04 Lesson</title>
+    <title>📖 Day14 Lesson</title>
     <style>
 
 
@@ -373,7 +373,7 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 <a class="" href="day03_practice_template.html">Day 3 - 模板</a>
 <a class="" href="day03_practice_validator.html">Day 3 - 验收</a>
 <h4>Day 4-5 (LLM)</h4>
-<a class="active" href="day04_lesson.html">Day 4 - 学习</a>
+<a class="" href="day04_lesson.html">Day 4 - 学习</a>
 <a class="" href="day04_practice_template.html">Day 4 - 模板</a>
 <a class="" href="day04_practice_validator.html">Day 4 - 验收</a>
 <a class="" href="day05_lesson.html">Day 5 - 学习</a>
@@ -400,95 +400,62 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 <a class="" href="day11_lesson.html">Day 11 - 学习</a>
 <a class="" href="day12_lesson.html">Day 12 - 学习</a>
 <a class="" href="day13_lesson.html">Day 13 - 学习</a>
-<a class="" href="day14_lesson.html">Day 14 - 学习</a>
+<a class="active" href="day14_lesson.html">Day 14 - 学习</a>
 <a class="" href="day15_lesson.html">Day 15 - 学习</a>
 <a class="" href="project_day11_15/README.md">项目脚手架</a>
 </div>
 <div class="main-content">
-    <div class="header"><h1>📖 Day 4 学习页：LLM API 调用与 Function Calling</h1></div>
+    <div class="header"><h1>📖 Day 14 学习页：测试、优化与部署</h1></div>
     <div class="content">
 
-<h1>Day 4：LLM API 调用与 Function Calling</h1>
+<h1>Day 14：测试、优化与部署</h1>
 <blockquote class="note-block">
-<p><strong>🎯 今日目标</strong>：跑通 Function Calling 完整闭环——让 LLM 自己决定调用哪个 Python 函数、
-你执行它、把结果喂回去、LLM 给出最终回答。这是"Agent 会用工具"的本质，今天用 mock 就能练，不需要 API Key。</p>
+<p><strong>🎯 今日目标</strong>：给项目装上"安全网"（pytest 测试套件，不花一分钱 API 费），
+再把整个服务装进 Docker 容器——<code>docker run</code> 一条命令在任何机器上跑起来。</p>
 </blockquote>
-<div class="file-info"><div class="info-left">📚 本日资源：📝 <a href="day04_practice_template.html">练习模板</a> ｜ ✅ <a href="day04_practice_validator.html">验收脚本</a></div></div>
+<div class="file-info"><div class="info-left">🛠 项目脚手架：<a href="project_day11_15/README.md">project_day11_15/</a>（开发都在这个目录里） ｜ 📋 <a href="ACCEPTANCE_CRITERIA.html">验收清单</a></div></div>
 <h2>⏱ 今日安排（约 2 小时）</h2>
-<table class="styled-table"><thead><tr><th>时间</th><th>内容</th><th>方式</th></tr></thead><tbody><tr><td>30min</td><td><strong>理论学习</strong>：API 结构 + Function Calling 时序</td><td>阅读</td></tr><tr><td>40min</td><td><strong>Prompt 实验</strong>：System Prompt / Few-shot / ReAct 格式</td><td>编码实验</td></tr><tr><td>50min</td><td><strong>动手实操</strong>：完成练习模板 7 个 TODO</td><td>编码</td></tr></tbody></table>
+<table class="styled-table"><thead><tr><th>时间</th><th>内容</th><th>方式</th></tr></thead><tbody><tr><td>25min</td><td><strong>理论学习</strong>：Agent 项目的测试策略 + Docker 基础</td><td>阅读</td></tr><tr><td>60min</td><td><strong>测试</strong>：跑通 tests/ 三个测试文件，全部变绿</td><td>编码</td></tr><tr><td>35min</td><td><strong>部署</strong>：docker build + docker run</td><td>操作</td></tr></tbody></table>
 
-<h2>📖 第一步：理论学习</h2>
+<h2>📖 第一步：Agent 项目怎么测（测试金字塔）</h2>
+<table class="styled-table"><thead><tr><th>层级</th><th>测什么</th><th>要不要 Key/网络</th></tr></thead><tbody><tr><td>单元测试</td><td>memory 裁剪/隔离、tools 注册/安全路径——纯逻辑</td><td>不要（tests/test_memory.py、test_tools.py）</td></tr><tr><td>API 集成测试</td><td>路由 → Agent → 响应 全链路（<strong>monkeypatch 掉 LLM</strong>，返回固定回答）</td><td>不要（tests/test_api.py）</td></tr><tr><td>真实冒烟测试</td><td>打一次真实 API 验证配置</td><td>要（手动跑一次即可，不进 CI）</td></tr></tbody></table>
+<p>核心技巧：<strong>monkeypatch 掉 LLM 调用</strong>——把 <code>llm.chat</code> 替换成返回固定响应的假函数，
+Agent 循环、记忆、路由全部真实跑，只有 LLM 是假的。测试快、稳、免费，
+而且能模拟各种 LLM 行为（正常回答 / 要求调工具 / 抛异常）。</p>
 
-<h3>1. OpenAI 兼容 API 的请求结构</h3>
-<p>DeepSeek / Qwen / Moonshot 都兼容这套格式。一次对话 = POST 一个 JSON：</p>
-<pre class="code-block"><code>POST https://api.deepseek.com/chat/completions
-Authorization: Bearer 你的KEY
-
-{
-  "model": "deepseek-chat",
-  "messages": [
-    {"role": "system",    "content": "你是一个有用的助手"},   # 设定人设，放最前
-    {"role": "user",      "content": "北京今天天气怎么样？"},
-    {"role": "assistant", "content": null,
-      "tool_calls": [ ... ]},                                # LLM 请求调工具
-    {"role": "tool",      "content": "晴 25°C", "tool_call_id": "call_001"}  # 工具结果回传
-  ],
-  "tools": [ ... ]     # 告诉 LLM 有哪些工具可用
-}</code></pre>
-<h3>2. tools 参数：给 LLM 的"工具说明书"</h3>
-<pre class="code-block"><code>[
-  {
-    "type": "function",
-    "function": {
-      "name": "get_weather",
-      "description": "获取指定城市的天气信息",     # ← LLM 靠这句话决定选不选这个工具！
-      "parameters": {                            # ← JSON Schema，Day 2 的 Pydantic 可以自动生成
-        "type": "object",
-        "properties": {"city": {"type": "string", "description": "城市名称"}},
-        "required": ["city"]
-      }
-    }
-  }
-]</code></pre>
-<h3>3. Function Calling 完整时序（今天的核心）</h3>
-<pre class="code-block"><code>用户提问
-   │
-   ▼
-① 带 tools 调 LLM ──────────────► LLM 不直接回答，返回 tool_calls：
-   │                                {"name": "get_weather", "arguments": '{"city":"北京"}'}
-   ▼                                 注意：arguments 是 JSON 字符串，要 json.loads！
-② 你解析并执行真正的 Python 函数，得到结果 "晴 25°C"
-   │
-   ▼
-③ 把结果作为 role="tool" 消息追加进 messages（带上 tool_call_id）
-   │
-   ▼
-④ 再次调用 LLM ─────────────────► LLM 综合工具结果，给出最终回答
-   │
-   ▼
-⑤ 循环：如果第 ④ 步又返回 tool_calls，回到 ②，直到给出最终回答
-   （所以必须有 max_rounds 上限，防止无限烧钱）</code></pre>
-<h3>4. Prompt 工程三原则（今天顺手练）</h3>
-<table class="styled-table"><thead><tr><th>原则</th><th>做法</th></tr></thead><tbody><tr><td>System Prompt 精简</td><td>只放人设 + 工具使用规则；太长 LLM 会忽略后面的</td></tr><tr><td>Few-shot</td><td>在 prompt 里给 1-2 个输入→输出示例，格式遵循度大幅提升</td></tr><tr><td>格式约束</td><td>让 LLM 按固定格式输出（如 ReAct 的 Thought/Action），后面才好解析</td></tr></tbody></table>
+<h3>Docker 三个关键点（Dockerfile 已给好，要能逐行讲清）</h3>
+<pre class="code-block"><code>FROM python:3.12-slim                 # 1. 瘦基础镜像
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY app ./app                        # 2. 依赖先装、代码后拷——层缓存：
+                                      #    改代码不触发重装依赖，重建快一个量级
+EXPOSE 8000
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+                                      # 3. --host 0.0.0.0：容器内必须监听所有网卡，
+                                      #    否则端口映射后外面访问不到（新手第一坑）</code></pre>
+<p>环境变量在部署时的正确姿势：<code>docker run -e DEEPSEEK_API_KEY=sk-xxx ...</code>——
+Key 走环境变量进容器，<strong>永远不写进镜像</strong>（.dockerignore 已排除 .env）。</p>
 <h2>🛠 第二步：动手实操</h2>
 <ol>
-<li><strong>打开模板</strong>：<a href="day04_practice_template.html">day04_practice_template.py</a>。两个工具已注册好，
-mock LLM 也写好了（不需要 Key），你实现 4 个核心函数：
-  <ul>
-  <li>TODO 1.2：<code>get_tools_for_api()</code> —— 把注册表转成上面的 tools 格式</li>
-  <li>TODO 3.1：<code>parse_tool_calls()</code> —— 从响应里取 tool_calls，<code>json.loads</code> 解析 arguments</li>
-  <li>TODO 3.2：<code>execute_tool_call()</code> —— 查注册表、执行、返回结果</li>
-  <li>TODO 4.1：<code>chat_with_function_calling()</code> —— 按上面的 ①→⑤ 时序写主循环（最有价值的一题）</li>
-  <li>TODO 5.1（可选）：有 DeepSeek Key 的话把 mock 换成真实 API</li>
-  </ul></li>
-<li><strong>运行自测</strong>：<code>python day04_practice_template.py</code>，两个问题都应打出最终回答。</li>
-<li><strong>验收</strong>：<code>python day04_practice_validator.py</code> —— 验收用构造好的 LLM 响应直接喂你的解析函数，
-并跑通你的完整闭环。</li>
+<li><strong>跑测试</strong>：<code>pip install pytest httpx</code> →
+<code>pytest tests/ -v</code>。Day 12 没完成的部分现在是红的——<strong>把 TODO 补完让它们变绿</strong>，
+这就是测试驱动。三个文件：test_memory（记忆/隔离）、test_tools（注册/安全路径，
+含 <code>../../etc/passwd</code> 必须被拒的用例）、test_api（monkeypatch LLM 的全链路）。</li>
+<li><strong>加一条你自己的测试</strong>（TODO 7.3）：往 tests/ 里补一个你认为最可能出 bug 的场景
+（比如：用户消息超长时记忆被正确裁剪）。</li>
+<li><strong>构建镜像</strong>：<code>docker build -t dev-agent .</code> →
+<code>docker run --rm -e DEEPSEEK_API_KEY=你的key -p 8000:8000 dev-agent</code> →
+浏览器开 <code>http://127.0.0.1:8000/static/index.html</code> 聊天。
+没有 Docker 环境就先跳过，读完 Dockerfile 能讲清每一行也算达标。</li>
+<li><strong>优化盘点</strong>（对照检查）：max_tokens 已设？历史已裁剪？相同请求有缓存思路？
+token 统计有入口？——都在前几天的代码里，确认没被删掉。</li>
 </ol>
+<h2>✅ 第三步：验收（Day 14 部分）</h2>
+<ul><li><code>pytest tests/ -v</code> 全绿（无 Key 环境也能全绿）</li><li>docker run 后 <code>/health</code> 通、聊天可用（或能逐行讲清 Dockerfile）</li><li><code>.env</code> 和 <code>workspace/</code> 不在镜像里（<code>docker run ... ls /app</code> 自查）</li><li>对照 <a href="ACCEPTANCE_CRITERIA.html">交付清单</a> Day 14 部分打勾</li></ul>
 <h2>⚠️ 避坑</h2>
-<ul><li>❌ <code>arguments</code> 是 JSON <strong>字符串</strong>不是字典——忘 json.loads 是新手第一坑</li><li>❌ 工具结果忘以 <code>role="tool"</code> 回传 → LLM 不知道工具说了什么，永远循环</li><li>❌ 主循环没有轮数上限 → LLM 反复要求调工具，token 烧个不停</li><li>✅ 真实 API 的 JSON 可能格式错误：json.loads 必须套 try/except + 重试</li><li>✅ 国内直连用 DeepSeek / Qwen / Moonshot，都有免费额度</li></ul>
+<ul><li>❌ 集成测试直接打真实 API → 慢、贵、结果不稳定；monkeypatch 是标准做法</li><li>❌ Dockerfile 里 COPY . . 且没有 .dockerignore → .env 里的 Key 进镜像 = 泄露密钥</li><li>❌ uvicorn 忘了 --host 0.0.0.0 → 容器外永远访问不通</li><li>❌ 异步测试直接 def → 拿不到事件循环；用 pytest-asyncio 或像 test_api 一样用 TestClient 同步壳</li><li>❌ 一次都不跑测试就继续开发 → 回归只能靠手点；<code>pytest</code> 要变成肌肉记忆</li></ul>
 <h2>🔗 延伸资源</h2>
-<ul><li><a href="https://platform.openai.com/docs/guides/function-calling">OpenAI Function Calling 指南</a></li><li><a href="https://api-docs.deepseek.com/">DeepSeek API 文档</a>（免费额度）</li><li><a href="https://www.promptingguide.ai/zh">Prompt Engineering Guide（中文）</a></li><li><code>tutorial_03_real_api.py</code>：真实 API 实战教程——配好 Key 后把今天的 mock 换成真调用（限流/超时/重试都在里面）</li></ul>
+<ul><li><a href="https://fastapi.tiangolo.com/zh/tutorial/testing/">FastAPI 官方测试指南</a></li><li><a href="https://docs.docker.com/get-started/docker-concepts/building-images/build-context-and-dockerfile/">Docker 构建概念</a></li></ul>
 
     </div>
 </div>

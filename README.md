@@ -9,7 +9,7 @@
 |---|---|---|
 | 阶段一（Day 1-5） | Python 异步/类型系统/生成器 + LLM API + Function Calling | 每天练习模板 + 自动验收脚本 |
 | 阶段二（Day 6-10） | ReAct Agent、LangGraph、MCP、RAG 与记忆系统 | 每天练习模板 + 自动验收脚本 |
-| 阶段三（Day 11-15） | 完整 Agent 项目实战（FastAPI + 部署） | 大纲 + 交付清单（自主实战） |
+| 阶段三（Day 11-15） | 完整 Agent 项目实战（FastAPI + 部署） | Day 11-15 学习页 + 项目脚手架 `project_day11_15/`（前端/测试/Docker 文件已提供） |
 
 ## 快速开始
 

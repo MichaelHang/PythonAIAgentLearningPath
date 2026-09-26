@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📖 Day04 Lesson</title>
+    <title>📖 Day15 Lesson</title>
     <style>
 
 
@@ -373,7 +373,7 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 <a class="" href="day03_practice_template.html">Day 3 - 模板</a>
 <a class="" href="day03_practice_validator.html">Day 3 - 验收</a>
 <h4>Day 4-5 (LLM)</h4>
-<a class="active" href="day04_lesson.html">Day 4 - 学习</a>
+<a class="" href="day04_lesson.html">Day 4 - 学习</a>
 <a class="" href="day04_practice_template.html">Day 4 - 模板</a>
 <a class="" href="day04_practice_validator.html">Day 4 - 验收</a>
 <a class="" href="day05_lesson.html">Day 5 - 学习</a>
@@ -401,94 +401,42 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 <a class="" href="day12_lesson.html">Day 12 - 学习</a>
 <a class="" href="day13_lesson.html">Day 13 - 学习</a>
 <a class="" href="day14_lesson.html">Day 14 - 学习</a>
-<a class="" href="day15_lesson.html">Day 15 - 学习</a>
+<a class="active" href="day15_lesson.html">Day 15 - 学习</a>
 <a class="" href="project_day11_15/README.md">项目脚手架</a>
 </div>
 <div class="main-content">
-    <div class="header"><h1>📖 Day 4 学习页：LLM API 调用与 Function Calling</h1></div>
+    <div class="header"><h1>📖 Day 15 学习页：总结、文档与延伸</h1></div>
     <div class="content">
 
-<h1>Day 4：LLM API 调用与 Function Calling</h1>
+<h1>Day 15：总结、文档与延伸</h1>
 <blockquote class="note-block">
-<p><strong>🎯 今日目标</strong>：跑通 Function Calling 完整闭环——让 LLM 自己决定调用哪个 Python 函数、
-你执行它、把结果喂回去、LLM 给出最终回答。这是"Agent 会用工具"的本质，今天用 mock 就能练，不需要 API Key。</p>
+<p><strong>🎯 今日目标</strong>：收尾不写代码——整理知识体系、补齐项目文档、规划进阶路线。
+这一天结束时，你手里应该有一个<strong>能部署、有测试、有文档</strong>的 Agent 项目，
+和一张刻在脑子里的知识地图。</p>
 </blockquote>
-<div class="file-info"><div class="info-left">📚 本日资源：📝 <a href="day04_practice_template.html">练习模板</a> ｜ ✅ <a href="day04_practice_validator.html">验收脚本</a></div></div>
+<div class="file-info"><div class="info-left">🛠 项目脚手架：<a href="project_day11_15/README.md">project_day11_15/</a>（开发都在这个目录里） ｜ 📋 <a href="ACCEPTANCE_CRITERIA.html">验收清单</a></div></div>
 <h2>⏱ 今日安排（约 2 小时）</h2>
-<table class="styled-table"><thead><tr><th>时间</th><th>内容</th><th>方式</th></tr></thead><tbody><tr><td>30min</td><td><strong>理论学习</strong>：API 结构 + Function Calling 时序</td><td>阅读</td></tr><tr><td>40min</td><td><strong>Prompt 实验</strong>：System Prompt / Few-shot / ReAct 格式</td><td>编码实验</td></tr><tr><td>50min</td><td><strong>动手实操</strong>：完成练习模板 7 个 TODO</td><td>编码</td></tr></tbody></table>
+<table class="styled-table"><thead><tr><th>时间</th><th>内容</th><th>方式</th></tr></thead><tbody><tr><td>40min</td><td><strong>知识收束</strong>：15 天知识地图自测</td><td>复盘</td></tr><tr><td>50min</td><td><strong>项目文档</strong>：README + 架构图 + 使用示例</td><td>写作</td></tr><tr><td>30min</td><td><strong>进阶路线</strong>：Multi-Agent / 评测 / 安全</td><td>规划</td></tr></tbody></table>
 
-<h2>📖 第一步：理论学习</h2>
+<h2>📖 第一步：15 天知识地图（合上材料自测）</h2>
+<table class="styled-table"><thead><tr><th>阶段</th><th>你掌握的能力</th><th>关键文件</th></tr></thead><tbody><tr><td>阶段一</td><td>asyncio 并发、Pydantic Schema、装饰器注册、生成器流式、Function Calling 全流程</td><td>day01-05 / tutorial 01-03</td></tr><tr><td>阶段二</td><td>手写 ReAct、LangGraph 图模型、MCP 协议、记忆与 RAG、错误恢复</td><td>day06-10</td></tr><tr><td>阶段三</td><td>分层服务架构、SSE 流式、pytest 测试、Docker 部署</td><td>project_day11_15/</td></tr></tbody></table>
+<p><strong>结业自查十问</strong>（答不上来的回对应学习页）：
+① 为什么 async 函数里不能用 time.sleep？② Pydantic 校验和安全过滤的区别？
+③ Function Calling 的完整时序？④ ReAct 循环为什么必须有 max_steps？
+⑤ LangGraph 的 Node/Edge/Conditional Edge 对应手写循环的哪些部分？
+⑥ MCP 解决了 M×N 什么问题？⑦ 短期记忆为什么要裁剪、system 为什么不能裁？
+⑧ 路径穿越怎么防？⑨ SSE 和 WebSocket 怎么选？⑩ 为什么测试要 monkeypatch 掉 LLM？</p>
 
-<h3>1. OpenAI 兼容 API 的请求结构</h3>
-<p>DeepSeek / Qwen / Moonshot 都兼容这套格式。一次对话 = POST 一个 JSON：</p>
-<pre class="code-block"><code>POST https://api.deepseek.com/chat/completions
-Authorization: Bearer 你的KEY
-
-{
-  "model": "deepseek-chat",
-  "messages": [
-    {"role": "system",    "content": "你是一个有用的助手"},   # 设定人设，放最前
-    {"role": "user",      "content": "北京今天天气怎么样？"},
-    {"role": "assistant", "content": null,
-      "tool_calls": [ ... ]},                                # LLM 请求调工具
-    {"role": "tool",      "content": "晴 25°C", "tool_call_id": "call_001"}  # 工具结果回传
-  ],
-  "tools": [ ... ]     # 告诉 LLM 有哪些工具可用
-}</code></pre>
-<h3>2. tools 参数：给 LLM 的"工具说明书"</h3>
-<pre class="code-block"><code>[
-  {
-    "type": "function",
-    "function": {
-      "name": "get_weather",
-      "description": "获取指定城市的天气信息",     # ← LLM 靠这句话决定选不选这个工具！
-      "parameters": {                            # ← JSON Schema，Day 2 的 Pydantic 可以自动生成
-        "type": "object",
-        "properties": {"city": {"type": "string", "description": "城市名称"}},
-        "required": ["city"]
-      }
-    }
-  }
-]</code></pre>
-<h3>3. Function Calling 完整时序（今天的核心）</h3>
-<pre class="code-block"><code>用户提问
-   │
-   ▼
-① 带 tools 调 LLM ──────────────► LLM 不直接回答，返回 tool_calls：
-   │                                {"name": "get_weather", "arguments": '{"city":"北京"}'}
-   ▼                                 注意：arguments 是 JSON 字符串，要 json.loads！
-② 你解析并执行真正的 Python 函数，得到结果 "晴 25°C"
-   │
-   ▼
-③ 把结果作为 role="tool" 消息追加进 messages（带上 tool_call_id）
-   │
-   ▼
-④ 再次调用 LLM ─────────────────► LLM 综合工具结果，给出最终回答
-   │
-   ▼
-⑤ 循环：如果第 ④ 步又返回 tool_calls，回到 ②，直到给出最终回答
-   （所以必须有 max_rounds 上限，防止无限烧钱）</code></pre>
-<h3>4. Prompt 工程三原则（今天顺手练）</h3>
-<table class="styled-table"><thead><tr><th>原则</th><th>做法</th></tr></thead><tbody><tr><td>System Prompt 精简</td><td>只放人设 + 工具使用规则；太长 LLM 会忽略后面的</td></tr><tr><td>Few-shot</td><td>在 prompt 里给 1-2 个输入→输出示例，格式遵循度大幅提升</td></tr><tr><td>格式约束</td><td>让 LLM 按固定格式输出（如 ReAct 的 Thought/Action），后面才好解析</td></tr></tbody></table>
-<h2>🛠 第二步：动手实操</h2>
-<ol>
-<li><strong>打开模板</strong>：<a href="day04_practice_template.html">day04_practice_template.py</a>。两个工具已注册好，
-mock LLM 也写好了（不需要 Key），你实现 4 个核心函数：
-  <ul>
-  <li>TODO 1.2：<code>get_tools_for_api()</code> —— 把注册表转成上面的 tools 格式</li>
-  <li>TODO 3.1：<code>parse_tool_calls()</code> —— 从响应里取 tool_calls，<code>json.loads</code> 解析 arguments</li>
-  <li>TODO 3.2：<code>execute_tool_call()</code> —— 查注册表、执行、返回结果</li>
-  <li>TODO 4.1：<code>chat_with_function_calling()</code> —— 按上面的 ①→⑤ 时序写主循环（最有价值的一题）</li>
-  <li>TODO 5.1（可选）：有 DeepSeek Key 的话把 mock 换成真实 API</li>
-  </ul></li>
-<li><strong>运行自测</strong>：<code>python day04_practice_template.py</code>，两个问题都应打出最终回答。</li>
-<li><strong>验收</strong>：<code>python day04_practice_validator.py</code> —— 验收用构造好的 LLM 响应直接喂你的解析函数，
-并跑通你的完整闭环。</li>
-</ol>
-<h2>⚠️ 避坑</h2>
-<ul><li>❌ <code>arguments</code> 是 JSON <strong>字符串</strong>不是字典——忘 json.loads 是新手第一坑</li><li>❌ 工具结果忘以 <code>role="tool"</code> 回传 → LLM 不知道工具说了什么，永远循环</li><li>❌ 主循环没有轮数上限 → LLM 反复要求调工具，token 烧个不停</li><li>✅ 真实 API 的 JSON 可能格式错误：json.loads 必须套 try/except + 重试</li><li>✅ 国内直连用 DeepSeek / Qwen / Moonshot，都有免费额度</li></ul>
-<h2>🔗 延伸资源</h2>
-<ul><li><a href="https://platform.openai.com/docs/guides/function-calling">OpenAI Function Calling 指南</a></li><li><a href="https://api-docs.deepseek.com/">DeepSeek API 文档</a>（免费额度）</li><li><a href="https://www.promptingguide.ai/zh">Prompt Engineering Guide（中文）</a></li><li><code>tutorial_03_real_api.py</code>：真实 API 实战教程——配好 Key 后把今天的 mock 换成真调用（限流/超时/重试都在里面）</li></ul>
+<h2>🛠 第二步：项目文档（交付清单的 Day 15 部分）</h2>
+<ul><li><strong>README</strong>：项目是什么 / 截图或 GIF / 安装步骤（含 Key 配置）/ 运行方式 / 接口说明 / 已知限制</li><li><strong>架构图</strong>：把 Day 11 的分层图画成正式版（可用 mermaid / draw.io / 截图）</li><li><strong>示例</strong>：至少 3 条端到端示例（普通对话 / 工具调用 / 记忆多轮），贴请求和响应</li><li><strong>README 里的 Day 11-15 任务表</strong>更新为实际完成情况</li></ul>
+<h2>🚀 第三步：进阶路线（Day 15 之后）</h2>
+<table class="styled-table"><thead><tr><th>方向</th><th>内容</th><th>建议起点</th></tr></thead><tbody><tr><td><strong>Multi-Agent</strong></td><td>AutoGen / CrewAI 多 Agent 协作：规划者-执行者、辩论、角色分工</td><td>把本项目拆成'规划 Agent + 工具 Agent'两个角色</td></tr><tr><td><strong>Agent 评测</strong></td><td>固定测试集 + 自动回归：工具选择对了吗？答案对了吗？成本多少？</td><td>把 tests/ 思路扩展成几十条端到端用例</td></tr><tr><td><strong>Agent 安全</strong></td><td>Prompt 注入防护、工具沙箱、最小权限、审计日志</td><td>回顾 Day 12 路径穿越——再补一层输入过滤</td></tr><tr><td><strong>生产化</strong></td><td>K8s 多副本（记忆换 Redis）、LangSmith/Langfuse 观测、灰度发布</td><td>把进程内 MemoryStore 换成 Redis 接口</td></tr><tr><td><strong>保持学习</strong></td><td>领域每周都在变——保持每周一篇论文/博客的阅读习惯</td><td>Lilian Weng 博客 / 各框架 release note</td></tr></tbody></table>
+<h2>✅ 结业验收</h2>
+<ul><li><a href="ACCEPTANCE_CRITERIA.html">交付清单</a> Day 11-15 全部打勾</li><li>项目 README 完整，新人照着 5 分钟能跑起来</li><li>pytest 全绿、docker run 可用</li><li>合上材料能回答上面的十问</li></ul>
+<blockquote class="note-block">
+<p><strong>最后提醒</strong>：15 天是启动时间，不是终点。框架会过时，但
+<strong>规划 → 工具调用 → 反思 → 迭代</strong>这个循环不会。把它刻在脑子里，任何新框架都不过是它的具象化。</p>
+</blockquote>
 
     </div>
 </div>
