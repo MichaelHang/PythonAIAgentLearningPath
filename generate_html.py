@@ -42,6 +42,7 @@ from pygments.formatters import HtmlFormatter
     ("day10_practice_validator.py", "🐍 Day10 Practice Validator"),
     ("tutorial_01_decorators.py", "🐍 Tutorial 01 Decorators"),
     ("tutorial_02_async.py", "🐍 Tutorial 02 Async"),
+    ("tutorial_03_real_api.py", "🐍 Tutorial 03 Real API"),
 ]
 
 # 侧边栏导航：(href, 显示文字, 分组标题或 None)
@@ -54,6 +55,7 @@ from pygments.formatters import HtmlFormatter
     ("ACCEPTANCE_CRITERIA.html", "验收标准", None),
     ("tutorial_01_decorators.html", "装饰器 8 步教程", "实战教程"),
     ("tutorial_02_async.html", "异步 9 步教程", None),
+    ("tutorial_03_real_api.html", "真实 API 教程", None),
     ("day01_lesson.html", "Day 1 - 学习", "Day 1-3 (基础)"),
     ("day01_practice_template.html", "Day 1 - 模板", None),
     ("day01_practice_validator.html", "Day 1 - 验收", None),

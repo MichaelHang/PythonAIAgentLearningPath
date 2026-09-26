@@ -500,6 +500,7 @@ mock LLM 也写好了（不需要 Key），你实现 4 个核心函数：
 '<a href="https://platform.openai.com/docs/guides/function-calling">OpenAI Function Calling 指南</a>',
 '<a href="https://api-docs.deepseek.com/">DeepSeek API 文档</a>（免费额度）',
 '<a href="https://www.promptingguide.ai/zh">Prompt Engineering Guide（中文）</a>',
+'<code>tutorial_03_real_api.py</code>：真实 API 实战教程——配好 Key 后把今天的 mock 换成真调用（限流/超时/重试都在里面）',
 ])}
 """
 

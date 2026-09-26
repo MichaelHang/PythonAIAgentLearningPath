@@ -23,6 +23,10 @@ pip install -r requirements.txt
 # 3. 跑一遍 Day 1 的异步教程热身
 python tutorial_02_async.py
 
+# 3.5（可选）配好 Key 后体验真实 LLM API
+#   PowerShell:  $env:DEEPSEEK_API_KEY = "sk-..."
+python tutorial_03_real_api.py
+
 # 4. 开始 Day 1：打开 day01_practice_template.html，完成其中的 TODO
 python day01_practice_template.py      # 运行你的实现
 python day01_practice_validator.py     # 行为级验收打分
@@ -49,6 +53,7 @@ ACCEPTANCE_CRITERIA.html         # 每个练习的验收标准与手动清单
 day01~day10_lesson.html          # 每天的学习页（目标/理论/实操步骤/验收要求）
 tutorial_01_decorators.py/.html  # 装饰器 8 步实战教程（对应 Day 2）
 tutorial_02_async.py/.html       # 异步 9 步实战教程（对应 Day 1）
+tutorial_03_real_api.py/.html    # 真实 LLM API 实战教程（可选，需 Key：DeepSeek/Qwen 等）
 day01~day10_practice_template.*  # 每天练习模板（含 TODO）
 day01~day10_practice_validator.* # 自动验收脚本（行为级打分，全部 10 天）
 generate_html.py                 # 修改 .py 后重新生成对应代码页
