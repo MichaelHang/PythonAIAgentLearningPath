@@ -5,116 +5,334 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>📋 练习验收标准 — Python AI Agent 15 天学习路线图</title>
     <style>
-        
-* { margin:0; padding:0; box-sizing:border-box; }
-body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    line-height:1.6; color:#333;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding:0;
+/* ===== Maple Mono 代码字体（自托管，OFL 开源协议） ===== */
+@font-face {
+    font-family:"Maple Mono";
+    font-style:normal; font-weight:400; font-display:swap;
+    src:url("fonts/maple-mono-latin-400-normal.woff2") format("woff2");
 }
+@font-face {
+    font-family:"Maple Mono";
+    font-style:normal; font-weight:700; font-display:swap;
+    src:url("fonts/maple-mono-latin-700-normal.woff2") format("woff2");
+}
+@font-face {
+    font-family:"Maple Mono";
+    font-style:italic; font-weight:400; font-display:swap;
+    src:url("fonts/maple-mono-latin-400-italic.woff2") format("woff2");
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    line-height:1.65; color:#1d1d1f;
+    background:#f5f5f7;
+    padding:0;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+}
+.nav-wrapper { display:flex; min-height:100vh; }
 .nav-sidebar {
     width:250px; min-width:250px;
-    background: #181825;
-    color: #ffffff;
-    padding: 20px 15px;
+    background:rgba(255,255,255,0.72);
+    -webkit-backdrop-filter:saturate(180%) blur(20px);
+    backdrop-filter:saturate(180%) blur(20px);
+    border-right:1px solid rgba(0,0,0,0.06);
+    color:#1d1d1f;
+    padding:24px 14px;
     font-size:14px;
     overflow-y:auto;
     height:100vh;
     position:sticky; top:0;
-    display:flex; flex-direction:column;
-    gap:2px;
+    display:flex; flex-direction:column; gap:2px;
 }
 .nav-sidebar h3 {
-    color:#f5c2e7; font-size:15px; margin:18px 0 8px 0;
-    border-bottom:1px solid #45475a; padding-bottom:6px;
+    color:#1d1d1f; font-size:15px; font-weight:700; margin:18px 0 10px;
 }
 .nav-sidebar h3:first-child { margin-top:0; }
 .nav-sidebar h4 {
-    color:#a6e3a1; font-size:13px; margin:14px 0 4px 0;
-    font-weight:600;
+    color:#86868b; font-size:11px; font-weight:600; margin:16px 0 4px;
+    text-transform:uppercase; letter-spacing:0.05em;
 }
 .nav-sidebar a {
-    color:#89dceb; display:block; padding:5px 12px; font-size:13px;
-    border-radius:4px; text-decoration:none; transition:background 0.2s, color 0.2s;
+    color:#424245; display:block; padding:6px 12px; font-size:13px;
+    border-radius:8px; text-decoration:none; transition:background .2s, color .2s;
 }
-.nav-sidebar a:hover {
-    background:#313244; color:#ffffff; text-decoration:none;
-}
-.nav-sidebar a.active {
-    background:#45475a; color:#ffffff; font-weight:700;
-    border-left:3px solid #f5c2e7; padding-left:9px;
-}
-.nav-wrapper { display:flex; min-height:100vh; }
+.nav-sidebar a:hover { background:rgba(0,0,0,0.05); color:#1d1d1f; text-decoration:none; }
+.nav-sidebar a.active { background:#0071e3; color:#ffffff; font-weight:600; }
 .main-content {
     flex:1; min-width:0;
-    margin:20px 20px 20px 0; background:white; border-radius:10px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    margin:16px 16px 16px 0;
+    background:#ffffff; border-radius:18px;
+    box-shadow:0 4px 24px rgba(0,0,0,0.05);
     overflow:hidden;
 }
 /* 返回顶部按钮 */
 .back-top {
-    position:fixed; bottom:30px; right:30px;
-    background:#667eea; color:white; border:none;
-    width:48px; height:48px; border-radius:50%;
-    cursor:pointer; font-size:20px;
-    box-shadow:0 4px 12px rgba(0,0,0,0.3); display:none; z-index:999;
-    transition:background 0.3s;
+    position:fixed; bottom:28px; right:28px;
+    background:rgba(255,255,255,0.82);
+    -webkit-backdrop-filter:saturate(180%) blur(16px);
+    backdrop-filter:saturate(180%) blur(16px);
+    color:#1d1d1f; border:1px solid rgba(0,0,0,0.08);
+    width:44px; height:44px; border-radius:50%;
+    cursor:pointer; font-size:18px;
+    box-shadow:0 4px 16px rgba(0,0,0,0.12); display:none; z-index:999;
+    transition:transform .2s, background .2s;
 }
-.back-top:hover { background:#764ba2; }
+.back-top:hover { background:#ffffff; transform:translateY(-2px); }
 
 /* ── 内容区样式 ── */
 .header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color:white; padding:40px; text-align:center;
+    background:#ffffff; color:#1d1d1f;
+    padding:56px 40px 40px; text-align:center;
+    border-bottom:1px solid rgba(0,0,0,0.06);
 }
-.header h1 { font-size:2.2em; margin-bottom:10px; text-shadow:2px 2px 4px rgba(0,0,0,0.2); }
-.header .meta { font-size:1.1em; opacity:0.9; }
-.content { padding:40px; }
-h1 { color:#667eea; border-bottom:3px solid #667eea; padding-bottom:10px; margin-top:30px; margin-bottom:20px; }
-h2 { color:#764ba2; margin-top:25px; margin-bottom:15px; border-left:5px solid #764ba2; padding-left:15px; }
-h3 { color:#555; margin-top:20px; margin-bottom:10px; }
-p { margin-bottom:15px; }
-.styled-table {
-    width:100%; border-collapse:collapse; margin:20px 0;
-    box-shadow:0 2px 15px rgba(0,0,0,0.1); border-radius:8px; overflow:hidden;
+.header h1 { font-size:2.4em; font-weight:700; letter-spacing:-0.02em; margin-bottom:10px; }
+.header .meta { font-size:1.05em; color:#86868b; }
+.content { padding:44px 48px; }
+h1 { color:#1d1d1f; font-size:2em; font-weight:700; letter-spacing:-0.02em; margin:36px 0 18px; }
+.content > h1:first-child { margin-top:0; }
+h2 { color:#1d1d1f; font-size:1.5em; font-weight:700; letter-spacing:-0.01em; margin:36px 0 16px; }
+h3 { color:#1d1d1f; font-size:1.15em; font-weight:600; margin:26px 0 10px; }
+h4 { color:#1d1d1f; font-size:1em; font-weight:600; margin:20px 0 8px; }
+p { margin-bottom:14px; color:#424245; }
+li { margin-bottom:8px; color:#424245; }
+strong { color:#1d1d1f; font-weight:600; }
+ul, ol { margin-left:24px; margin-bottom:14px; }
+a { color:#0071e3; text-decoration:none; transition:color .2s; }
+a:hover { color:#0077ed; text-decoration:underline; }
+hr { border:none; height:1px; background:#e8e8ed; margin:32px 0; }
+code {
+    font-family:"Maple Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+    font-size:0.88em;
+    background:rgba(0,0,0,0.055);
+    color:#1d1d1f;
+    padding:2px 6px; border-radius:6px;
 }
-.styled-table thead { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white; }
-.styled-table th, .styled-table td { padding:12px 15px; text-align:left; border-bottom:1px solid #ddd; }
-.styled-table tbody tr:hover { background-color:#f5f5f5; }
-.styled-table tbody tr:nth-of-type(even) { background-color:#f9f9f9; }
+pre { position:relative; overflow-x:auto; font-family:"Maple Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace; }
 .code-block {
-    background:#282c34; color:#abb2bf; padding:15px;
-    border-radius:8px; overflow-x:auto; margin:15px 0;
-    box-shadow:0 4px 6px rgba(0,0,0,0.1);
+    background:#f5f5f7; color:#1d1d1f; padding:18px 20px;
+    border-radius:14px; overflow-x:auto; margin:16px 0;
+    font-size:13.5px; line-height:1.55;
 }
-code { background:#f4f4f4; padding:2px 6px; border-radius:3px; font-family:'Courier New',monospace; color:#e83e8c; }
-.code-block code { background:transparent; color:inherit; padding:0; }
+.code-block code { background:transparent; color:inherit; padding:0; font-size:inherit; }
+.styled-table {
+    width:100%; border-collapse:separate; border-spacing:0;
+    margin:18px 0; border:1px solid #e8e8ed;
+    border-radius:12px; overflow:hidden;
+    font-size:14.5px;
+}
+.styled-table thead { background:#f5f5f7; }
+.styled-table th { padding:11px 16px; text-align:left; font-weight:600; color:#1d1d1f; }
+.styled-table td { padding:11px 16px; text-align:left; border-top:1px solid #e8e8ed; color:#424245; }
+.styled-table tbody tr:hover { background-color:#fafafa; }
 .note-block {
-    background:#fff3cd; border-left:5px solid #ffc107;
-    padding:15px; margin:15px 0; border-radius:4px;
+    background:#f5f5f7;
+    border-left:3px solid #0071e3;
+    padding:16px 20px; margin:18px 0; border-radius:12px;
 }
-ul, ol { margin-left:25px; margin-bottom:15px; }
-li { margin-bottom:8px; }
-a { color:#667eea; text-decoration:none; transition:color 0.3s; }
-a:hover { color:#764ba2; text-decoration:underline; }
-hr { border:none; height:2px; background:linear-gradient(to right,#667eea,#764ba2); margin:30px 0; }
-pre { position:relative; overflow-x:auto; }
-@media print { body { background:white; padding:0; } .main-content { box-shadow:none; } .nav-sidebar { display:none; } .back-top { display:none; } }
+.note-block p { margin-bottom:6px; color:#424245; }
+.note-block p:last-child { margin-bottom:0; }
+
+/* ===== 代码高亮配色（Xcode 浅色，Apple 文档风） ===== */
+pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: #eaeaf0 }
+.highlight { background: #f5f5f7; color: #1D1D1F }
+.highlight .c { color: #707F8C } /* Comment */
+.highlight .err { color: #C41A16 } /* Error */
+.highlight .k { color: #AD3DA4 } /* Keyword */
+.highlight .n { color: #1D1D1F } /* Name */
+.highlight .o { color: #1D1D1F } /* Operator */
+.highlight .p { color: #1D1D1F } /* Punctuation */
+.highlight .ch { color: #707F8C } /* Comment.Hashbang */
+.highlight .cm { color: #707F8C } /* Comment.Multiline */
+.highlight .cp { color: #78492A } /* Comment.Preproc */
+.highlight .cpf { color: #707F8C } /* Comment.PreprocFile */
+.highlight .c1 { color: #707F8C } /* Comment.Single */
+.highlight .cs { color: #707F8C } /* Comment.Special */
+.highlight .gd { color: #C41A16 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #C41A16 } /* Generic.Error */
+.highlight .gh { color: #1D1D1F; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #248A3D } /* Generic.Inserted */
+.highlight .go { color: #6E6E73 } /* Generic.Output */
+.highlight .gp { color: #707F8C } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #1D1D1F; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #C41A16 } /* Generic.Traceback */
+.highlight .kc { color: #AD3DA4 } /* Keyword.Constant */
+.highlight .kd { color: #AD3DA4 } /* Keyword.Declaration */
+.highlight .kn { color: #AD3DA4 } /* Keyword.Namespace */
+.highlight .kp { color: #AD3DA4 } /* Keyword.Pseudo */
+.highlight .kr { color: #AD3DA4 } /* Keyword.Reserved */
+.highlight .kt { color: #0B4F79 } /* Keyword.Type */
+.highlight .m { color: #1C00CF } /* Literal.Number */
+.highlight .s { color: #C41A16 } /* Literal.String */
+.highlight .na { color: #1D1D1F } /* Name.Attribute */
+.highlight .nb { color: #3E8087 } /* Name.Builtin */
+.highlight .nc { color: #3E8087 } /* Name.Class */
+.highlight .no { color: #1C00CF } /* Name.Constant */
+.highlight .nd { color: #78492A } /* Name.Decorator */
+.highlight .ni { color: #1D1D1F } /* Name.Entity */
+.highlight .ne { color: #0B4F79 } /* Name.Exception */
+.highlight .nf { color: #0B4F79 } /* Name.Function */
+.highlight .nl { color: #1D1D1F } /* Name.Label */
+.highlight .nn { color: #3E8087 } /* Name.Namespace */
+.highlight .nx { color: #1D1D1F } /* Name.Other */
+.highlight .py { color: #1D1D1F } /* Name.Property */
+.highlight .nt { color: #AD3DA4 } /* Name.Tag */
+.highlight .nv { color: #1D1D1F } /* Name.Variable */
+.highlight .ow { color: #AD3DA4 } /* Operator.Word */
+.highlight .pm { color: #1D1D1F } /* Punctuation.Marker */
+.highlight .w { color: #1D1D1F } /* Text.Whitespace */
+.highlight .mb { color: #1C00CF } /* Literal.Number.Bin */
+.highlight .mf { color: #1C00CF } /* Literal.Number.Float */
+.highlight .mh { color: #1C00CF } /* Literal.Number.Hex */
+.highlight .mi { color: #1C00CF } /* Literal.Number.Integer */
+.highlight .mo { color: #1C00CF } /* Literal.Number.Oct */
+.highlight .sa { color: #C41A16 } /* Literal.String.Affix */
+.highlight .sb { color: #C41A16 } /* Literal.String.Backtick */
+.highlight .sc { color: #C41A16 } /* Literal.String.Char */
+.highlight .dl { color: #C41A16 } /* Literal.String.Delimiter */
+.highlight .sd { color: #C41A16 } /* Literal.String.Doc */
+.highlight .s2 { color: #C41A16 } /* Literal.String.Double */
+.highlight .se { color: #A0410D } /* Literal.String.Escape */
+.highlight .sh { color: #C41A16 } /* Literal.String.Heredoc */
+.highlight .si { color: #C41A16 } /* Literal.String.Interpol */
+.highlight .sx { color: #C41A16 } /* Literal.String.Other */
+.highlight .sr { color: #C41A16 } /* Literal.String.Regex */
+.highlight .s1 { color: #C41A16 } /* Literal.String.Single */
+.highlight .ss { color: #C41A16 } /* Literal.String.Symbol */
+.highlight .bp { color: #3E8087 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #0B4F79 } /* Name.Function.Magic */
+.highlight .vc { color: #1D1D1F } /* Name.Variable.Class */
+.highlight .vg { color: #1D1D1F } /* Name.Variable.Global */
+.highlight .vi { color: #1D1D1F } /* Name.Variable.Instance */
+.highlight .vm { color: #3E8087 } /* Name.Variable.Magic */
+.highlight .il { color: #1C00CF } /* Literal.Number.Integer.Long */
+
+pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+pre.code-block .hll { background-color: #eaeaf0 }
+pre.code-block { background: #f5f5f7; color: #1D1D1F }
+pre.code-block .c { color: #707F8C } /* Comment */
+pre.code-block .err { color: #C41A16 } /* Error */
+pre.code-block .k { color: #AD3DA4 } /* Keyword */
+pre.code-block .n { color: #1D1D1F } /* Name */
+pre.code-block .o { color: #1D1D1F } /* Operator */
+pre.code-block .p { color: #1D1D1F } /* Punctuation */
+pre.code-block .ch { color: #707F8C } /* Comment.Hashbang */
+pre.code-block .cm { color: #707F8C } /* Comment.Multiline */
+pre.code-block .cp { color: #78492A } /* Comment.Preproc */
+pre.code-block .cpf { color: #707F8C } /* Comment.PreprocFile */
+pre.code-block .c1 { color: #707F8C } /* Comment.Single */
+pre.code-block .cs { color: #707F8C } /* Comment.Special */
+pre.code-block .gd { color: #C41A16 } /* Generic.Deleted */
+pre.code-block .ge { font-style: italic } /* Generic.Emph */
+pre.code-block .gr { color: #C41A16 } /* Generic.Error */
+pre.code-block .gh { color: #1D1D1F; font-weight: bold } /* Generic.Heading */
+pre.code-block .gi { color: #248A3D } /* Generic.Inserted */
+pre.code-block .go { color: #6E6E73 } /* Generic.Output */
+pre.code-block .gp { color: #707F8C } /* Generic.Prompt */
+pre.code-block .gs { font-weight: bold } /* Generic.Strong */
+pre.code-block .gu { color: #1D1D1F; font-weight: bold } /* Generic.Subheading */
+pre.code-block .gt { color: #C41A16 } /* Generic.Traceback */
+pre.code-block .kc { color: #AD3DA4 } /* Keyword.Constant */
+pre.code-block .kd { color: #AD3DA4 } /* Keyword.Declaration */
+pre.code-block .kn { color: #AD3DA4 } /* Keyword.Namespace */
+pre.code-block .kp { color: #AD3DA4 } /* Keyword.Pseudo */
+pre.code-block .kr { color: #AD3DA4 } /* Keyword.Reserved */
+pre.code-block .kt { color: #0B4F79 } /* Keyword.Type */
+pre.code-block .m { color: #1C00CF } /* Literal.Number */
+pre.code-block .s { color: #C41A16 } /* Literal.String */
+pre.code-block .na { color: #1D1D1F } /* Name.Attribute */
+pre.code-block .nb { color: #3E8087 } /* Name.Builtin */
+pre.code-block .nc { color: #3E8087 } /* Name.Class */
+pre.code-block .no { color: #1C00CF } /* Name.Constant */
+pre.code-block .nd { color: #78492A } /* Name.Decorator */
+pre.code-block .ni { color: #1D1D1F } /* Name.Entity */
+pre.code-block .ne { color: #0B4F79 } /* Name.Exception */
+pre.code-block .nf { color: #0B4F79 } /* Name.Function */
+pre.code-block .nl { color: #1D1D1F } /* Name.Label */
+pre.code-block .nn { color: #3E8087 } /* Name.Namespace */
+pre.code-block .nx { color: #1D1D1F } /* Name.Other */
+pre.code-block .py { color: #1D1D1F } /* Name.Property */
+pre.code-block .nt { color: #AD3DA4 } /* Name.Tag */
+pre.code-block .nv { color: #1D1D1F } /* Name.Variable */
+pre.code-block .ow { color: #AD3DA4 } /* Operator.Word */
+pre.code-block .pm { color: #1D1D1F } /* Punctuation.Marker */
+pre.code-block .w { color: #1D1D1F } /* Text.Whitespace */
+pre.code-block .mb { color: #1C00CF } /* Literal.Number.Bin */
+pre.code-block .mf { color: #1C00CF } /* Literal.Number.Float */
+pre.code-block .mh { color: #1C00CF } /* Literal.Number.Hex */
+pre.code-block .mi { color: #1C00CF } /* Literal.Number.Integer */
+pre.code-block .mo { color: #1C00CF } /* Literal.Number.Oct */
+pre.code-block .sa { color: #C41A16 } /* Literal.String.Affix */
+pre.code-block .sb { color: #C41A16 } /* Literal.String.Backtick */
+pre.code-block .sc { color: #C41A16 } /* Literal.String.Char */
+pre.code-block .dl { color: #C41A16 } /* Literal.String.Delimiter */
+pre.code-block .sd { color: #C41A16 } /* Literal.String.Doc */
+pre.code-block .s2 { color: #C41A16 } /* Literal.String.Double */
+pre.code-block .se { color: #A0410D } /* Literal.String.Escape */
+pre.code-block .sh { color: #C41A16 } /* Literal.String.Heredoc */
+pre.code-block .si { color: #C41A16 } /* Literal.String.Interpol */
+pre.code-block .sx { color: #C41A16 } /* Literal.String.Other */
+pre.code-block .sr { color: #C41A16 } /* Literal.String.Regex */
+pre.code-block .s1 { color: #C41A16 } /* Literal.String.Single */
+pre.code-block .ss { color: #C41A16 } /* Literal.String.Symbol */
+pre.code-block .bp { color: #3E8087 } /* Name.Builtin.Pseudo */
+pre.code-block .fm { color: #0B4F79 } /* Name.Function.Magic */
+pre.code-block .vc { color: #1D1D1F } /* Name.Variable.Class */
+pre.code-block .vg { color: #1D1D1F } /* Name.Variable.Global */
+pre.code-block .vi { color: #1D1D1F } /* Name.Variable.Instance */
+pre.code-block .vm { color: #3E8087 } /* Name.Variable.Magic */
+pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
+
+/* ===== 代码窗容器：浅灰底 ===== */
+.highlight {
+    background:#f5f5f7; color:#1d1d1f;
+    border-radius:14px; padding:18px 20px;
+    overflow-x:auto; margin:16px 0;
+}
+.highlight pre { margin:0; background:transparent; padding:0; }
+.highlight code { background:transparent; color:inherit; padding:0; }
+
+    .file-info {
+        background:#f5f5f7; padding:10px 16px; border-radius:12px;
+        margin-bottom:18px; font-size:14px; color:#6e6e73;
+        display:flex; align-items:center; justify-content:space-between;
+        flex-wrap:wrap; gap:8px;
+    }
+    .file-info .info-left { display:flex; align-items:center; gap:8px; }
+    .download-btn {
+        display:inline-flex; align-items:center; gap:5px;
+        background:#0071e3; color:#fff; border:none;
+        padding:7px 16px; border-radius:980px; font-size:13px;
+        text-decoration:none; cursor:pointer; white-space:nowrap;
+        transition: background .2s;
+    }
+    .download-btn:hover { background:#0077ed; }
+
+@media print { body { background:#fff; padding:0; } .main-content { box-shadow:none; } .nav-sidebar { display:none; } .back-top { display:none; } }
 @media (max-width:900px) {
-    .nav-sidebar { width:200px; min-width:200px; font-size:13px; padding:15px 10px; }
-    .header h1 { font-size:1.6em; }
-    .content { padding:20px; }
+    .nav-sidebar { width:200px; min-width:200px; font-size:13px; padding:16px 10px; }
+    .header h1 { font-size:1.8em; }
+    .content { padding:24px; }
 }
 @media (max-width:650px) {
     .nav-wrapper { flex-direction:column; }
-    .nav-sidebar { width:100%; min-width:100%; height:auto; position:relative; flex-direction:row; flex-wrap:wrap; gap:5px; padding:10px; }
+    .nav-sidebar { width:100%; min-width:100%; height:auto; position:relative; flex-direction:row; flex-wrap:wrap; gap:5px; padding:12px; }
     .nav-sidebar h3, .nav-sidebar h4 { display:none; }
 }
-
-        
-        
-    </style>
+</style>
 </head>
 <body>
 <div class="nav-wrapper">
@@ -126,25 +344,35 @@ pre { position:relative; overflow-x:auto; }
 <a class="" href="tutorial_01_decorators.html">装饰器 8 步教程</a>
 <a class="" href="tutorial_02_async.html">异步 9 步教程</a>
 <h4>Day 1-3 (基础)</h4>
+<a class="" href="day01_lesson.html">Day 1 - 学习</a>
 <a class="" href="day01_practice_template.html">Day 1 - 模板</a>
 <a class="" href="day01_practice_validator.html">Day 1 - 验收</a>
+<a class="" href="day02_lesson.html">Day 2 - 学习</a>
 <a class="" href="day02_practice_template.html">Day 2 - 模板</a>
 <a class="" href="day02_practice_validator.html">Day 2 - 验收</a>
+<a class="" href="day03_lesson.html">Day 3 - 学习</a>
 <a class="" href="day03_practice_template.html">Day 3 - 模板</a>
 <a class="" href="day03_practice_validator.html">Day 3 - 验收</a>
 <h4>Day 4-5 (LLM)</h4>
+<a class="" href="day04_lesson.html">Day 4 - 学习</a>
 <a class="" href="day04_practice_template.html">Day 4 - 模板</a>
 <a class="" href="day04_practice_validator.html">Day 4 - 验收</a>
+<a class="" href="day05_lesson.html">Day 5 - 学习</a>
 <a class="" href="day05_practice_template.html">Day 5 - 模板</a>
 <a class="" href="day05_practice_validator.html">Day 5 - 验收</a>
 <h4>Day 6-7 (Agent)</h4>
+<a class="" href="day06_lesson.html">Day 6 - 学习</a>
 <a class="" href="day06_practice_template.html">Day 6 - 模板</a>
 <a class="" href="day06_practice_validator.html">Day 6 - 验收</a>
+<a class="" href="day07_lesson.html">Day 7 - 学习</a>
 <a class="" href="day07_practice_template.html">Day 7 - 模板</a>
 <a class="" href="day07_practice_validator.html">Day 7 - 验收</a>
 <h4>Day 8-10 (高级)</h4>
+<a class="" href="day08_lesson.html">Day 8 - 学习</a>
 <a class="" href="day08_practice_template.html">Day 8 - 模板</a>
+<a class="" href="day09_lesson.html">Day 9 - 学习</a>
 <a class="" href="day09_practice_template.html">Day 9 - 模板</a>
+<a class="" href="day10_lesson.html">Day 10 - 学习</a>
 <a class="" href="day10_practice_template.html">Day 10 - 模板</a>
 </div>
 <div class="main-content">
@@ -155,59 +383,13 @@ pre { position:relative; overflow-x:auto; }
 <hr/>
 <h2 id="day-1">📅 Day 1：异步编程核心</h2>
 <h3 id="api-agent">练习项目：异步批量调用多个 API（模拟 Agent 多工具并发调用）</h3>
-<h4 id="6">✅ 验收标准（6 条）</h4>
-<table class="styled-table">
-<thead>
-<tr>
-<th>序号</th>
-<th>验收标准</th>
-<th>验证方法</th>
-<th>分值</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td><strong>使用了 <code>async/await</code> 语法</strong></td>
-<td>代码中用 <code>async def</code> 定义函数，用 <code>await</code> 调用异步操作</td>
-<td>20 分</td>
-</tr>
-<tr>
-<td>2</td>
-<td><strong>使用了 <code>asyncio.gather()</code> 或 <code>create_task()</code></strong></td>
-<td>并发执行多个任务，不是逐个 <code>await</code></td>
-<td>20 分</td>
-</tr>
-<tr>
-<td>3</td>
-<td><strong>异步版本比同步版本快至少 30%</strong></td>
-<td>运行同步和异步两个版本，对比耗时</td>
-<td>20 分</td>
-</tr>
-<tr>
-<td>4</td>
-<td><strong>有错误处理（<code>try/except</code>）</strong></td>
-<td>捕获可能的异常（超时、网络错误等）</td>
-<td>15 分</td>
-</tr>
-<tr>
-<td>5</td>
-<td><strong>有超时控制（<code>asyncio.timeout</code>）</strong></td>
-<td>使用 <code>async with asyncio.timeout(秒数):</code></td>
-<td>15 分</td>
-</tr>
-<tr>
-<td>6</td>
-<td><strong>没有在异步函数中误用 <code>time.sleep()</code></strong></td>
-<td>全文搜索 <code>time.sleep</code>，如果和 <code>async</code> 同时出现则扣分</td>
-<td>10 分</td>
-</tr>
-</tbody>
-</table>
-<p><strong>总分：100 分</strong>
-- <strong>80-100 分</strong>：✅ 验收通过，继续 Day 2
-- <strong>60-79 分</strong>：⚠️ 基本通过，但有改进空间
-- <strong>60 分以下</strong>：❌ 未通过，需要重做</p>
+<h4>✅ 验收标准（自动验收，共 100 分）</h4><table class="styled-table"><thead><tr><th>序号</th><th>验收标准</th><th>验证方法（行为级：验收脚本真的调用你的代码）</th><th>分值</th></tr></thead><tbody><tr><td>1</td><td><strong>代码可以加载，没有语法错误</strong></td><td>验收脚本动态加载你的 .py 文件</td><td>5 分</td></tr><tr><td>2</td><td><strong>异步请求：是 async 协程函数，返回 url/status/data 结构</strong></td><td>脚本真的调用 <code>异步请求()</code> 并检查返回字典</td><td>20 分</td></tr><tr><td>3</td><td><strong>并发请求：3 个请求结果正确且<strong>真并发</strong>（总耗时接近单次而非 3 倍）</strong></td><td>脚本用你自己的单次耗时做基准，真实计时对比</td><td>25 分</td></tr><tr><td>4</td><td><strong>同步请求：返回结果正确（作为性能对比的慢基准）</strong></td><td>脚本调用 <code>同步请求()</code></td><td>8 分</td></tr><tr><td>5</td><td><strong>性能对比：运行后打印同步/异步两种耗时</strong></td><td>脚本捕获你的输出并检查</td><td>12 分</td></tr><tr><td>6</td><td><strong>重试机制：第 1 次模拟失败后能重试并成功</strong></td><td>脚本注入假 random（第 1 次失败、之后成功）观察行为</td><td>20 分</td></tr><tr><td>7</td><td><strong>类型注解：至少 4 个函数有返回值注解</strong></td><td>AST 静态检查</td><td>10 分</td></tr></tbody></table>
+<p><strong>总分：100 分</strong></p>
+<ul>
+<li><strong>80-100 分</strong>：✅ 验收通过，继续 Day 2</li>
+<li><strong>60-79 分</strong>：⚠️ 基本通过，但有改进空间</li>
+<li><strong>60 分以下</strong>：❌ 未通过，需要重做</li>
+</ul>
 <h4 id="_1">🔍 验收方式</h4>
 <div class="codehilite"><pre class="code-block"><span></span><code><span class="c1"># 方式 1：自动验收脚本（推荐）</span>
 python<span class="w"> </span>day01_practice_validator.py
@@ -246,71 +428,13 @@ python<span class="w"> </span>your_file.py
 <hr/>
 <h2 id="day-2">📅 Day 2：类型系统与装饰器进阶</h2>
 <h3 id="pydantic-tool-schema">练习项目：用 Pydantic 定义 Tool Schema，并用装饰器实现工具注册机制</h3>
-<h4 id="8">✅ 验收标准（8 条）</h4>
-<table class="styled-table">
-<thead>
-<tr>
-<th>序号</th>
-<th>验收标准</th>
-<th>验证方法</th>
-<th>分值</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td><strong>使用 Pydantic v2 定义输入/输出 Schema</strong></td>
-<td>定义了继承 <code>BaseModel</code> 的类</td>
-<td>15 分</td>
-</tr>
-<tr>
-<td>2</td>
-<td><strong>实现了 <code>@工具</code> 装饰器（三层嵌套）</strong></td>
-<td>装饰器工厂函数，接受名称/描述参数</td>
-<td>15 分</td>
-</tr>
-<tr>
-<td>3</td>
-<td><strong>装饰器内正确使用 <code>@functools.wraps</code></strong></td>
-<td>保留原函数的 <code>__name__</code> 和 <code>__doc__</code></td>
-<td>15 分</td>
-</tr>
-<tr>
-<td>4</td>
-<td><strong>装饰器将函数注册到全局工具注册表</strong></td>
-<td>存在 <code>工具注册表</code> 字典，有注册逻辑</td>
-<td>10 分</td>
-</tr>
-<tr>
-<td>5</td>
-<td><strong>注册了至少 3 个不同功能的工具</strong></td>
-<td>用 <code>@工具</code> 装饰了至少 3 个函数</td>
-<td>15 分</td>
-</tr>
-<tr>
-<td>6</td>
-<td><strong>包装函数内有输入/输出 Pydantic 验证</strong></td>
-<td>用 <code>模型.model_validate()</code> 或类似方法</td>
-<td>10 分</td>
-</tr>
-<tr>
-<td>7</td>
-<td><strong>代码有类型注解</strong></td>
-<td>函数有 <code>-&gt;</code> 返回值类型注解</td>
-<td>10 分</td>
-</tr>
-<tr>
-<td>8</td>
-<td><strong>代码可运行，工具可被调用</strong></td>
-<td>运行 <code>python 你的文件.py</code> 无报错</td>
-<td>10 分</td>
-</tr>
-</tbody>
-</table>
-<p><strong>总分：100 分</strong>
-- <strong>80-100 分</strong>：✅ 验收通过
-- <strong>60-79 分</strong>：⚠️ 基本通过
-- <strong>60 分以下</strong>：❌ 未通过</p>
+<h4>✅ 验收标准（自动验收，共 100 分）</h4><table class="styled-table"><thead><tr><th>序号</th><th>验收标准</th><th>验证方法（行为级：验收脚本真的调用你的代码）</th><th>分值</th></tr></thead><tbody><tr><td>1</td><td><strong>代码可以加载（需要 pydantic）</strong></td><td>动态加载；缺依赖会提示 pip install pydantic</td><td>5 分</td></tr><tr><td>2</td><td><strong>装饰器内使用 <code>functools.wraps</code></strong></td><td>AST 检查 @工具 装饰器内部</td><td>10 分</td></tr><tr><td>3</td><td><strong>工具注册表：注册 ≥3 个工具且包含「计算器」，信息含 描述/函数</strong></td><td>加载后检查 <code>工具注册表</code> 内容</td><td>15 分</td></tr><tr><td>4</td><td><strong>调用工具：<code>调用工具('计算器', 表达式='3 + 5 * 2')</code> 算出 13</strong></td><td>脚本真的调用你的函数并核对结果</td><td>20 分</td></tr><tr><td>5</td><td><strong>输入验证：表达式传 int 等错误类型会被拦截</strong></td><td>脚本故意传错误类型，要求抛异常或返回错误信息</td><td>15 分</td></tr><tr><td>6</td><td><strong>列出所有工具：≥3 个，均为 OpenAI Function Calling 格式（含 parameters.properties）</strong></td><td>逐项检查结构（提示：用 model_json_schema()）</td><td>20 分</td></tr><tr><td>7</td><td><strong>注册的函数可直接调用，且保留原函数名（wraps 真的生效）</strong></td><td>调用注册表里的函数并检查 <code>__name__</code></td><td>15 分</td></tr></tbody></table>
+<p><strong>总分：100 分</strong></p>
+<ul>
+<li><strong>80-100 分</strong>：✅ 验收通过</li>
+<li><strong>60-79 分</strong>：⚠️ 基本通过</li>
+<li><strong>60 分以下</strong>：❌ 未通过</li>
+</ul>
 <h4 id="_4">🔍 验收方式</h4>
 <div class="codehilite"><pre class="code-block"><span></span><code><span class="c1"># 自动验收脚本</span>
 python<span class="w"> </span>day02_practice_validator.py
@@ -340,67 +464,7 @@ python<span class="w"> </span>day02_practice_validator.py<span class="w"> </span
 <hr/>
 <h2 id="day-3">📅 Day 3：生成器、迭代器与上下文管理器</h2>
 <h3 id="llm">练习项目：实现一个流式 LLM 响应的异步生成器包装器</h3>
-<h4 id="8_1">✅ 验收标准（8 条）</h4>
-<table class="styled-table">
-<thead>
-<tr>
-<th>序号</th>
-<th>验收标准</th>
-<th>验证方法</th>
-<th>分值</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td><strong>实现了同步生成器（<code>def</code> + <code>yield</code>）</strong></td>
-<td>函数内用 <code>yield</code> 产出值，不是 <code>return</code></td>
-<td>10 分</td>
-</tr>
-<tr>
-<td>2</td>
-<td><strong>实现了异步生成器（<code>async def</code> + <code>yield</code>）</strong></td>
-<td>异步函数内用 <code>yield</code></td>
-<td>15 分</td>
-</tr>
-<tr>
-<td>3</td>
-<td><strong>流式输出：多次 <code>yield</code>，不是一次返回</strong></td>
-<td>生成器函数内有至少 2 个 <code>yield</code></td>
-<td>15 分</td>
-</tr>
-<tr>
-<td>4</td>
-<td><strong>实现了同步上下文管理器（<code>__enter__</code>/<code>__exit__</code>）</strong></td>
-<td>定义了包含这两个方法的类</td>
-<td>10 分</td>
-</tr>
-<tr>
-<td>5</td>
-<td><strong>或使用了 <code>@contextmanager</code> 实现上下文管理器</strong></td>
-<td>函数用 <code>@contextmanager</code> 装饰</td>
-<td>10 分</td>
-</tr>
-<tr>
-<td>6</td>
-<td><strong>实现了异步上下文管理器（<code>__aenter__</code>/<code>__aexit__</code>）</strong></td>
-<td>定义了包含这两个方法的类</td>
-<td>15 分</td>
-</tr>
-<tr>
-<td>7</td>
-<td><strong>或使用了 <code>@asynccontextmanager</code></strong></td>
-<td>异步函数用 <code>@asynccontextmanager</code> 装饰</td>
-<td>10 分</td>
-</tr>
-<tr>
-<td>8</td>
-<td><strong>代码可运行，生成器可被 <code>for</code>/<code>async for</code> 迭代</strong></td>
-<td>运行无报错</td>
-<td>15 分</td>
-</tr>
-</tbody>
-</table>
+<h4>✅ 验收标准（自动验收，共 100 分）</h4><table class="styled-table"><thead><tr><th>序号</th><th>验收标准</th><th>验证方法（行为级：验收脚本真的调用你的代码）</th><th>分值</th></tr></thead><tbody><tr><td>1</td><td><strong>代码可以加载</strong></td><td>动态加载你的 .py 文件</td><td>5 分</td></tr><tr><td>2</td><td><strong>同步生成器：逐块 yield ≥3 个 chunk，都是字符串</strong></td><td>脚本真的 <code>list()</code> 迭代你的生成器</td><td>15 分</td></tr><tr><td>3</td><td><strong>异步生成器：可用 <code>async for</code> 迭代出 ≥3 个 chunk（async def 里必须有 yield）</strong></td><td>脚本真的异步迭代</td><td>15 分</td></tr><tr><td>4</td><td><strong>同步计时器类：<code>__enter__</code> 返回 self，with 结束后打印耗时</strong></td><td>脚本真的进入你的 with 块</td><td>10 分</td></tr><tr><td>5</td><td><strong>@contextmanager 版本可用（yield 前后逻辑正确）</strong></td><td>脚本真的进入并退出</td><td>10 分</td></tr><tr><td>6</td><td><strong>异步计时器类：<code>__aenter__</code> 返回 self</strong></td><td>脚本真的 async with</td><td>10 分</td></tr><tr><td>7</td><td><strong>@asynccontextmanager 版本可用</strong></td><td>脚本真的 async with</td><td>10 分</td></tr><tr><td>8</td><td><strong>流式 LLM 客户端：<code>chat()</code> 返回异步生成器并逐块产出 ≥3 个 chunk</strong></td><td>脚本真的 async for 迭代你的 chat()</td><td>25 分</td></tr></tbody></table>
 <p><strong>总分：100 分</strong></p>
 <h4 id="_7">🔍 验收方式</h4>
 <div class="codehilite"><pre class="code-block"><span></span><code>python<span class="w"> </span>day03_practice_validator.py
@@ -419,65 +483,12 @@ python<span class="w"> </span>day02_practice_validator.py<span class="w"> </span
 <hr/>
 <h2 id="day-4llm-api-prompt">📅 Day 4：LLM API 调用与 Prompt 工程</h2>
 <h3 id="function-calling-llm">练习项目：实现支持 Function Calling 的 LLM 客户端</h3>
-<h4 id="_9">✅ 验收标准</h4>
-<table class="styled-table">
-<thead>
-<tr>
-<th>序号</th>
-<th>验收标准</th>
-<th>验证方法</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td><strong>能调用 LLM API（OpenAI 兼容格式）</strong></td>
-<td>用 <code>aiohttp</code>/<code>httpx</code> 发送异步 HTTP 请求</td>
-</tr>
-<tr>
-<td>2</td>
-<td><strong>请求格式正确：包含 <code>messages</code>、<code>model</code> 字段</strong></td>
-<td>检查请求体结构</td>
-</tr>
-<tr>
-<td>3</td>
-<td><strong>能解析 LLM 返回的 JSON 响应</strong></td>
-<td>用 <code>response.json()</code> 解析</td>
-</tr>
-<tr>
-<td>4</td>
-<td><strong>实现了 Function Calling：发送 <code>tools</code> 参数</strong></td>
-<td>请求体包含 <code>tools</code> 字段（OpenAI 格式）</td>
-</tr>
-<tr>
-<td>5</td>
-<td><strong>能解析 LLM 的 <code>tool_calls</code> 响应</strong></td>
-<td>从响应中提取 <code>function.name</code> 和 <code>function.arguments</code></td>
-</tr>
-<tr>
-<td>6</td>
-<td><strong>能根据 <code>tool_calls</code> 执行对应函数</strong></td>
-<td>调用本地 Python 函数，传入解析后的参数</td>
-</tr>
-<tr>
-<td>7</td>
-<td><strong>将函数执行结果返回给 LLM（追加 <code>role: tool</code> 消息）</strong></td>
-<td>构造正确的消息格式</td>
-</tr>
-<tr>
-<td>8</td>
-<td><strong>有错误处理：JSON 解析失败重试</strong></td>
-<td><code>try/except</code> + 重试逻辑</td>
-</tr>
-</tbody>
-</table>
-<h4 id="_10">🔍 验收方式</h4>
-<div class="codehilite"><pre class="code-block"><span></span><code><span class="c1"># 需要有 API Key 才能完整测试</span>
-<span class="c1"># 可以先用 mock 模式测试逻辑</span>
+<h4>✅ 验收标准（自动验收，共 100 分）</h4><table class="styled-table"><thead><tr><th>序号</th><th>验收标准</th><th>验证方法（行为级：验收脚本真的调用你的代码）</th><th>分值</th></tr></thead><tbody><tr><td>1</td><td><strong>代码可以加载</strong></td><td>动态加载你的 .py 文件</td><td>5 分</td></tr><tr><td>2</td><td><strong>tools 参数：≥2 个工具，均为 OpenAI Function Calling 格式</strong></td><td>调用你的 <code>get_tools_for_api()</code> 逐项检查</td><td>15 分</td></tr><tr><td>3</td><td><strong>解析 tool_calls：id/name/arguments（arguments 要 json.loads 成字典）</strong></td><td>用构造好的 LLM 响应喂你的 <code>parse_tool_calls()</code></td><td>20 分</td></tr><tr><td>4</td><td><strong>执行工具：calculator 真的算出 13</strong></td><td>脚本调用你的 <code>execute_tool_call()</code></td><td>20 分</td></tr><tr><td>5</td><td><strong>对话闭环：天气问题给出非空回答</strong></td><td>脚本真的跑你的 <code>chat_with_function_calling()</code></td><td>15 分</td></tr><tr><td>6</td><td><strong>对话闭环：计算问题给出回答</strong></td><td>同上（换一个问题）</td><td>15 分</td></tr><tr><td>7</td><td><strong>错误处理：核心函数中有 try/except（JSON 解析必须容错）</strong></td><td>AST 检查</td><td>10 分</td></tr></tbody></table>
+<h4>🔍 验收方式</h4>
+<div class="codehilite"><pre class="code-block"><span></span><code><span class="c1"># 内置 mock LLM，无需 API Key 即可完成全部必做验收</span>
+python day04_practice_validator.py
 
-python<span class="w"> </span>your_day04_practice.py
-<span class="c1"># 预期：LLM 会选择调用工具 → 执行工具 → LLM 根据结果生成最终回答</span>
-</code></pre></div>
+<span class="c1"># TODO 5.1（可选）：有 DeepSeek 等 Key 时把 mock 换成真实 API 再玩一遍</span></code></pre></div>
 <h4 id="_11">💡 关键流程</h4>
 <div class="codehilite"><pre class="code-block"><span></span><code><span class="err">用户提问</span>
 <span class="w">  </span><span class="err">↓</span>
@@ -490,92 +501,17 @@ python<span class="w"> </span>your_day04_practice.py
 <hr/>
 <h2 id="day-5-ai">📅 Day 5：阶段一实战——命令行 AI 助手</h2>
 <h3 id="pydantic-function-calling">练习项目：综合练习，集成异步 + Pydantic + Function Calling + 流式输出</h3>
-<h4 id="_12">✅ 验收标准（手动检查清单）</h4>
-<ul>
-<li>[ ] 用户在命令行输入自然语言，程序能理解意图</li>
-<li>[ ] 支持至少 2 个工具调用（如：计算器、天气查询）</li>
-<li>[ ] 工具调用使用 Function Calling 机制（不是关键词匹配）</li>
-<li>[ ] 异步并发处理多个工具调用（<code>asyncio.gather</code>）</li>
-<li>[ ] LLM 响应支持流式输出（<code>yield</code> chunk by chunk）</li>
-<li>[ ] 所有数据结构用 Pydantic 定义</li>
-<li>[ ] 有基本的错误处理（API 失败、工具执行失败）</li>
-<li>[ ] 代码有类型注解</li>
-</ul>
-<h4 id="_13">🔍 验收方式</h4>
-<div class="codehilite"><pre class="code-block"><span></span><code><span class="c1"># 运行命令行助手</span>
-python<span class="w"> </span>your_cli_agent.py
+<h4>✅ 验收标准（自动验收，共 100 分）</h4><table class="styled-table"><thead><tr><th>序号</th><th>验收标准</th><th>验证方法（行为级：验收脚本真的调用你的代码）</th><th>分值</th></tr></thead><tbody><tr><td>1</td><td><strong>代码可以加载（需要 pydantic）</strong></td><td>动态加载</td><td>5 分</td></tr><tr><td>2</td><td><strong>tools 参数：≥2 个工具格式正确</strong></td><td>调用你的 <code>get_tools_for_api()</code></td><td>15 分</td></tr><tr><td>3</td><td><strong>执行工具：calculator 算出 13</strong></td><td>调用你的 <code>execute_tool()</code></td><td>15 分</td></tr><tr><td>4</td><td><strong>流式 LLM：chat() 是异步生成器并逐块输出</strong></td><td>脚本真的异步迭代你的 chat()</td><td>20 分</td></tr><tr><td>5</td><td><strong>端到端：计算问题——回答里必须包含工具算出的 13</strong></td><td>脚本构建你的 Agent 发起真实对话</td><td>20 分</td></tr><tr><td>6</td><td><strong>端到端：天气问答闭环</strong></td><td>同上（换一个问题）</td><td>10 分</td></tr><tr><td>7</td><td><strong>Function Calling：对话历史中有 role=tool 的消息（结果真的回传了）</strong></td><td>检查你的 messages 列表</td><td>10 分</td></tr><tr><td>8</td><td><strong>Pydantic 模型：≥3 个 BaseModel 子类</strong></td><td>AST 检查</td><td>5 分</td></tr></tbody></table>
+<h4>🔍 验收方式</h4>
+<div class="codehilite"><pre class="code-block"><span></span><code>python day05_practice_validator.py
 
-<span class="c1"># 测试对话</span>
-&gt;<span class="w"> </span>帮我计算<span class="w"> </span><span class="m">3</span><span class="w"> </span>+<span class="w"> </span><span class="m">5</span><span class="w"> </span>*<span class="w"> </span><span class="m">2</span>
-<span class="c1"># 预期：Agent 调用计算器工具，返回 13</span>
-
-&gt;<span class="w"> </span>北京今天天气怎么样？
-<span class="c1"># 预期：Agent 调用天气查询工具，返回天气信息</span>
-</code></pre></div>
+<span class="c1"># 交互式体验（把模板末尾 run_cli 的注释打开）：</span>
+<span class="c1">#   输入"帮我计算 3 + 5 * 2" → 应调用工具并回答 13</span>
+<span class="c1">#   输入"exit" 退出</span></code></pre></div>
 <hr/>
 <h2 id="day-6agent">📅 Day 6：Agent 架构原理（核心！）</h2>
 <h3 id="python-react-agent">练习项目：不依赖框架，纯 Python 手写一个 ReAct Agent 循环</h3>
-<h4 id="8_2">✅ 验收标准（8 条）</h4>
-<table class="styled-table">
-<thead>
-<tr>
-<th>序号</th>
-<th>验收标准</th>
-<th>验证方法</th>
-<th>分值</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td><strong>实现了 ReAct 主循环（for/while + max_steps）</strong></td>
-<td>有循环结构，有步数上限</td>
-<td>15 分</td>
-</tr>
-<tr>
-<td>2</td>
-<td><strong>循环内正确构建 ReAct Prompt</strong></td>
-<td>Prompt 包含 Thought/Action/Action Input/Observation 格式说明</td>
-<td>10 分</td>
-</tr>
-<tr>
-<td>3</td>
-<td><strong>能解析 LLM 返回的 ReAct 格式</strong></td>
-<td>用正则或字符串方法提取 Action 和 Action Input</td>
-<td>15 分</td>
-</tr>
-<tr>
-<td>4</td>
-<td><strong>能根据 Action 执行对应工具</strong></td>
-<td>有 <code>execute_tool()</code> 函数</td>
-<td>10 分</td>
-</tr>
-<tr>
-<td>5</td>
-<td><strong>工具执行结果加入下一步的 Prompt</strong></td>
-<td>拼接 Observation 到下一次请求</td>
-<td>10 分</td>
-</tr>
-<tr>
-<td>6</td>
-<td><strong>能识别"Final Answer"并终止循环</strong></td>
-<td>解析到 Final Answer 后 <code>return</code></td>
-<td>15 分</td>
-</tr>
-<tr>
-<td>7</td>
-<td><strong>使用了 <code>async/await</code>（异步 LLM 调用）</strong></td>
-<td>主函数是 <code>async def</code>，内部用 <code>await</code></td>
-<td>15 分</td>
-</tr>
-<tr>
-<td>8</td>
-<td><strong>代码可运行，Agent 能完成多步推理任务</strong></td>
-<td>运行后 Agent 能正确使用工具并给出答案</td>
-<td>10 分</td>
-</tr>
-</tbody>
-</table>
+<h4>✅ 验收标准（自动验收，共 100 分）</h4><table class="styled-table"><thead><tr><th>序号</th><th>验收标准</th><th>验证方法（行为级：验收脚本真的调用你的代码）</th><th>分值</th></tr></thead><tbody><tr><td>1</td><td><strong>代码可以加载</strong></td><td>动态加载</td><td>5 分</td></tr><tr><td>2</td><td><strong>工具描述：包含 Calculator 和 Weather（放进 System Prompt 的清单）</strong></td><td>调用你的 <code>get_tools_description()</code></td><td>10 分</td></tr><tr><td>3</td><td><strong>执行工具：Calculator[3 + 5 * 2] 返回 success 且输出含 13</strong></td><td>调用你的 <code>execute_tool()</code></td><td>15 分</td></tr><tr><td>4</td><td><strong>解析 Action 响应：Thought/Action/Action Input 提取正确</strong></td><td>用样例响应喂你的 <code>parse_react_response()</code></td><td>13 分</td></tr><tr><td>5</td><td><strong>解析 Final Answer 响应：action 为空、答案在 action_input</strong></td><td>同上（换样例）</td><td>12 分</td></tr><tr><td>6</td><td><strong>Agent 端到端：计算题——正常终止且回答含工具算出的 13（死循环直接判负）</strong></td><td>脚本真跑你的 <code>react_agent()</code></td><td>20 分</td></tr><tr><td>7</td><td><strong>Agent 端到端：天气题——回答包含查询结果</strong></td><td>同上</td><td>15 分</td></tr><tr><td>8</td><td><strong>循环结构：react_agent 内有 for 循环（步数上限）和 await</strong></td><td>AST 检查</td><td>10 分</td></tr></tbody></table>
 <p><strong>总分：100 分</strong></p>
 <h4 id="_14">🔍 验收方式</h4>
 <div class="codehilite"><pre class="code-block"><span></span><code>python<span class="w"> </span>day06_practice_validator.py
@@ -608,21 +544,12 @@ python<span class="w"> </span>your_cli_agent.py
 <hr/>
 <h2 id="day-7langgraph">📅 Day 7：LangGraph 入门</h2>
 <h3 id="langgraph-react-agent">练习项目：用 LangGraph 实现带条件分支的 ReAct Agent</h3>
-<h4 id="_15">✅ 验收标准（手动检查清单）</h4>
-<ul>
-<li>[ ] 使用 <code>StateGraph</code> 定义 Agent 状态</li>
-<li>[ ] 定义了至少 2 个 Node（如：<code>call_model</code>、<code>call_tool</code>）</li>
-<li>[ ] 定义了 Edge（如：<code>call_model</code> → <code>call_tool</code> 或 <code>END</code>）</li>
-<li>[ ] 使用了 <code>add_conditional_edges</code>（条件路由）</li>
-<li>[ ] State 类型用 TypedDict 或 Pydantic 模型定义</li>
-<li>[ ] Agent 能完成多步推理（和 Day 6 功能相同，但用 LangGraph 实现）</li>
-<li>[ ] 代码可运行</li>
-</ul>
-<h4 id="_16">🔍 验收方式</h4>
-<div class="codehilite"><pre class="code-block"><span></span><code>python<span class="w"> </span>your_day07_practice.py
+<h4>✅ 验收标准（自动验收，共 100 分）</h4><table class="styled-table"><thead><tr><th>序号</th><th>验收标准</th><th>验证方法（行为级：验收脚本真的调用你的代码）</th><th>分值</th></tr></thead><tbody><tr><td>1</td><td><strong>代码可以加载</strong></td><td>动态加载</td><td>5 分</td></tr><tr><td>2</td><td><strong>AgentState：定义了 messages 和 step_count 字段</strong></td><td>检查 TypedDict 注解</td><td>10 分</td></tr><tr><td>3</td><td><strong>tools 参数格式正确</strong></td><td>调用你的 <code>get_tools_for_api()</code></td><td>10 分</td></tr><tr><td>4</td><td><strong>执行工具：calculator 算出 13</strong></td><td>调用你的 <code>execute_tool()</code></td><td>10 分</td></tr><tr><td>5</td><td><strong>call_model 节点：追加 assistant 消息、step_count +1（兼容部分更新返回）</strong></td><td>脚本构造 state 调用你的节点</td><td>15 分</td></tr><tr><td>6</td><td><strong>call_tool 节点：追加 role=tool 消息且内容含真实工具结果</strong></td><td>构造带 tool_calls 的 state 调用</td><td>15 分</td></tr><tr><td>7</td><td><strong>条件路由：有 tool_calls → 'call_tool'，无 → 'end'</strong></td><td>两种 state 分别试探你的 router</td><td>15 分</td></tr><tr><td>8</td><td><strong>端到端：run_agent 完整跑通，回答含工具结果（未装 langgraph 可用模拟器降级）</strong></td><td>脚本真跑你的 run_agent</td><td>20 分</td></tr></tbody></table>
+<h4>🔍 验收方式</h4>
+<div class="codehilite"><pre class="code-block"><span></span><code>python day07_practice_validator.py
 
-<span class="c1"># 预期输出类似 Day 6，但内部是用 LangGraph 驱动的</span>
-</code></pre></div>
+<span class="c1"># 未安装 langgraph 也能验收：run_agent 允许降级调用内置模拟器</span>
+<span class="c1"># 装了真实库（pip install langgraph）后取消 build_agent_graph 的注释即可无缝切换</span></code></pre></div>
 <h4 id="_17">💡 关键代码框架</h4>
 <div class="codehilite"><pre class="code-block"><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">langgraph.graph</span><span class="w"> </span><span class="kn">import</span> <span class="n">StateGraph</span><span class="p">,</span> <span class="n">END</span>
 
@@ -696,24 +623,32 @@ python<span class="w"> </span>your_day08_agent.py
 <h2 id="day-11-15">📅 Day 11-15：完整项目实战</h2>
 <h3 id="agent_1">项目：智能开发助手 Agent</h3>
 <h4 id="_23">✅ 验收标准（项目交付清单）</h4>
-<p><strong>Day 11-12：核心开发</strong>
-- [ ] 项目有清晰的目录结构
-- [ ] FastAPI 后端框架搭建完成
-- [ ] Agent 核心循环实现（ReAct 或 LangGraph）
-- [ ] 工具系统：至少 4 个可用工具</p>
-<p><strong>Day 13：Web UI</strong>
-- [ ] FastAPI + SSE（Server-sent Events）实现流式 API
-- [ ] 简单 Web 前端（Streamlit / Gradio / 纯 HTML+JS）
-- [ ] Agent 思考过程可视化（显示 Thought、Action、Observation）</p>
-<p><strong>Day 14：测试与部署</strong>
-- [ ] 单元测试（pytest + pytest-asyncio）
-- [ ] Token 消耗统计与优化
-- [ ] Docker 容器化（Dockerfile + docker-compose.yml）
-- [ ] 部署到云服务器或本地运行</p>
-<p><strong>Day 15：文档</strong>
-- [ ] README.md：项目介绍、安装步骤、使用方法
-- [ ] 架构图（可以用 Markdown 画图或贴图）
-- [ ] 示例代码</p>
+<p><strong>Day 11-12：核心开发</strong></p>
+<ul>
+<li>☐ 项目有清晰的目录结构</li>
+<li>☐ FastAPI 后端框架搭建完成</li>
+<li>☐ Agent 核心循环实现（ReAct 或 LangGraph）</li>
+<li>☐ 工具系统：至少 4 个可用工具</li>
+</ul>
+<p><strong>Day 13：Web UI</strong></p>
+<ul>
+<li>☐ FastAPI + SSE（Server-sent Events）实现流式 API</li>
+<li>☐ 简单 Web 前端（Streamlit / Gradio / 纯 HTML+JS）</li>
+<li>☐ Agent 思考过程可视化（显示 Thought、Action、Observation）</li>
+</ul>
+<p><strong>Day 14：测试与部署</strong></p>
+<ul>
+<li>☐ 单元测试（pytest + pytest-asyncio）</li>
+<li>☐ Token 消耗统计与优化</li>
+<li>☐ Docker 容器化（Dockerfile + docker-compose.yml）</li>
+<li>☐ 部署到云服务器或本地运行</li>
+</ul>
+<p><strong>Day 15：文档</strong></p>
+<ul>
+<li>☐ README.md：项目介绍、安装步骤、使用方法</li>
+<li>☐ 架构图（可以用 Markdown 画图或贴图）</li>
+<li>☐ 示例代码</li>
+</ul>
 <hr/>
 <h2 id="_24">📊 综合评分标准</h2>
 <table class="styled-table">
@@ -735,7 +670,7 @@ python<span class="w"> </span>your_day08_agent.py
 <tr>
 <td>阶段二</td>
 <td>Day 6-10</td>
-<td>每 day 完成检查清单</td>
+<td>Day 6-7 自动验收 ≥80 分；Day 8-10 完成检查清单</td>
 <td>掌握 Agent 架构</td>
 </tr>
 <tr>
@@ -813,7 +748,7 @@ python<span class="w"> </span>day01_practice_validator.py<span class="w"> </span
 <h3 id="q3day-8910">Q3：Day 8/9/10 没有自动验收脚本？</h3>
 <p>A：这些天的练习更综合，难以完全自动化验收。请按照文档中的"手动检查清单"逐项自查。</p>
 <h3 id="q4">Q4：我可以参考标准答案吗？</h3>
-<p>A：可以！每个 Day 的 <code>tutorial_xx.py</code> 或 <code>ACCEPTANCE_CRITERIA.md</code> 里都有标准答案。<strong>但建议先自己尝试</strong>，卡住了再看。</p>
+<p>A：项目暂不提供标准答案——<strong>建议先自己尝试</strong>。卡住时可以：① 对照验收脚本的逐项提示（它会告诉你差在哪）；② 重读 TODO 的 docstring，需求都写在里面；③ 让 AI 助手帮你解读报错，但代码尽量自己写。</p>
 <hr/>
 <p><strong>祝你学习顺利！遇到任何问题，随时问我！</strong> 🚀</p>
     </div>

@@ -114,10 +114,13 @@ def mock_llm_response(messages: List[Dict], has_tools: bool = True) -> Dict:
     has_tool_result = any(msg.get("role") == "tool" for msg in messages)
     
     if has_tool_result:
-        # 已经有工具结果，生成最终回答
+        # 已经有工具结果，生成引用结果的最终回答
+        # （引用工具返回内容，便于确认工具真的被执行了）
+        tool_msg = next((msg for msg in reversed(messages) if msg.get("role") == "tool"), None)
+        结果 = tool_msg.get("content", "无") if tool_msg else "无"
         return {
             "role": "assistant",
-            "content": f"根据查询结果，我已经为您完成了计算。"
+            "content": f"根据工具返回的结果（{结果}），我已经完成你的请求。"
         }
     
     # 首次调用，可能需要工具
@@ -264,6 +267,10 @@ async def run_agent(user_input: str, max_steps: int = 10) -> str:
     1. 初始化 state = {"messages": [system_msg, user_msg], "step_count": 0}
     2. 调用 graph.invoke(state) 或 graph.astream(state)
     3. 返回最终回答
+    
+    提示：
+    - 如果还没安装 langgraph，可以先降级调用
+      simulate_langgraph_loop(user_input, max_steps) 跑通逻辑
     """
     # TODO 7.1：实现 Agent 运行
     pass
@@ -335,6 +342,12 @@ async def main():
     print("Day 7 练习：LangGraph ReAct Agent")
     print("=" * 60)
     
+    # 友好提示：核心 TODO 未完成时，演示结果会不完整
+    _probe = execute_tool("calculator", {"expression": "1 + 1"})
+    if _probe is None:
+        print("\n⚠️ 检测到 TODO 2.3（execute_tool）尚未实现，工具执行结果将是空的。")
+        print("💡 请先完成 TODO 2.2 / 2.3 / 4.1 / 4.2 / 5.1，再运行本文件查看完整演示。\n")
+    
     # 测试 1：用模拟器跑通 ReAct 流程
     print("\n📝 测试 1：计算问题")
     print("用户：帮我计算 3 + 5 * 2")
@@ -354,4 +367,8 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except Exception as e:
+        print(f"\n⚠️ 运行中断：{type(e).__name__}: {e}")
+        print("💡 这通常是因为上面的 TODO 还没有完成。请先实现各个任务函数，再运行本文件。")

@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🐍 Day01 Practice Template</title>
+    <title>📖 Day09 Lesson</title>
     <style>
+
 
 /* ===== Maple Mono 代码字体（自托管，OFL 开源协议） ===== */
 @font-face {
@@ -336,6 +337,7 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 
     
     
+    
     </style>
 </head>
 <body>
@@ -349,7 +351,7 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 <a class="" href="tutorial_02_async.html">异步 9 步教程</a>
 <h4>Day 1-3 (基础)</h4>
 <a class="" href="day01_lesson.html">Day 1 - 学习</a>
-<a class="active" href="day01_practice_template.html">Day 1 - 模板</a>
+<a class="" href="day01_practice_template.html">Day 1 - 模板</a>
 <a class="" href="day01_practice_validator.html">Day 1 - 验收</a>
 <a class="" href="day02_lesson.html">Day 2 - 学习</a>
 <a class="" href="day02_practice_template.html">Day 2 - 模板</a>
@@ -374,175 +376,68 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 <h4>Day 8-10 (高级)</h4>
 <a class="" href="day08_lesson.html">Day 8 - 学习</a>
 <a class="" href="day08_practice_template.html">Day 8 - 模板</a>
-<a class="" href="day09_lesson.html">Day 9 - 学习</a>
+<a class="active" href="day09_lesson.html">Day 9 - 学习</a>
 <a class="" href="day09_practice_template.html">Day 9 - 模板</a>
 <a class="" href="day10_lesson.html">Day 10 - 学习</a>
 <a class="" href="day10_practice_template.html">Day 10 - 模板</a>
 </div>
 <div class="main-content">
-    <div class="header"><h1>🐍 Day01 Practice Template</h1></div>
+    <div class="header"><h1>📖 Day 9 学习页：记忆系统与 RAG</h1></div>
     <div class="content">
-        <div class="file-info"><div class="info-left">📄 文件: <code>day01_practice_template.py</code></div><a class="download-btn" href="day01_practice_template.py" download>⬇ 下载 .py 文件</a></div>
-<div class="highlight"><pre><span></span><span class="sd">"""</span>
-<span class="sd">Day 1 练习：异步批量调用多个 API（模拟 Agent 多工具并发调用）</span>
-<span class="sd">验收标准：</span>
-<span class="sd">1. 必须使用 async/await</span>
-<span class="sd">2. 必须使用 asyncio.gather() 并发执行</span>
-<span class="sd">3. 对比同步 vs 异步的性能差异（异步更快）</span>
-<span class="sd">4. 正确处理异常</span>
-<span class="sd">5. 代码有类型注解</span>
-<span class="sd">"""</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
+<h1>Day 9：记忆系统与 RAG</h1>
+<blockquote class="note-block">
+<p><strong>🎯 今日目标</strong>：让 Agent "记住"该记的东西——短期记忆管对话历史（带裁剪），
+长期记忆/RAG 管知识检索。理解了今天的内容，你就理解了 ChatGPT 的"记忆"和"知识库问答"的全部原理。</p>
+</blockquote>
+<div class="file-info"><div class="info-left">📚 本日资源：📝 <a href="day09_practice_template.html">练习模板</a> ｜ 📋 <a href="ACCEPTANCE_CRITERIA.html">手动验收清单</a></div></div>
+<h2>⏱ 今日安排（约 2 小时）</h2>
+<table class="styled-table"><thead><tr><th>时间</th><th>内容</th><th>方式</th></tr></thead><tbody><tr><td>40min</td><td><strong>理论学习</strong>：三种记忆 + RAG 五步</td><td>阅读 + 编码</td></tr><tr><td>40min</td><td><strong>RAG 实战</strong>：向量检索 + 检索器</td><td>编码</td></tr><tr><td>40min</td><td><strong>动手实操</strong>：带记忆的 Agent + 上下文裁剪</td><td>编码</td></tr></tbody></table>
 
-
-<span class="c1"># ==================== 任务 1：实现异步 HTTP 请求 ====================</span>
-<span class="c1"># 提示：使用 aiohttp 或 asyncio 模拟 API 调用</span>
-
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">异步请求</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">延迟秒</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    模拟异步 API 请求</span>
-<span class="sd">    </span>
-<span class="sd">    需求：</span>
-<span class="sd">    1. 使用 await asyncio.sleep(延迟秒) 模拟网络延迟</span>
-<span class="sd">    2. 返回包含 url、状态码、响应数据的字典</span>
-<span class="sd">    3. 添加 try/except 处理异常</span>
-<span class="sd">    </span>
-<span class="sd">    示例返回：</span>
-<span class="sd">    {"url": "https://api.example.com/users", "status": 200, "data": {...}}</span>
-<span class="sd">    """</span>
-    <span class="c1"># TODO: 在这里写你的代码</span>
-    <span class="k">pass</span>
-
-
-<span class="c1"># ==================== 任务 2：并发调用多个 API ====================</span>
-<span class="c1"># 提示：使用 asyncio.gather()</span>
-
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">并发请求</span><span class="p">(</span><span class="n">urls</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    并发请求多个 URL</span>
-<span class="sd">    </span>
-<span class="sd">    需求：</span>
-<span class="sd">    1. 为每个 URL 创建异步任务</span>
-<span class="sd">    2. 使用 asyncio.gather() 并发执行</span>
-<span class="sd">    3. 返回所有结果</span>
-<span class="sd">    </span>
-<span class="sd">    提示：</span>
-<span class="sd">    tasks = [异步请求(url) for url in urls]</span>
-<span class="sd">    results = await asyncio.gather(*tasks)</span>
-<span class="sd">    """</span>
-    <span class="c1"># TODO: 在这里写你的代码</span>
-    <span class="k">pass</span>
-
-
-<span class="c1"># ==================== 任务 3：对比同步 vs 异步性能 ====================</span>
-<span class="c1"># 提示：分别用同步和异步方式请求 5 个 URL，记录耗时</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">同步请求</span><span class="p">(</span><span class="n">urls</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    同步请求多个 URL（用于对比）</span>
-<span class="sd">    </span>
-<span class="sd">    需求：</span>
-<span class="sd">    1. 使用 for 循环逐个请求</span>
-<span class="sd">    2. 使用 time.sleep() 模拟延迟</span>
-<span class="sd">    3. 记录总耗时</span>
-<span class="sd">    </span>
-<span class="sd">    提示：这是错误示范，故意写得很慢</span>
-<span class="sd">    """</span>
-    <span class="c1"># TODO: 在这里写你的代码</span>
-    <span class="k">pass</span>
-
-
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">性能对比</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    对比同步 vs 异步的性能差异</span>
-<span class="sd">    </span>
-<span class="sd">    需求：</span>
-<span class="sd">    1. 准备 5 个 URL（可以相同）</span>
-<span class="sd">    2. 分别用同步和异步方式请求</span>
-<span class="sd">    3. 打印两种方式的耗时</span>
-<span class="sd">    4. 断言：异步耗时 &lt; 同步耗时 * 0.5</span>
-<span class="sd">    </span>
-<span class="sd">    预期结果：</span>
-<span class="sd">    同步：~5 秒（5 个请求 × 1 秒）</span>
-<span class="sd">    异步：~1 秒（5 个请求并发，只花最慢的那个的时间）</span>
-<span class="sd">    """</span>
-    <span class="c1"># TODO: 在这里写你的代码</span>
-    <span class="k">pass</span>
-
-
-<span class="c1"># ==================== 任务 4：异常处理 ====================</span>
-<span class="c1"># 提示：有些请求可能失败，需要捕获异常</span>
-
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">异步请求带重试</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">最大重试</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    带重试机制的异步请求</span>
-<span class="sd">    </span>
-<span class="sd">    需求：</span>
-<span class="sd">    1. 如果请求失败（模拟随机失败），重试最多 最大重试 次</span>
-<span class="sd">    2. 使用 try/except 捕获异常</span>
-<span class="sd">    3. 每次重试前等待 0.5 秒</span>
-<span class="sd">    </span>
-<span class="sd">    提示：可以用 random.random() &lt; 0.3 模拟 30% 失败率</span>
-<span class="sd">    """</span>
-    <span class="c1"># TODO: 在这里写你的代码</span>
-    <span class="k">pass</span>
-
-
-<span class="c1"># ==================== 主函数 ====================</span>
-
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">"""主函数：运行所有练习"""</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"Day 1 练习：异步批量调用多个 API"</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
-    
-    <span class="c1"># 测试数据</span>
-    <span class="n">urls</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">"https://api.example.com/users"</span><span class="p">,</span>
-        <span class="s2">"https://api.example.com/posts"</span><span class="p">,</span>
-        <span class="s2">"https://api.example.com/comments"</span><span class="p">,</span>
-        <span class="s2">"https://api.example.com/albums"</span><span class="p">,</span>
-        <span class="s2">"https://api.example.com/photos"</span><span class="p">,</span>
-    <span class="p">]</span>
-    
-    <span class="c1"># 任务 1：单个异步请求</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">📝 任务 1：单个异步请求"</span><span class="p">)</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">异步请求</span><span class="p">(</span><span class="n">urls</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"结果：</span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-    
-    <span class="c1"># 任务 2：并发请求</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">📝 任务 2：并发请求"</span><span class="p">)</span>
-    <span class="n">results</span> <span class="o">=</span> <span class="k">await</span> <span class="n">并发请求</span><span class="p">(</span><span class="n">urls</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"并发请求了 </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span><span class="si">}</span><span class="s2"> 个 URL"</span><span class="p">)</span>
-    
-    <span class="c1"># 任务 3：性能对比</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">📝 任务 3：性能对比（同步 vs 异步）"</span><span class="p">)</span>
-    <span class="k">await</span> <span class="n">性能对比</span><span class="p">()</span>
-    
-    <span class="c1"># 任务 4：异常处理</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">📝 任务 4：异常处理（带重试）"</span><span class="p">)</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">异步请求带重试</span><span class="p">(</span><span class="n">urls</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"带重试的结果：</span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-    
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ 所有任务完成！现在运行 python day01_practice_validator.py 验收"</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
-
-
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
-    <span class="n">开始时间</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">⚠️ 运行中断：</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"💡 这通常是因为上面的 TODO 还没有完成。请先实现各个任务函数，再运行本文件。"</span><span class="p">)</span>
-    <span class="n">总耗时</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">开始时间</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">⏱ 总耗时：</span><span class="si">{</span><span class="n">总耗时</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> 秒"</span><span class="p">)</span>
-</pre></div>
+<h2>📖 第一步：Agent 的三种记忆</h2>
+<table class="styled-table"><thead><tr><th>类型</th><th>存什么</th><th>实现方式</th><th>生命周期</th></tr></thead><tbody><tr><td>短期记忆</td><td>当前对话的消息历史</td><td>消息列表 + 滑动窗口裁剪</td><td>本次会话</td></tr><tr><td>长期记忆</td><td>用户偏好、事实、文档知识</td><td>向量库检索（RAG）</td><td>跨会话持久</td></tr><tr><td>工作记忆</td><td>当前任务的草稿/中间结果</td><td>scratchpad / state 字段</td><td>本次任务</td></tr></tbody></table>
+<p>为什么短期记忆要裁剪：模型上下文窗口有限（且越长越贵），10 轮对话后历史可能已超限——
+所以要滑动窗口（只留最近 N 条）或摘要压缩（把旧历史总结成一段话）。</p>
+<pre class="code-block"><code>class ShortTermMemory:
+    def add(self, role, content):
+        self.messages.append(ConversationMessage(role, content))
+        if len(self.messages) &gt; self.max_messages:
+            # 裁剪最旧的非 system 消息（system 是人设，必须永远保留）
+            for i, m in enumerate(self.messages):
+                if m.role != "system":
+                    del self.messages[i]
+                    break</code></pre>
+<h2>📖 第二步：RAG（检索增强生成）五步流程</h2>
+<pre class="code-block"><code>① 知识入库    文档 → 切块(chunk) → 每块算 embedding → 存进向量库
+                                        │
+用户提问 ──► ② 问题也算 embedding ──────┤
+              ③ 相似度检索：找出最相关的 top_k 块
+              ④ 把检索到的知识拼进 Prompt：
+                  "请参考以下资料回答：\n{检索结果}\n\n问题：{用户问题}"
+              ⑤ LLM 生成 —— 答案基于真实资料，不再靠幻觉</code></pre>
+<p>本练习用<strong>关键词重合度</strong>代替 embedding（纯标准库能跑）；原理完全一致——
+正式项目把 <code>SimpleVectorStore</code> 换成 ChromaDB/FAISS + embedding 模型即可，接口不变。
+注意：英文按空格分词，<strong>中文没有空格</strong>，要按字/bigram 或 jieba 分词，否则检索直接失效（模板已处理）。</p>
+<h2>🛠 第三步：动手实操</h2>
+<ol>
+<li><strong>打开模板</strong>：<a href="day09_practice_template.html">day09_practice_template.py</a>：
+  <ul>
+  <li>TODO 1.1-1.4：<code>ShortTermMemory</code> 添加/裁剪/格式转换/清空</li>
+  <li>TODO 2.1-2.2：<code>SimpleVectorStore</code> 添加与检索（关键词重合度打分即可）</li>
+  <li>TODO 3.1-3.2：<code>RAGRetriever</code> 知识入库 + 检索并格式化成可拼接的文本</li>
+  <li>TODO 4.1：<code>MemoryAgent.chat()</code> —— 先检索相关知识注入 prompt，再走对话，回答写回短期记忆</li>
+  <li>TODO 5.1：<code>compress_conversation()</code> —— 按估算 token（1 个中文字 ≈ 2 token）从新到旧保留，system 不丢</li>
+  </ul></li>
+<li><strong>运行自测</strong>：<code>python day09_practice_template.py</code>。
+测试 4 是记忆的"图灵测试"：先告诉它"我叫张三，我喜欢 Python"，再问"我叫什么名字？"——
+答对了说明记忆链路通了。</li>
+<li><strong>验收</strong>：按 <a href="ACCEPTANCE_CRITERIA.html">验收标准文档</a> Day 9 清单自查，并回答三个问题：
+裁剪为什么保留 system？检索为什么比"把所有知识塞 prompt"好？压缩和滑动窗口各适合什么场景？</li>
+</ol>
+<h2>⚠️ 避坑</h2>
+<ul><li>❌ 对话历史无限制地append → 超出上下文窗口直接报错；必须有裁剪或压缩策略</li><li>❌ 中文文本用空格分词做检索 → 整句一个'词'，检索永远失灵（要用分词/字符级匹配）</li><li>❌ Embedding 模型中英文不匹配 → 中文用 <code>bge-large-zh</code> 或 <code>text-embedding-3-small</code></li><li>✅ 记忆不是越多越好——塞一堆无关历史反而稀释重点，<strong>相关性检索</strong>才是关键</li></ul>
+<h2>🔗 延伸资源</h2>
+<ul><li><a href="https://docs.trychroma.com/">ChromaDB 文档</a></li><li><a href="https://python.langchain.com/docs/tutorials/rag/">LangChain RAG 教程</a></li></ul>
 
     </div>
 </div>

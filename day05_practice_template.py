@@ -12,6 +12,7 @@ Day 5 练习：命令行 AI 助手（阶段一综合实战）
 """
 
 import asyncio
+import functools
 import json
 import sys
 from typing import List, Dict, Any, AsyncGenerator, Optional
@@ -128,15 +129,43 @@ class StreamingLLMClient:
         pass
     
     async def _mock_stream(self, messages: List[ChatMessage]) -> AsyncGenerator[str, None]:
-        """模拟流式输出（用于测试）"""
-        response = "我需要计算 3 + 5 * 2 的结果。"
-        for char in response:
-            await asyncio.sleep(0.05)
-            yield char
-        yield "\n"
+        """
+        模拟流式输出（用于测试）
         
-        # 模拟 tool call
-        yield '[TOOL_CALL] calculator: {"expression": "3+5*2"}'
+        根据对话历史决定输出：
+        - 还没有工具结果 → 先输出一段文字，再输出 [TOOL_CALL] 标记
+        - 已经有工具结果（role=tool 的消息）→ 输出引用工具结果的最终回答
+        这样 Agent 主循环（TODO 4.1）第二轮就能拿到最终答案，正常终止。
+        """
+        has_tool_result = any(m.role == "tool" for m in messages)
+        last_user = next((m.content for m in reversed(messages) if m.role == "user"), "")
+        
+        if not has_tool_result:
+            if "计算" in last_user:
+                for char in "我需要调用计算器工具。":
+                    await asyncio.sleep(0.03)
+                    yield char
+                yield "\n"
+                yield '[TOOL_CALL] calculator: {"expression": "3 + 5 * 2"}'
+                return
+            if "天气" in last_user:
+                for char in "我需要查询天气工具。":
+                    await asyncio.sleep(0.03)
+                    yield char
+                yield "\n"
+                yield '[TOOL_CALL] weather: {"city": "北京"}'
+                return
+            for char in "你好！我是命令行 AI 助手，可以帮你计算和查询天气。":
+                await asyncio.sleep(0.03)
+                yield char
+            return
+        
+        # 已有工具结果，生成引用结果的最终回答
+        tool_msg = next((m for m in reversed(messages) if m.role == "tool"), None)
+        response = f"根据工具返回的结果：{tool_msg.content if tool_msg else '无'}"
+        for char in response:
+            await asyncio.sleep(0.03)
+            yield char
     
     async def _call_real_api(
         self, 
@@ -232,7 +261,9 @@ async def run_cli():
     
     while True:
         try:
-            user_input = input("你：").strip()
+            # input() 是阻塞调用，在 async 循环里要用 asyncio.to_thread 放到线程里，
+            # 否则会卡住整个事件循环（Day 1 学过的知识点！）
+            user_input = (await asyncio.to_thread(input, "你：")).strip()
         except (EOFError, KeyboardInterrupt):
             print("\n👋 再见！")
             break
@@ -306,4 +337,8 @@ if __name__ == "__main__":
     
     # asyncio.run(run_cli())  # ← 取消注释来启动交互式 CLI
     
-    asyncio.run(main())  # ← 默认运行自动化测试
+    try:
+        asyncio.run(main())  # ← 默认运行自动化测试
+    except Exception as e:
+        print(f"\n⚠️ 运行中断：{type(e).__name__}: {e}")
+        print("💡 这通常是因为上面的 TODO 还没有完成。请先实现各个任务函数，再运行本文件。")

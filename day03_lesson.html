@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🐍 Day01 Practice Template</title>
+    <title>📖 Day03 Lesson</title>
     <style>
+
 
 /* ===== Maple Mono 代码字体（自托管，OFL 开源协议） ===== */
 @font-face {
@@ -336,6 +337,7 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 
     
     
+    
     </style>
 </head>
 <body>
@@ -349,12 +351,12 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 <a class="" href="tutorial_02_async.html">异步 9 步教程</a>
 <h4>Day 1-3 (基础)</h4>
 <a class="" href="day01_lesson.html">Day 1 - 学习</a>
-<a class="active" href="day01_practice_template.html">Day 1 - 模板</a>
+<a class="" href="day01_practice_template.html">Day 1 - 模板</a>
 <a class="" href="day01_practice_validator.html">Day 1 - 验收</a>
 <a class="" href="day02_lesson.html">Day 2 - 学习</a>
 <a class="" href="day02_practice_template.html">Day 2 - 模板</a>
 <a class="" href="day02_practice_validator.html">Day 2 - 验收</a>
-<a class="" href="day03_lesson.html">Day 3 - 学习</a>
+<a class="active" href="day03_lesson.html">Day 3 - 学习</a>
 <a class="" href="day03_practice_template.html">Day 3 - 模板</a>
 <a class="" href="day03_practice_validator.html">Day 3 - 验收</a>
 <h4>Day 4-5 (LLM)</h4>
@@ -380,169 +382,95 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 <a class="" href="day10_practice_template.html">Day 10 - 模板</a>
 </div>
 <div class="main-content">
-    <div class="header"><h1>🐍 Day01 Practice Template</h1></div>
+    <div class="header"><h1>📖 Day 3 学习页：生成器与上下文管理器</h1></div>
     <div class="content">
-        <div class="file-info"><div class="info-left">📄 文件: <code>day01_practice_template.py</code></div><a class="download-btn" href="day01_practice_template.py" download>⬇ 下载 .py 文件</a></div>
-<div class="highlight"><pre><span></span><span class="sd">"""</span>
-<span class="sd">Day 1 练习：异步批量调用多个 API（模拟 Agent 多工具并发调用）</span>
-<span class="sd">验收标准：</span>
-<span class="sd">1. 必须使用 async/await</span>
-<span class="sd">2. 必须使用 asyncio.gather() 并发执行</span>
-<span class="sd">3. 对比同步 vs 异步的性能差异（异步更快）</span>
-<span class="sd">4. 正确处理异常</span>
-<span class="sd">5. 代码有类型注解</span>
-<span class="sd">"""</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
+<h1>Day 3：生成器、异步生成器与上下文管理器</h1>
+<blockquote class="note-block">
+<p><strong>🎯 今日目标</strong>：实现一个"逐字吐出回复"的流式 LLM 客户端。你平时看到的 ChatGPT 打字机效果、
+Agent 流式输出，底层就是一个异步生成器。</p>
+</blockquote>
+<div class="file-info"><div class="info-left">📚 本日资源：📝 <a href="day03_practice_template.html">练习模板</a> ｜ ✅ <a href="day03_practice_validator.html">验收脚本</a></div></div>
+<h2>⏱ 今日安排（约 2 小时）</h2>
+<table class="styled-table"><thead><tr><th>时间</th><th>内容</th><th>方式</th></tr></thead><tbody><tr><td>30min</td><td><strong>理论学习</strong>：yield 的暂停/恢复机制 + 上下文管理器</td><td>阅读</td></tr><tr><td>30min</td><td><strong>编码理解</strong>：同步/异步生成器各写一遍</td><td>编码</td></tr><tr><td>60min</td><td><strong>动手实操</strong>：完成练习模板 11 个 TODO</td><td>编码</td></tr></tbody></table>
 
+<h2>📖 第一步：理论学习</h2>
 
-<span class="c1"># ==================== 任务 1：实现异步 HTTP 请求 ====================</span>
-<span class="c1"># 提示：使用 aiohttp 或 asyncio 模拟 API 调用</span>
+<h3>1. 生成器：能暂停的函数</h3>
+<p>普通函数 return 后就结束了；带 <code>yield</code> 的函数每次吐出一个值就<strong>暂停</strong>，
+下次迭代从暂停处继续。好处：不一次性把所有数据放进内存，要多少吐多少。</p>
+<pre class="code-block"><code>def 计数器(上限):
+    n = 0
+    while n &lt; 上限:
+        yield n      # 吐出 n 并暂停，下次从这里继续
+        n += 1
 
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">异步请求</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">延迟秒</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    模拟异步 API 请求</span>
-<span class="sd">    </span>
-<span class="sd">    需求：</span>
-<span class="sd">    1. 使用 await asyncio.sleep(延迟秒) 模拟网络延迟</span>
-<span class="sd">    2. 返回包含 url、状态码、响应数据的字典</span>
-<span class="sd">    3. 添加 try/except 处理异常</span>
-<span class="sd">    </span>
-<span class="sd">    示例返回：</span>
-<span class="sd">    {"url": "https://api.example.com/users", "status": 200, "data": {...}}</span>
-<span class="sd">    """</span>
-    <span class="c1"># TODO: 在这里写你的代码</span>
-    <span class="k">pass</span>
+for i in 计数器(3):   # 0 1 2 —— 一次只存在一个值
+    print(i)</code></pre>
+<p>两个关键性质：<strong>① 只能遍历一次</strong>（ exhausted 就没了，需要重复用就转 <code>list()</code>）；
+<strong>② 惰性求值</strong>（没人要就不计算——处理大文件/长流式响应不爆内存的根本原因）。</p>
 
+<h3>2. 异步生成器 = async def + yield（LLM 流式输出的原理）</h3>
+<p>LLM API 是一个 token 一个 token 返回的。客户端用异步生成器逐块接收，界面就能打字机式刷新：</p>
+<pre class="code-block"><code>import asyncio
+from typing import AsyncGenerator
 
-<span class="c1"># ==================== 任务 2：并发调用多个 API ====================</span>
-<span class="c1"># 提示：使用 asyncio.gather()</span>
+async def 流式响应(提示词: str) -&gt; AsyncGenerator[str, None]:
+    # 注意：async def 里必须有 yield，才是"异步生成器"
+    for chunk in [提示词[:i+1] for i in range(len(提示词))]:
+        await asyncio.sleep(0.1)   # 模拟网络到达一个 chunk
+        yield chunk
 
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">并发请求</span><span class="p">(</span><span class="n">urls</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    并发请求多个 URL</span>
-<span class="sd">    </span>
-<span class="sd">    需求：</span>
-<span class="sd">    1. 为每个 URL 创建异步任务</span>
-<span class="sd">    2. 使用 asyncio.gather() 并发执行</span>
-<span class="sd">    3. 返回所有结果</span>
-<span class="sd">    </span>
-<span class="sd">    提示：</span>
-<span class="sd">    tasks = [异步请求(url) for url in urls]</span>
-<span class="sd">    results = await asyncio.gather(*tasks)</span>
-<span class="sd">    """</span>
-    <span class="c1"># TODO: 在这里写你的代码</span>
-    <span class="k">pass</span>
+async def main():
+    async for chunk in 流式响应("你好世界"):   # 用 async for 消费
+        print(chunk, end="", flush=True)</code></pre>
+<p class="note-block">⚠️ 高频错误：<code>async def</code> 函数体里<strong>没有 yield</strong>，它就不是异步生成器，
+而是普通协程——用 <code>async for</code> 迭代它会直接 TypeError。练习模板里特意留了这个坑给你踩。</p>
 
+<h3>3. 上下文管理器：自动收尾的资源管家</h3>
+<p><code>with</code> 语句的底层。四种写法按需选择：</p>
+<pre class="code-block"><code>from contextlib import contextmanager, asynccontextmanager
+import time
 
-<span class="c1"># ==================== 任务 3：对比同步 vs 异步性能 ====================</span>
-<span class="c1"># 提示：分别用同步和异步方式请求 5 个 URL，记录耗时</span>
+# 写法 1：类实现（最完整，能保存状态）
+class 计时器:
+    def __enter__(self):
+        self.开始 = time.time()
+        return self                      # 约定：返回 self
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        print(f"耗时 {time.time()-self.开始:.3f}s")
+        return False                     # False = 异常继续往外抛
 
-<span class="k">def</span><span class="w"> </span><span class="nf">同步请求</span><span class="p">(</span><span class="n">urls</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    同步请求多个 URL（用于对比）</span>
-<span class="sd">    </span>
-<span class="sd">    需求：</span>
-<span class="sd">    1. 使用 for 循环逐个请求</span>
-<span class="sd">    2. 使用 time.sleep() 模拟延迟</span>
-<span class="sd">    3. 记录总耗时</span>
-<span class="sd">    </span>
-<span class="sd">    提示：这是错误示范，故意写得很慢</span>
-<span class="sd">    """</span>
-    <span class="c1"># TODO: 在这里写你的代码</span>
-    <span class="k">pass</span>
+# 写法 2：@contextmanager（简单的场景两行搞定）
+@contextmanager
+def 计时器简版(名称):
+    开始 = time.time()
+    yield                                # ← yield 前是 __enter__，后是 __exit__
+    print(f"{名称} 耗时 {time.time()-开始:.3f}s")
 
+with 计时器简版("查询"):        # 用法和写法 1 完全一样
+    time.sleep(0.5)
 
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">性能对比</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    对比同步 vs 异步的性能差异</span>
-<span class="sd">    </span>
-<span class="sd">    需求：</span>
-<span class="sd">    1. 准备 5 个 URL（可以相同）</span>
-<span class="sd">    2. 分别用同步和异步方式请求</span>
-<span class="sd">    3. 打印两种方式的耗时</span>
-<span class="sd">    4. 断言：异步耗时 &lt; 同步耗时 * 0.5</span>
-<span class="sd">    </span>
-<span class="sd">    预期结果：</span>
-<span class="sd">    同步：~5 秒（5 个请求 × 1 秒）</span>
-<span class="sd">    异步：~1 秒（5 个请求并发，只花最慢的那个的时间）</span>
-<span class="sd">    """</span>
-    <span class="c1"># TODO: 在这里写你的代码</span>
-    <span class="k">pass</span>
-
-
-<span class="c1"># ==================== 任务 4：异常处理 ====================</span>
-<span class="c1"># 提示：有些请求可能失败，需要捕获异常</span>
-
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">异步请求带重试</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">最大重试</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    带重试机制的异步请求</span>
-<span class="sd">    </span>
-<span class="sd">    需求：</span>
-<span class="sd">    1. 如果请求失败（模拟随机失败），重试最多 最大重试 次</span>
-<span class="sd">    2. 使用 try/except 捕获异常</span>
-<span class="sd">    3. 每次重试前等待 0.5 秒</span>
-<span class="sd">    </span>
-<span class="sd">    提示：可以用 random.random() &lt; 0.3 模拟 30% 失败率</span>
-<span class="sd">    """</span>
-    <span class="c1"># TODO: 在这里写你的代码</span>
-    <span class="k">pass</span>
-
-
-<span class="c1"># ==================== 主函数 ====================</span>
-
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">"""主函数：运行所有练习"""</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"Day 1 练习：异步批量调用多个 API"</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
-    
-    <span class="c1"># 测试数据</span>
-    <span class="n">urls</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">"https://api.example.com/users"</span><span class="p">,</span>
-        <span class="s2">"https://api.example.com/posts"</span><span class="p">,</span>
-        <span class="s2">"https://api.example.com/comments"</span><span class="p">,</span>
-        <span class="s2">"https://api.example.com/albums"</span><span class="p">,</span>
-        <span class="s2">"https://api.example.com/photos"</span><span class="p">,</span>
-    <span class="p">]</span>
-    
-    <span class="c1"># 任务 1：单个异步请求</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">📝 任务 1：单个异步请求"</span><span class="p">)</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">异步请求</span><span class="p">(</span><span class="n">urls</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"结果：</span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-    
-    <span class="c1"># 任务 2：并发请求</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">📝 任务 2：并发请求"</span><span class="p">)</span>
-    <span class="n">results</span> <span class="o">=</span> <span class="k">await</span> <span class="n">并发请求</span><span class="p">(</span><span class="n">urls</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"并发请求了 </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span><span class="si">}</span><span class="s2"> 个 URL"</span><span class="p">)</span>
-    
-    <span class="c1"># 任务 3：性能对比</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">📝 任务 3：性能对比（同步 vs 异步）"</span><span class="p">)</span>
-    <span class="k">await</span> <span class="n">性能对比</span><span class="p">()</span>
-    
-    <span class="c1"># 任务 4：异常处理</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">📝 任务 4：异常处理（带重试）"</span><span class="p">)</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">异步请求带重试</span><span class="p">(</span><span class="n">urls</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"带重试的结果：</span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-    
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ 所有任务完成！现在运行 python day01_practice_validator.py 验收"</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
-
-
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
-    <span class="n">开始时间</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">⚠️ 运行中断：</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"💡 这通常是因为上面的 TODO 还没有完成。请先实现各个任务函数，再运行本文件。"</span><span class="p">)</span>
-    <span class="n">总耗时</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">开始时间</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">⏱ 总耗时：</span><span class="si">{</span><span class="n">总耗时</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> 秒"</span><span class="p">)</span>
-</pre></div>
+# 异步版：__aenter__/__aexit__ 或 @asynccontextmanager（把 time.sleep 换成 await asyncio.sleep）</code></pre>
+<h3>4. 组合技：今天的终极目标</h3>
+<p>把「异步生成器（流式）」+「异步上下文管理器（自动计时）」组合成一个
+<code>流式LLM客户端</code>——<code>async with</code> 计时，<code>async for</code> 逐块 yield。这就是 Day 5/10 里 Agent 流式输出的雏形。</p>
+<h2>🛠 第二步：动手实操</h2>
+<ol>
+<li><strong>打开模板</strong>：<a href="day03_practice_template.html">day03_practice_template.py</a>，11 个 TODO：
+  <ul>
+  <li>任务 1/2：同步、异步流式生成器（照本页示例写，注意异步版函数体里必须有 yield）</li>
+  <li>任务 3/4：四种上下文管理器（类版 <code>__enter__</code> 要 return self）</li>
+  <li>任务 5：<code>流式LLM客户端.chat()</code> —— 签名已经是 <code>async def</code>，你要在方法体里加 yield 并用 <code>async with</code> 包计时器</li>
+  </ul></li>
+<li><strong>运行自测</strong>：<code>python day03_practice_template.py</code>，能看到逐块打字机输出。</li>
+<li><strong>验收</strong>：<code>python day03_practice_validator.py</code> —— 验收会真的迭代你的生成器数 chunk 数、
+真的进入你的 with 块检查 <code>__enter__</code> 是否返回 self。</li>
+</ol>
+<h2>⚠️ 避坑</h2>
+<ul><li>❌ 生成器只能遍历一次，第二次遍历是空的；要重复使用先转 list</li><li>❌ <code>async def</code> 忘写 yield → 不是异步生成器，<code>async for</code> 报 TypeError</li><li>❌ @contextmanager 版本忘写 yield → <code>RuntimeError: generator didn't yield</code></li><li>✅ 大文件/流式数据必须用生成器，一次性读进内存会爆</li></ul>
+<h2>🔗 延伸资源</h2>
+<ul><li><a href="https://realpython.com/introduction-to-python-generators/">Real Python: Generators</a></li><li><a href="https://docs.python.org/3/library/itertools.html">itertools 官方文档</a>（生成器工具箱）</li></ul>
 
     </div>
 </div>

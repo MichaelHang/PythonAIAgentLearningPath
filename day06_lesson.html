@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🐍 Day01 Practice Template</title>
+    <title>📖 Day06 Lesson</title>
     <style>
+
 
 /* ===== Maple Mono 代码字体（自托管，OFL 开源协议） ===== */
 @font-face {
@@ -336,6 +337,7 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 
     
     
+    
     </style>
 </head>
 <body>
@@ -349,7 +351,7 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 <a class="" href="tutorial_02_async.html">异步 9 步教程</a>
 <h4>Day 1-3 (基础)</h4>
 <a class="" href="day01_lesson.html">Day 1 - 学习</a>
-<a class="active" href="day01_practice_template.html">Day 1 - 模板</a>
+<a class="" href="day01_practice_template.html">Day 1 - 模板</a>
 <a class="" href="day01_practice_validator.html">Day 1 - 验收</a>
 <a class="" href="day02_lesson.html">Day 2 - 学习</a>
 <a class="" href="day02_practice_template.html">Day 2 - 模板</a>
@@ -365,7 +367,7 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 <a class="" href="day05_practice_template.html">Day 5 - 模板</a>
 <a class="" href="day05_practice_validator.html">Day 5 - 验收</a>
 <h4>Day 6-7 (Agent)</h4>
-<a class="" href="day06_lesson.html">Day 6 - 学习</a>
+<a class="active" href="day06_lesson.html">Day 6 - 学习</a>
 <a class="" href="day06_practice_template.html">Day 6 - 模板</a>
 <a class="" href="day06_practice_validator.html">Day 6 - 验收</a>
 <a class="" href="day07_lesson.html">Day 7 - 学习</a>
@@ -380,169 +382,71 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 <a class="" href="day10_practice_template.html">Day 10 - 模板</a>
 </div>
 <div class="main-content">
-    <div class="header"><h1>🐍 Day01 Practice Template</h1></div>
+    <div class="header"><h1>📖 Day 6 学习页：Agent 架构原理：手写 ReAct</h1></div>
     <div class="content">
-        <div class="file-info"><div class="info-left">📄 文件: <code>day01_practice_template.py</code></div><a class="download-btn" href="day01_practice_template.py" download>⬇ 下载 .py 文件</a></div>
-<div class="highlight"><pre><span></span><span class="sd">"""</span>
-<span class="sd">Day 1 练习：异步批量调用多个 API（模拟 Agent 多工具并发调用）</span>
-<span class="sd">验收标准：</span>
-<span class="sd">1. 必须使用 async/await</span>
-<span class="sd">2. 必须使用 asyncio.gather() 并发执行</span>
-<span class="sd">3. 对比同步 vs 异步的性能差异（异步更快）</span>
-<span class="sd">4. 正确处理异常</span>
-<span class="sd">5. 代码有类型注解</span>
-<span class="sd">"""</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
+<h1>Day 6：Agent 架构原理——纯 Python 手写 ReAct</h1>
+<blockquote class="note-block">
+<p><strong>🎯 今日目标</strong>：不依赖任何框架，手写一个 ReAct Agent 循环。写完你会发现：
+LangChain/AutoGen 这些框架的核心，就是一个几十行的循环 + 一段格式约定。</p>
+</blockquote>
+<div class="file-info"><div class="info-left">📚 本日资源：📝 <a href="day06_practice_template.html">练习模板</a> ｜ ✅ <a href="day06_practice_validator.html">验收脚本</a></div></div>
+<h2>⏱ 今日安排（约 2 小时）</h2>
+<table class="styled-table"><thead><tr><th>时间</th><th>内容</th><th>方式</th></tr></thead><tbody><tr><td>60min</td><td><strong>理论学习</strong>：Agent 四大模块 + ReAct 循环</td><td>阅读 + 手推</td></tr><tr><td>60min</td><td><strong>动手实操</strong>：完成 5 个任务，跑通 ReAct</td><td>编码</td></tr></tbody></table>
 
+<h2>📖 第一步：理论学习</h2>
 
-<span class="c1"># ==================== 任务 1：实现异步 HTTP 请求 ====================</span>
-<span class="c1"># 提示：使用 aiohttp 或 asyncio 模拟 API 调用</span>
+<h3>1. Agent 到底是什么（四大模块）</h3>
+<table class="styled-table"><thead><tr><th>模块</th><th>职责</th><th>本项目对应</th></tr></thead><tbody><tr><td>规划 Planning</td><td>把目标拆成步骤，决定下一步做什么</td><td>ReAct 循环里的 Thought</td></tr><tr><td>记忆 Memory</td><td>记住对话历史和长期知识</td><td>Day 9 实现</td></tr><tr><td>工具 Tools</td><td>调用计算器/搜索/文件等扩展能力</td><td>TOOLS_REGISTRY</td></tr><tr><td>执行 Action</td><td>真正去做（调 API、执行代码）</td><td>execute_tool</td></tr></tbody></table>
+<p>LLM 本身只会生成文本。Agent = <strong>LLM + 循环 + 工具</strong>：让 LLM 的"文本输出"能触发真实的函数执行，再把执行结果喂回去。</p>
 
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">异步请求</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">延迟秒</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    模拟异步 API 请求</span>
-<span class="sd">    </span>
-<span class="sd">    需求：</span>
-<span class="sd">    1. 使用 await asyncio.sleep(延迟秒) 模拟网络延迟</span>
-<span class="sd">    2. 返回包含 url、状态码、响应数据的字典</span>
-<span class="sd">    3. 添加 try/except 处理异常</span>
-<span class="sd">    </span>
-<span class="sd">    示例返回：</span>
-<span class="sd">    {"url": "https://api.example.com/users", "status": 200, "data": {...}}</span>
-<span class="sd">    """</span>
-    <span class="c1"># TODO: 在这里写你的代码</span>
-    <span class="k">pass</span>
+<h3>2. ReAct：Reasoning + Acting 交替</h3>
+<p>核心格式约定——LLM 按这个格式输出，你的程序按这个格式解析：</p>
+<pre class="code-block"><code>Thought: 我需要先算出 3 + 5 * 2 的结果        ← LLM 推理"下一步干什么"
+Action: Calculator                            ← 选择哪个工具
+Action Input: 3 + 5 * 2                       ← 工具参数
+Observation: 13                               ← 【你的程序】执行工具后填回去
+Thought: 我已经拿到结果了
+Final Answer: 3 + 5 * 2 = 13                  ← 循环出口</code></pre>
+<p>一轮完整流程：<strong>构建 prompt（含工具清单 + 历史步骤）→ LLM 输出 → 解析 →
+是 Final Answer 就结束，否则执行工具 → 把 Action/Observation 追加进历史 → 再来一轮</strong>。</p>
 
+<h3>3. 手写循环（伪代码，练习就照这个骨架写）</h3>
+<pre class="code-block"><code>async def react_agent(user_input, tools, max_steps=10):
+    steps = []
+    for step in range(max_steps):            # ← 必须有上限，防死循环
+        prompt = build_prompt(user_input, steps)   # 工具清单 + 历史 Thought/Action/Observation
+        response = await llm_call(prompt)
+        thought, action, action_input = parse(response)
 
-<span class="c1"># ==================== 任务 2：并发调用多个 API ====================</span>
-<span class="c1"># 提示：使用 asyncio.gather()</span>
+        if action 为空:                      # LLM 给了 Final Answer
+            return action_input              # ← 循环唯一正常出口
 
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">并发请求</span><span class="p">(</span><span class="n">urls</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    并发请求多个 URL</span>
-<span class="sd">    </span>
-<span class="sd">    需求：</span>
-<span class="sd">    1. 为每个 URL 创建异步任务</span>
-<span class="sd">    2. 使用 asyncio.gather() 并发执行</span>
-<span class="sd">    3. 返回所有结果</span>
-<span class="sd">    </span>
-<span class="sd">    提示：</span>
-<span class="sd">    tasks = [异步请求(url) for url in urls]</span>
-<span class="sd">    results = await asyncio.gather(*tasks)</span>
-<span class="sd">    """</span>
-    <span class="c1"># TODO: 在这里写你的代码</span>
-    <span class="k">pass</span>
+        result = execute_tool(action, action_input)
+        steps.append(AgentStep(thought, action, action_input, observation=result))
 
-
-<span class="c1"># ==================== 任务 3：对比同步 vs 异步性能 ====================</span>
-<span class="c1"># 提示：分别用同步和异步方式请求 5 个 URL，记录耗时</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">同步请求</span><span class="p">(</span><span class="n">urls</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    同步请求多个 URL（用于对比）</span>
-<span class="sd">    </span>
-<span class="sd">    需求：</span>
-<span class="sd">    1. 使用 for 循环逐个请求</span>
-<span class="sd">    2. 使用 time.sleep() 模拟延迟</span>
-<span class="sd">    3. 记录总耗时</span>
-<span class="sd">    </span>
-<span class="sd">    提示：这是错误示范，故意写得很慢</span>
-<span class="sd">    """</span>
-    <span class="c1"># TODO: 在这里写你的代码</span>
-    <span class="k">pass</span>
-
-
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">性能对比</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    对比同步 vs 异步的性能差异</span>
-<span class="sd">    </span>
-<span class="sd">    需求：</span>
-<span class="sd">    1. 准备 5 个 URL（可以相同）</span>
-<span class="sd">    2. 分别用同步和异步方式请求</span>
-<span class="sd">    3. 打印两种方式的耗时</span>
-<span class="sd">    4. 断言：异步耗时 &lt; 同步耗时 * 0.5</span>
-<span class="sd">    </span>
-<span class="sd">    预期结果：</span>
-<span class="sd">    同步：~5 秒（5 个请求 × 1 秒）</span>
-<span class="sd">    异步：~1 秒（5 个请求并发，只花最慢的那个的时间）</span>
-<span class="sd">    """</span>
-    <span class="c1"># TODO: 在这里写你的代码</span>
-    <span class="k">pass</span>
-
-
-<span class="c1"># ==================== 任务 4：异常处理 ====================</span>
-<span class="c1"># 提示：有些请求可能失败，需要捕获异常</span>
-
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">异步请求带重试</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">最大重试</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    带重试机制的异步请求</span>
-<span class="sd">    </span>
-<span class="sd">    需求：</span>
-<span class="sd">    1. 如果请求失败（模拟随机失败），重试最多 最大重试 次</span>
-<span class="sd">    2. 使用 try/except 捕获异常</span>
-<span class="sd">    3. 每次重试前等待 0.5 秒</span>
-<span class="sd">    </span>
-<span class="sd">    提示：可以用 random.random() &lt; 0.3 模拟 30% 失败率</span>
-<span class="sd">    """</span>
-    <span class="c1"># TODO: 在这里写你的代码</span>
-    <span class="k">pass</span>
-
-
-<span class="c1"># ==================== 主函数 ====================</span>
-
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">"""主函数：运行所有练习"""</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"Day 1 练习：异步批量调用多个 API"</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
-    
-    <span class="c1"># 测试数据</span>
-    <span class="n">urls</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">"https://api.example.com/users"</span><span class="p">,</span>
-        <span class="s2">"https://api.example.com/posts"</span><span class="p">,</span>
-        <span class="s2">"https://api.example.com/comments"</span><span class="p">,</span>
-        <span class="s2">"https://api.example.com/albums"</span><span class="p">,</span>
-        <span class="s2">"https://api.example.com/photos"</span><span class="p">,</span>
-    <span class="p">]</span>
-    
-    <span class="c1"># 任务 1：单个异步请求</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">📝 任务 1：单个异步请求"</span><span class="p">)</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">异步请求</span><span class="p">(</span><span class="n">urls</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"结果：</span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-    
-    <span class="c1"># 任务 2：并发请求</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">📝 任务 2：并发请求"</span><span class="p">)</span>
-    <span class="n">results</span> <span class="o">=</span> <span class="k">await</span> <span class="n">并发请求</span><span class="p">(</span><span class="n">urls</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"并发请求了 </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span><span class="si">}</span><span class="s2"> 个 URL"</span><span class="p">)</span>
-    
-    <span class="c1"># 任务 3：性能对比</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">📝 任务 3：性能对比（同步 vs 异步）"</span><span class="p">)</span>
-    <span class="k">await</span> <span class="n">性能对比</span><span class="p">()</span>
-    
-    <span class="c1"># 任务 4：异常处理</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">📝 任务 4：异常处理（带重试）"</span><span class="p">)</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">异步请求带重试</span><span class="p">(</span><span class="n">urls</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"带重试的结果：</span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-    
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ 所有任务完成！现在运行 python day01_practice_validator.py 验收"</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
-
-
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
-    <span class="n">开始时间</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">⚠️ 运行中断：</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"💡 这通常是因为上面的 TODO 还没有完成。请先实现各个任务函数，再运行本文件。"</span><span class="p">)</span>
-    <span class="n">总耗时</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">开始时间</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">⏱ 总耗时：</span><span class="si">{</span><span class="n">总耗时</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> 秒"</span><span class="p">)</span>
-</pre></div>
+    return "达到最大步数限制"                 # 防御性兜底</code></pre>
+<p>模板内置的 mock LLM 规则：<strong>prompt 里最后一个 Action 后面还没有 Observation → 返回工具调用；
+已经有了 → 返回 Final Answer（引用工具结果）</strong>。所以只要你的循环正确把历史拼进 prompt，
+第 2 轮就会拿到最终答案。</p>
+<h2>🛠 第二步：动手实操</h2>
+<ol>
+<li><strong>打开模板</strong>：<a href="day06_practice_template.html">day06_practice_template.py</a>，5 个任务：
+  <ul>
+  <li>TODO 1.2：<code>get_tools_description()</code> —— 生成放进 prompt 的工具清单</li>
+  <li>TODO 1.3：<code>execute_tool()</code> —— 返回 ToolResult（成功/失败都要兜住）</li>
+  <li>TODO 2.1：<code>build_react_prompt()</code> —— 系统说明 + 工具清单 + 历史 steps + Question</li>
+  <li>TODO 3.1：<code>parse_react_response()</code> —— 正则提取 Thought/Action/Action Input；有 Final Answer 时 action 返回空串、答案放 action_input</li>
+  <li>TODO 4.1：<code>react_agent()</code> 主循环（按伪代码骨架写）</li>
+  </ul></li>
+<li><strong>运行自测</strong>：<code>python day06_practice_template.py</code>，两个测试都应打出最终回答而不是"达到最大步数"。</li>
+<li><strong>验收</strong>：<code>python day06_practice_validator.py</code> —— 验收会真跑你的 Agent：计算题答案里必须有 13、
+天气题必须有查询结果，Agent 卡死循环会被直接判负。</li>
+</ol>
+<h2>⚠️ 避坑</h2>
+<ul><li>❌ 不设 <code>max_steps</code> → LLM 反复要求调工具，无限循环烧钱</li><li>❌ 历史步骤（Action/Observation）不拼回 prompt → LLM 看不到自己做过什么，永远重复第一步</li><li>❌ 只解析成功路径 → 工具报错时 Agent 崩溃；把错误信息作为 Observation 喂回去，LLM 会自我纠正</li><li>✅ 每步记录 token 消耗（Day 10 会做），成本要可见</li></ul>
+<h2>🔗 延伸资源</h2>
+<ul><li><a href="https://arxiv.org/abs/2210.03629">ReAct 原始论文</a></li><li><a href="https://lilianweng.github.io/posts/2023-06-23-agent/">Lilian Weng: LLM Powered Autonomous Agents</a>（Agent 领域总纲）</li></ul>
 
     </div>
 </div>

@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🐍 Day01 Practice Template</title>
+    <title>📖 Day02 Lesson</title>
     <style>
+
 
 /* ===== Maple Mono 代码字体（自托管，OFL 开源协议） ===== */
 @font-face {
@@ -336,6 +337,7 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 
     
     
+    
     </style>
 </head>
 <body>
@@ -349,9 +351,9 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 <a class="" href="tutorial_02_async.html">异步 9 步教程</a>
 <h4>Day 1-3 (基础)</h4>
 <a class="" href="day01_lesson.html">Day 1 - 学习</a>
-<a class="active" href="day01_practice_template.html">Day 1 - 模板</a>
+<a class="" href="day01_practice_template.html">Day 1 - 模板</a>
 <a class="" href="day01_practice_validator.html">Day 1 - 验收</a>
-<a class="" href="day02_lesson.html">Day 2 - 学习</a>
+<a class="active" href="day02_lesson.html">Day 2 - 学习</a>
 <a class="" href="day02_practice_template.html">Day 2 - 模板</a>
 <a class="" href="day02_practice_validator.html">Day 2 - 验收</a>
 <a class="" href="day03_lesson.html">Day 3 - 学习</a>
@@ -380,169 +382,115 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 <a class="" href="day10_practice_template.html">Day 10 - 模板</a>
 </div>
 <div class="main-content">
-    <div class="header"><h1>🐍 Day01 Practice Template</h1></div>
+    <div class="header"><h1>📖 Day 2 学习页：类型系统与装饰器进阶</h1></div>
     <div class="content">
-        <div class="file-info"><div class="info-left">📄 文件: <code>day01_practice_template.py</code></div><a class="download-btn" href="day01_practice_template.py" download>⬇ 下载 .py 文件</a></div>
-<div class="highlight"><pre><span></span><span class="sd">"""</span>
-<span class="sd">Day 1 练习：异步批量调用多个 API（模拟 Agent 多工具并发调用）</span>
-<span class="sd">验收标准：</span>
-<span class="sd">1. 必须使用 async/await</span>
-<span class="sd">2. 必须使用 asyncio.gather() 并发执行</span>
-<span class="sd">3. 对比同步 vs 异步的性能差异（异步更快）</span>
-<span class="sd">4. 正确处理异常</span>
-<span class="sd">5. 代码有类型注解</span>
-<span class="sd">"""</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
+<h1>Day 2：类型系统与装饰器进阶</h1>
+<blockquote class="note-block">
+<p><strong>🎯 今日目标</strong>：能用 Pydantic v2 定义"Agent 工具的输入/输出 Schema"，并写一个带参数的装饰器把任意函数自动注册为 Agent 工具——这是后面所有天的工具系统底座。</p>
+</blockquote>
+<div class="file-info"><div class="info-left">📚 本日资源：📝 <a href="day02_practice_template.html">练习模板</a> ｜ ✅ <a href="day02_practice_validator.html">验收脚本</a></div></div>
+<h2>⏱ 今日安排（约 2 小时）</h2>
+<table class="styled-table"><thead><tr><th>时间</th><th>内容</th><th>方式</th></tr></thead><tbody><tr><td>30min</td><td><strong>理论学习</strong>：Pydantic 数据验证 + 装饰器三层嵌套</td><td>阅读</td></tr><tr><td>30min</td><td><strong>跑教程</strong>：装饰器 8 步教程</td><td>运行 + 修改</td></tr><tr><td>60min</td><td><strong>动手实操</strong>：完成练习模板 13 个 TODO</td><td>编码</td></tr></tbody></table>
 
+<h2>📖 第一步：理论学习</h2>
 
-<span class="c1"># ==================== 任务 1：实现异步 HTTP 请求 ====================</span>
-<span class="c1"># 提示：使用 aiohttp 或 asyncio 模拟 API 调用</span>
+<h3>1. 为什么 Agent 需要数据验证</h3>
+<p>LLM 返回的内容<strong>不可信</strong>：你要它给数字，它可能给字符串；你要它给城市名，它可能幻觉出不存在的东西。
+Pydantic 的作用：定义好"数据长什么样"，不符合就当场报错，而不是让错误数据流进你的工具。</p>
+<pre class="code-block"><code>from pydantic import BaseModel, Field, ValidationError
 
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">异步请求</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">延迟秒</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    模拟异步 API 请求</span>
-<span class="sd">    </span>
-<span class="sd">    需求：</span>
-<span class="sd">    1. 使用 await asyncio.sleep(延迟秒) 模拟网络延迟</span>
-<span class="sd">    2. 返回包含 url、状态码、响应数据的字典</span>
-<span class="sd">    3. 添加 try/except 处理异常</span>
-<span class="sd">    </span>
-<span class="sd">    示例返回：</span>
-<span class="sd">    {"url": "https://api.example.com/users", "status": 200, "data": {...}}</span>
-<span class="sd">    """</span>
-    <span class="c1"># TODO: 在这里写你的代码</span>
-    <span class="k">pass</span>
+class 计算器输入(BaseModel):
+    表达式: str = Field(..., description="四则运算表达式")
 
+# ✅ 合法输入：通过
+参数 = 计算器输入(表达式="3 + 5 * 2")
 
-<span class="c1"># ==================== 任务 2：并发调用多个 API ====================</span>
-<span class="c1"># 提示：使用 asyncio.gather()</span>
+# ❌ 非法输入：当场拦截（表达式应为 str，传了 int）
+try:
+    计算器输入(表达式=12345)
+except ValidationError as e:
+    print("拦截成功:", e.errors()[0]["msg"])
 
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">并发请求</span><span class="p">(</span><span class="n">urls</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    并发请求多个 URL</span>
-<span class="sd">    </span>
-<span class="sd">    需求：</span>
-<span class="sd">    1. 为每个 URL 创建异步任务</span>
-<span class="sd">    2. 使用 asyncio.gather() 并发执行</span>
-<span class="sd">    3. 返回所有结果</span>
-<span class="sd">    </span>
-<span class="sd">    提示：</span>
-<span class="sd">    tasks = [异步请求(url) for url in urls]</span>
-<span class="sd">    results = await asyncio.gather(*tasks)</span>
-<span class="sd">    """</span>
-    <span class="c1"># TODO: 在这里写你的代码</span>
-    <span class="k">pass</span>
+# 生成 JSON Schema（给 LLM 看的参数说明就靠它）
+print(计算器输入.model_json_schema())</code></pre>
+<p>注意：<strong>Pydantic 只做类型校验，不做安全过滤</strong>。"import os; os.system(...)" 是合法的 str，类型校验拦不住它——
+拦截危险内容要在工具内部自己做（白名单、沙箱）。两层防护缺一不可。</p>
 
+<h3>2. dataclass vs Pydantic（怎么选）</h3>
+<table class="styled-table"><thead><tr><th></th><th>dataclass</th><th>Pydantic v2</th></tr></thead><tbody><tr><td>用途</td><td>纯内存数据结构</td><td>需要校验/序列化的边界数据（API 输入输出、LLM 返回）</td></tr><tr><td>校验</td><td>无</td><td>自动类型转换 + 校验 + 报错</td></tr><tr><td>性能</td><td>快</td><td>v2 用 Rust 核心，也很快</td></tr><tr><td>Agent 中</td><td>内部状态（如 AgentStep）</td><td>工具 Schema、消息模型、配置</td></tr></tbody></table>
 
-<span class="c1"># ==================== 任务 3：对比同步 vs 异步性能 ====================</span>
-<span class="c1"># 提示：分别用同步和异步方式请求 5 个 URL，记录耗时</span>
+<h3>3. 装饰器：三步从入门到工具注册</h3>
+<p><strong>本质</strong>：装饰器 = 接受一个函数，返回一个新函数（给手机套壳，壳能在原功能外加点行为）。</p>
+<pre class="code-block"><code>import functools
 
-<span class="k">def</span><span class="w"> </span><span class="nf">同步请求</span><span class="p">(</span><span class="n">urls</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    同步请求多个 URL（用于对比）</span>
-<span class="sd">    </span>
-<span class="sd">    需求：</span>
-<span class="sd">    1. 使用 for 循环逐个请求</span>
-<span class="sd">    2. 使用 time.sleep() 模拟延迟</span>
-<span class="sd">    3. 记录总耗时</span>
-<span class="sd">    </span>
-<span class="sd">    提示：这是错误示范，故意写得很慢</span>
-<span class="sd">    """</span>
-    <span class="c1"># TODO: 在这里写你的代码</span>
-    <span class="k">pass</span>
+def 计时装饰器(原函数):
+    @functools.wraps(原函数)      # ✅ 必须加！保留原函数的 __name__/__doc__
+    def 包装函数(*args, **kwargs):
+        开始 = time.time()
+        结果 = 原函数(*args, **kwargs)
+        print(f"⏱ {原函数.__name__} 耗时 {time.time()-开始:.4f}s")
+        return 结果
+    return 包装函数
 
+@计时装饰器
+def 慢速加法(a, b):
+    time.sleep(1)
+    return a + b
 
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">性能对比</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    对比同步 vs 异步的性能差异</span>
-<span class="sd">    </span>
-<span class="sd">    需求：</span>
-<span class="sd">    1. 准备 5 个 URL（可以相同）</span>
-<span class="sd">    2. 分别用同步和异步方式请求</span>
-<span class="sd">    3. 打印两种方式的耗时</span>
-<span class="sd">    4. 断言：异步耗时 &lt; 同步耗时 * 0.5</span>
-<span class="sd">    </span>
-<span class="sd">    预期结果：</span>
-<span class="sd">    同步：~5 秒（5 个请求 × 1 秒）</span>
-<span class="sd">    异步：~1 秒（5 个请求并发，只花最慢的那个的时间）</span>
-<span class="sd">    """</span>
-    <span class="c1"># TODO: 在这里写你的代码</span>
-    <span class="k">pass</span>
+慢速加法(3, 5)   # 自动打印耗时</code></pre>
+<p><strong>致命陷阱</strong>：不加 <code>@functools.wraps</code>，被装饰函数的 <code>__name__</code> 会变成"包装"，
+<code>__doc__</code> 变 None——Agent 靠函数名和 docstring 选工具，丢了就全乱。</p>
+<p><strong>带参数的装饰器 = 三层嵌套</strong>（多包一层"参数层"）：</p>
+<pre class="code-block"><code>def 重试(最大次数=3):                 # 第 1 层：收参数
+    def 装饰器(原函数):               # 第 2 层：收函数
+        @functools.wraps(原函数)
+        def 包装(*args, **kwargs):   # 第 3 层：真正执行
+            for i in range(最大次数):
+                try:
+                    return 原函数(*args, **kwargs)
+                except Exception as e:
+                    if i == 最大次数 - 1:
+                        raise
+                    time.sleep(0.5)
+        return 包装
+    return 装饰器
 
+@重试(最大次数=3)
+def 不稳定的网络请求(): ...</code></pre>
+<p><strong>Agent 实战：工具注册装饰器</strong>（今天练习的核心模式，LangChain 的 @tool 就是它）：</p>
+<pre class="code-block"><code>工具注册表 = {}
 
-<span class="c1"># ==================== 任务 4：异常处理 ====================</span>
-<span class="c1"># 提示：有些请求可能失败，需要捕获异常</span>
+def 工具(名称, 描述):
+    def 装饰器(func):
+        @functools.wraps(func)
+        def 包装(*args, **kwargs):
+            return func(*args, **kwargs)
+        工具注册表[名称] = {"函数": 包装, "描述": 描述}
+        return 包装
+    return 装饰器
 
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">异步请求带重试</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">最大重试</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    带重试机制的异步请求</span>
-<span class="sd">    </span>
-<span class="sd">    需求：</span>
-<span class="sd">    1. 如果请求失败（模拟随机失败），重试最多 最大重试 次</span>
-<span class="sd">    2. 使用 try/except 捕获异常</span>
-<span class="sd">    3. 每次重试前等待 0.5 秒</span>
-<span class="sd">    </span>
-<span class="sd">    提示：可以用 random.random() &lt; 0.3 模拟 30% 失败率</span>
-<span class="sd">    """</span>
-    <span class="c1"># TODO: 在这里写你的代码</span>
-    <span class="k">pass</span>
+@工具("计算器", "执行四则运算")
+def 计算(表达式): return eval(表达式)
 
-
-<span class="c1"># ==================== 主函数 ====================</span>
-
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">"""主函数：运行所有练习"""</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"Day 1 练习：异步批量调用多个 API"</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
-    
-    <span class="c1"># 测试数据</span>
-    <span class="n">urls</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">"https://api.example.com/users"</span><span class="p">,</span>
-        <span class="s2">"https://api.example.com/posts"</span><span class="p">,</span>
-        <span class="s2">"https://api.example.com/comments"</span><span class="p">,</span>
-        <span class="s2">"https://api.example.com/albums"</span><span class="p">,</span>
-        <span class="s2">"https://api.example.com/photos"</span><span class="p">,</span>
-    <span class="p">]</span>
-    
-    <span class="c1"># 任务 1：单个异步请求</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">📝 任务 1：单个异步请求"</span><span class="p">)</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">异步请求</span><span class="p">(</span><span class="n">urls</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"结果：</span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-    
-    <span class="c1"># 任务 2：并发请求</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">📝 任务 2：并发请求"</span><span class="p">)</span>
-    <span class="n">results</span> <span class="o">=</span> <span class="k">await</span> <span class="n">并发请求</span><span class="p">(</span><span class="n">urls</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"并发请求了 </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span><span class="si">}</span><span class="s2"> 个 URL"</span><span class="p">)</span>
-    
-    <span class="c1"># 任务 3：性能对比</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">📝 任务 3：性能对比（同步 vs 异步）"</span><span class="p">)</span>
-    <span class="k">await</span> <span class="n">性能对比</span><span class="p">()</span>
-    
-    <span class="c1"># 任务 4：异常处理</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">📝 任务 4：异常处理（带重试）"</span><span class="p">)</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">异步请求带重试</span><span class="p">(</span><span class="n">urls</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"带重试的结果：</span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-    
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ 所有任务完成！现在运行 python day01_practice_validator.py 验收"</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
-
-
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
-    <span class="n">开始时间</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">⚠️ 运行中断：</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"💡 这通常是因为上面的 TODO 还没有完成。请先实现各个任务函数，再运行本文件。"</span><span class="p">)</span>
-    <span class="n">总耗时</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">开始时间</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">⏱ 总耗时：</span><span class="si">{</span><span class="n">总耗时</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> 秒"</span><span class="p">)</span>
-</pre></div>
+# 之后 Agent 只需遍历 工具注册表 就知道"我有哪些工具可用"</code></pre>
+<h2>🛠 第二步：动手实操</h2>
+<ol>
+<li><strong>跑教程</strong>：<code>python tutorial_01_decorators.py</code>，8 步从"一等公民"到"类装饰器"。</li>
+<li><strong>打开模板</strong>：<a href="day02_practice_template.html">day02_practice_template.py</a>，13 个 TODO 分四组：
+  <ul>
+  <li>TODO 1.2-1.3：为天气查询、文件搜索定义输入/输出 Schema（照抄计算器的写法）</li>
+  <li>TODO 2.1-2.5：实现装饰器三层嵌套（输入验证 → 调用原函数 → 输出验证 → 注册进注册表）</li>
+  <li>TODO 3.2-3.3：用 @工具 注册至少 3 个工具</li>
+  <li>TODO 4.1-4.2：<code>调用工具</code>（查注册表并调用）和 <code>列出所有工具</code>（转成 OpenAI Function Calling 格式，用 <code>model_json_schema()</code>）</li>
+  </ul></li>
+<li><strong>运行自测</strong>：<code>python day02_practice_template.py</code>，4 个测试全部 ✅（测试 2 应显示拦截了类型错误）。</li>
+<li><strong>验收</strong>：<code>python day02_practice_validator.py</code>（需要 <code>pip install pydantic</code>）。验收会真的调用你注册的计算器、传错误类型试探你的验证逻辑、检查 OpenAI 格式。</li>
+</ol>
+<h2>⚠️ 避坑</h2>
+<ul><li>❌ Pydantic v1 和 v2 API 不兼容（<code>.schema()</code> 已改名 <code>model_json_schema()</code>），确认装的是 v2</li><li>❌ 忘写 <code>@functools.wraps(func)</code> —— 验收脚本会专门检查这一点</li><li>✅ 类型注解本身不做运行时检查，Pydantic 模型才做；两者配合使用</li></ul>
+<h2>🔗 延伸资源</h2>
+<ul><li><a href="https://docs.pydantic.dev/latest/">Pydantic V2 官方文档</a></li><li><a href="https://mypy.readthedocs.io/">mypy 官方文档</a>（静态类型检查）</li></ul>
 
     </div>
 </div>

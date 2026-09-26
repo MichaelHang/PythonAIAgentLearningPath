@@ -6,6 +6,7 @@ Python 异步编程 零基础实战教程
 
 运行方式：python tutorial_02_async.py
 学习方式：从上到下逐步阅读，每步都输出结果
+环境要求：Python 3.11+（第 7 步用到了 asyncio.timeout）
 
 核心理解（一句话）：
   同步 = 排队办事，一件一件来
@@ -220,6 +221,8 @@ async def 可能超时的API调用(api名称, 延时):
 
 async def 带超时的调用():
     print("  调用 API-1（1秒，正常）...")
+    # 注意：asyncio.timeout 需要 Python 3.11+；
+    # 旧版本用 async with asyncio.wait_for(协程, 超时秒数) 也能实现同样效果
     try:
         async with asyncio.timeout(3):
             结果 = await 可能超时的API调用("API-1", 1)

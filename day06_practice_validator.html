@@ -5,217 +5,336 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🐍 Day06 Practice Validator</title>
     <style>
-        
-* { margin:0; padding:0; box-sizing:border-box; }
-body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    line-height:1.6; color:#333;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding:0;
+
+/* ===== Maple Mono 代码字体（自托管，OFL 开源协议） ===== */
+@font-face {
+    font-family:"Maple Mono";
+    font-style:normal; font-weight:400; font-display:swap;
+    src:url("fonts/maple-mono-latin-400-normal.woff2") format("woff2");
 }
+@font-face {
+    font-family:"Maple Mono";
+    font-style:normal; font-weight:700; font-display:swap;
+    src:url("fonts/maple-mono-latin-700-normal.woff2") format("woff2");
+}
+@font-face {
+    font-family:"Maple Mono";
+    font-style:italic; font-weight:400; font-display:swap;
+    src:url("fonts/maple-mono-latin-400-italic.woff2") format("woff2");
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    line-height:1.65; color:#1d1d1f;
+    background:#f5f5f7;
+    padding:0;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+}
+.nav-wrapper { display:flex; min-height:100vh; }
 .nav-sidebar {
     width:250px; min-width:250px;
-    background: #181825;
-    color: #ffffff;
-    padding: 20px 15px;
+    background:rgba(255,255,255,0.72);
+    -webkit-backdrop-filter:saturate(180%) blur(20px);
+    backdrop-filter:saturate(180%) blur(20px);
+    border-right:1px solid rgba(0,0,0,0.06);
+    color:#1d1d1f;
+    padding:24px 14px;
     font-size:14px;
     overflow-y:auto;
     height:100vh;
     position:sticky; top:0;
-    display:flex; flex-direction:column;
-    gap:2px;
+    display:flex; flex-direction:column; gap:2px;
 }
 .nav-sidebar h3 {
-    color:#f5c2e7; font-size:15px; margin:18px 0 8px 0;
-    border-bottom:1px solid #45475a; padding-bottom:6px;
+    color:#1d1d1f; font-size:15px; font-weight:700; margin:18px 0 10px;
 }
 .nav-sidebar h3:first-child { margin-top:0; }
 .nav-sidebar h4 {
-    color:#a6e3a1; font-size:13px; margin:14px 0 4px 0;
-    font-weight:600;
+    color:#86868b; font-size:11px; font-weight:600; margin:16px 0 4px;
+    text-transform:uppercase; letter-spacing:0.05em;
 }
 .nav-sidebar a {
-    color:#89dceb; display:block; padding:5px 12px; font-size:13px;
-    border-radius:4px; text-decoration:none; transition:background 0.2s, color 0.2s;
+    color:#424245; display:block; padding:6px 12px; font-size:13px;
+    border-radius:8px; text-decoration:none; transition:background .2s, color .2s;
 }
-.nav-sidebar a:hover {
-    background:#313244; color:#ffffff; text-decoration:none;
-}
-.nav-sidebar a.active {
-    background:#45475a; color:#ffffff; font-weight:700;
-    border-left:3px solid #f5c2e7; padding-left:9px;
-}
-.nav-wrapper { display:flex; min-height:100vh; }
+.nav-sidebar a:hover { background:rgba(0,0,0,0.05); color:#1d1d1f; text-decoration:none; }
+.nav-sidebar a.active { background:#0071e3; color:#ffffff; font-weight:600; }
 .main-content {
     flex:1; min-width:0;
-    margin:20px 20px 20px 0; background:white; border-radius:10px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    margin:16px 16px 16px 0;
+    background:#ffffff; border-radius:18px;
+    box-shadow:0 4px 24px rgba(0,0,0,0.05);
     overflow:hidden;
 }
 /* 返回顶部按钮 */
 .back-top {
-    position:fixed; bottom:30px; right:30px;
-    background:#667eea; color:white; border:none;
-    width:48px; height:48px; border-radius:50%;
-    cursor:pointer; font-size:20px;
-    box-shadow:0 4px 12px rgba(0,0,0,0.3); display:none; z-index:999;
-    transition:background 0.3s;
+    position:fixed; bottom:28px; right:28px;
+    background:rgba(255,255,255,0.82);
+    -webkit-backdrop-filter:saturate(180%) blur(16px);
+    backdrop-filter:saturate(180%) blur(16px);
+    color:#1d1d1f; border:1px solid rgba(0,0,0,0.08);
+    width:44px; height:44px; border-radius:50%;
+    cursor:pointer; font-size:18px;
+    box-shadow:0 4px 16px rgba(0,0,0,0.12); display:none; z-index:999;
+    transition:transform .2s, background .2s;
 }
-.back-top:hover { background:#764ba2; }
+.back-top:hover { background:#ffffff; transform:translateY(-2px); }
 
 /* ── 内容区样式 ── */
 .header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color:white; padding:40px; text-align:center;
+    background:#ffffff; color:#1d1d1f;
+    padding:56px 40px 40px; text-align:center;
+    border-bottom:1px solid rgba(0,0,0,0.06);
 }
-.header h1 { font-size:2.2em; margin-bottom:10px; text-shadow:2px 2px 4px rgba(0,0,0,0.2); }
-.header .meta { font-size:1.1em; opacity:0.9; }
-.content { padding:40px; }
-h1 { color:#667eea; border-bottom:3px solid #667eea; padding-bottom:10px; margin-top:30px; margin-bottom:20px; }
-h2 { color:#764ba2; margin-top:25px; margin-bottom:15px; border-left:5px solid #764ba2; padding-left:15px; }
-h3 { color:#555; margin-top:20px; margin-bottom:10px; }
-p { margin-bottom:15px; }
-.styled-table {
-    width:100%; border-collapse:collapse; margin:20px 0;
-    box-shadow:0 2px 15px rgba(0,0,0,0.1); border-radius:8px; overflow:hidden;
+.header h1 { font-size:2.4em; font-weight:700; letter-spacing:-0.02em; margin-bottom:10px; }
+.header .meta { font-size:1.05em; color:#86868b; }
+.content { padding:44px 48px; }
+h1 { color:#1d1d1f; font-size:2em; font-weight:700; letter-spacing:-0.02em; margin:36px 0 18px; }
+.content > h1:first-child { margin-top:0; }
+h2 { color:#1d1d1f; font-size:1.5em; font-weight:700; letter-spacing:-0.01em; margin:36px 0 16px; }
+h3 { color:#1d1d1f; font-size:1.15em; font-weight:600; margin:26px 0 10px; }
+h4 { color:#1d1d1f; font-size:1em; font-weight:600; margin:20px 0 8px; }
+p { margin-bottom:14px; color:#424245; }
+li { margin-bottom:8px; color:#424245; }
+strong { color:#1d1d1f; font-weight:600; }
+ul, ol { margin-left:24px; margin-bottom:14px; }
+a { color:#0071e3; text-decoration:none; transition:color .2s; }
+a:hover { color:#0077ed; text-decoration:underline; }
+hr { border:none; height:1px; background:#e8e8ed; margin:32px 0; }
+code {
+    font-family:"Maple Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+    font-size:0.88em;
+    background:rgba(0,0,0,0.055);
+    color:#1d1d1f;
+    padding:2px 6px; border-radius:6px;
 }
-.styled-table thead { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white; }
-.styled-table th, .styled-table td { padding:12px 15px; text-align:left; border-bottom:1px solid #ddd; }
-.styled-table tbody tr:hover { background-color:#f5f5f5; }
-.styled-table tbody tr:nth-of-type(even) { background-color:#f9f9f9; }
+pre { position:relative; overflow-x:auto; font-family:"Maple Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace; }
 .code-block {
-    background:#282c34; color:#abb2bf; padding:15px;
-    border-radius:8px; overflow-x:auto; margin:15px 0;
-    box-shadow:0 4px 6px rgba(0,0,0,0.1);
+    background:#f5f5f7; color:#1d1d1f; padding:18px 20px;
+    border-radius:14px; overflow-x:auto; margin:16px 0;
+    font-size:13.5px; line-height:1.55;
 }
-code { background:#f4f4f4; padding:2px 6px; border-radius:3px; font-family:'Courier New',monospace; color:#e83e8c; }
-.code-block code { background:transparent; color:inherit; padding:0; }
+.code-block code { background:transparent; color:inherit; padding:0; font-size:inherit; }
+.styled-table {
+    width:100%; border-collapse:separate; border-spacing:0;
+    margin:18px 0; border:1px solid #e8e8ed;
+    border-radius:12px; overflow:hidden;
+    font-size:14.5px;
+}
+.styled-table thead { background:#f5f5f7; }
+.styled-table th { padding:11px 16px; text-align:left; font-weight:600; color:#1d1d1f; }
+.styled-table td { padding:11px 16px; text-align:left; border-top:1px solid #e8e8ed; color:#424245; }
+.styled-table tbody tr:hover { background-color:#fafafa; }
 .note-block {
-    background:#fff3cd; border-left:5px solid #ffc107;
-    padding:15px; margin:15px 0; border-radius:4px;
+    background:#f5f5f7;
+    border-left:3px solid #0071e3;
+    padding:16px 20px; margin:18px 0; border-radius:12px;
 }
-ul, ol { margin-left:25px; margin-bottom:15px; }
-li { margin-bottom:8px; }
-a { color:#667eea; text-decoration:none; transition:color 0.3s; }
-a:hover { color:#764ba2; text-decoration:underline; }
-hr { border:none; height:2px; background:linear-gradient(to right,#667eea,#764ba2); margin:30px 0; }
-pre { position:relative; overflow-x:auto; }
-@media print { body { background:white; padding:0; } .main-content { box-shadow:none; } .nav-sidebar { display:none; } .back-top { display:none; } }
-@media (max-width:900px) {
-    .nav-sidebar { width:200px; min-width:200px; font-size:13px; padding:15px 10px; }
-    .header h1 { font-size:1.6em; }
-    .content { padding:20px; }
-}
-@media (max-width:650px) {
-    .nav-wrapper { flex-direction:column; }
-    .nav-sidebar { width:100%; min-width:100%; height:auto; position:relative; flex-direction:row; flex-wrap:wrap; gap:5px; padding:10px; }
-    .nav-sidebar h3, .nav-sidebar h4 { display:none; }
-}
+.note-block p { margin-bottom:6px; color:#424245; }
+.note-block p:last-child { margin-bottom:0; }
 
-        pre { line-height: 125%; }
+/* ===== 代码高亮配色（Xcode 浅色，Apple 文档风） ===== */
+pre { line-height: 125%; }
 td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
 span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
 td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
 span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
-.highlight .hll { background-color: #49483e }
-.highlight { background: #272822; color: #F8F8F2 }
-.highlight .c { color: #959077 } /* Comment */
-.highlight .err { color: #ED007E; background-color: #1E0010 } /* Error */
-.highlight .esc { color: #F8F8F2 } /* Escape */
-.highlight .g { color: #F8F8F2 } /* Generic */
-.highlight .k { color: #66D9EF } /* Keyword */
-.highlight .l { color: #AE81FF } /* Literal */
-.highlight .n { color: #F8F8F2 } /* Name */
-.highlight .o { color: #FF4689 } /* Operator */
-.highlight .x { color: #F8F8F2 } /* Other */
-.highlight .p { color: #F8F8F2 } /* Punctuation */
-.highlight .ch { color: #959077 } /* Comment.Hashbang */
-.highlight .cm { color: #959077 } /* Comment.Multiline */
-.highlight .cp { color: #959077 } /* Comment.Preproc */
-.highlight .cpf { color: #959077 } /* Comment.PreprocFile */
-.highlight .c1 { color: #959077 } /* Comment.Single */
-.highlight .cs { color: #959077 } /* Comment.Special */
-.highlight .gd { color: #FF4689 } /* Generic.Deleted */
-.highlight .ge { color: #F8F8F2; font-style: italic } /* Generic.Emph */
-.highlight .ges { color: #F8F8F2; font-weight: bold; font-style: italic } /* Generic.EmphStrong */
-.highlight .gr { color: #F8F8F2 } /* Generic.Error */
-.highlight .gh { color: #F8F8F2 } /* Generic.Heading */
-.highlight .gi { color: #A6E22E } /* Generic.Inserted */
-.highlight .go { color: #66D9EF } /* Generic.Output */
-.highlight .gp { color: #FF4689; font-weight: bold } /* Generic.Prompt */
-.highlight .gs { color: #F8F8F2; font-weight: bold } /* Generic.Strong */
-.highlight .gu { color: #959077 } /* Generic.Subheading */
-.highlight .gt { color: #F8F8F2 } /* Generic.Traceback */
-.highlight .kc { color: #66D9EF } /* Keyword.Constant */
-.highlight .kd { color: #66D9EF } /* Keyword.Declaration */
-.highlight .kn { color: #FF4689 } /* Keyword.Namespace */
-.highlight .kp { color: #66D9EF } /* Keyword.Pseudo */
-.highlight .kr { color: #66D9EF } /* Keyword.Reserved */
-.highlight .kt { color: #66D9EF } /* Keyword.Type */
-.highlight .ld { color: #E6DB74 } /* Literal.Date */
-.highlight .m { color: #AE81FF } /* Literal.Number */
-.highlight .s { color: #E6DB74 } /* Literal.String */
-.highlight .na { color: #A6E22E } /* Name.Attribute */
-.highlight .nb { color: #F8F8F2 } /* Name.Builtin */
-.highlight .nc { color: #A6E22E } /* Name.Class */
-.highlight .no { color: #66D9EF } /* Name.Constant */
-.highlight .nd { color: #A6E22E } /* Name.Decorator */
-.highlight .ni { color: #F8F8F2 } /* Name.Entity */
-.highlight .ne { color: #A6E22E } /* Name.Exception */
-.highlight .nf { color: #A6E22E } /* Name.Function */
-.highlight .nl { color: #F8F8F2 } /* Name.Label */
-.highlight .nn { color: #F8F8F2 } /* Name.Namespace */
-.highlight .nx { color: #A6E22E } /* Name.Other */
-.highlight .py { color: #F8F8F2 } /* Name.Property */
-.highlight .nt { color: #FF4689 } /* Name.Tag */
-.highlight .nv { color: #F8F8F2 } /* Name.Variable */
-.highlight .ow { color: #FF4689 } /* Operator.Word */
-.highlight .pm { color: #F8F8F2 } /* Punctuation.Marker */
-.highlight .w { color: #F8F8F2 } /* Text.Whitespace */
-.highlight .mb { color: #AE81FF } /* Literal.Number.Bin */
-.highlight .mf { color: #AE81FF } /* Literal.Number.Float */
-.highlight .mh { color: #AE81FF } /* Literal.Number.Hex */
-.highlight .mi { color: #AE81FF } /* Literal.Number.Integer */
-.highlight .mo { color: #AE81FF } /* Literal.Number.Oct */
-.highlight .sa { color: #E6DB74 } /* Literal.String.Affix */
-.highlight .sb { color: #E6DB74 } /* Literal.String.Backtick */
-.highlight .sc { color: #E6DB74 } /* Literal.String.Char */
-.highlight .dl { color: #E6DB74 } /* Literal.String.Delimiter */
-.highlight .sd { color: #E6DB74 } /* Literal.String.Doc */
-.highlight .s2 { color: #E6DB74 } /* Literal.String.Double */
-.highlight .se { color: #AE81FF } /* Literal.String.Escape */
-.highlight .sh { color: #E6DB74 } /* Literal.String.Heredoc */
-.highlight .si { color: #E6DB74 } /* Literal.String.Interpol */
-.highlight .sx { color: #E6DB74 } /* Literal.String.Other */
-.highlight .sr { color: #E6DB74 } /* Literal.String.Regex */
-.highlight .s1 { color: #E6DB74 } /* Literal.String.Single */
-.highlight .ss { color: #E6DB74 } /* Literal.String.Symbol */
-.highlight .bp { color: #F8F8F2 } /* Name.Builtin.Pseudo */
-.highlight .fm { color: #A6E22E } /* Name.Function.Magic */
-.highlight .vc { color: #F8F8F2 } /* Name.Variable.Class */
-.highlight .vg { color: #F8F8F2 } /* Name.Variable.Global */
-.highlight .vi { color: #F8F8F2 } /* Name.Variable.Instance */
-.highlight .vm { color: #F8F8F2 } /* Name.Variable.Magic */
-.highlight .il { color: #AE81FF } /* Literal.Number.Integer.Long */
-.highlight { background:#282c34; border-radius:8px; padding:15px; overflow-x:auto; margin:15px 0; }
-.highlight pre { margin:0; }
+.highlight .hll { background-color: #eaeaf0 }
+.highlight { background: #f5f5f7; color: #1D1D1F }
+.highlight .c { color: #707F8C } /* Comment */
+.highlight .err { color: #C41A16 } /* Error */
+.highlight .k { color: #AD3DA4 } /* Keyword */
+.highlight .n { color: #1D1D1F } /* Name */
+.highlight .o { color: #1D1D1F } /* Operator */
+.highlight .p { color: #1D1D1F } /* Punctuation */
+.highlight .ch { color: #707F8C } /* Comment.Hashbang */
+.highlight .cm { color: #707F8C } /* Comment.Multiline */
+.highlight .cp { color: #78492A } /* Comment.Preproc */
+.highlight .cpf { color: #707F8C } /* Comment.PreprocFile */
+.highlight .c1 { color: #707F8C } /* Comment.Single */
+.highlight .cs { color: #707F8C } /* Comment.Special */
+.highlight .gd { color: #C41A16 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #C41A16 } /* Generic.Error */
+.highlight .gh { color: #1D1D1F; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #248A3D } /* Generic.Inserted */
+.highlight .go { color: #6E6E73 } /* Generic.Output */
+.highlight .gp { color: #707F8C } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #1D1D1F; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #C41A16 } /* Generic.Traceback */
+.highlight .kc { color: #AD3DA4 } /* Keyword.Constant */
+.highlight .kd { color: #AD3DA4 } /* Keyword.Declaration */
+.highlight .kn { color: #AD3DA4 } /* Keyword.Namespace */
+.highlight .kp { color: #AD3DA4 } /* Keyword.Pseudo */
+.highlight .kr { color: #AD3DA4 } /* Keyword.Reserved */
+.highlight .kt { color: #0B4F79 } /* Keyword.Type */
+.highlight .m { color: #1C00CF } /* Literal.Number */
+.highlight .s { color: #C41A16 } /* Literal.String */
+.highlight .na { color: #1D1D1F } /* Name.Attribute */
+.highlight .nb { color: #3E8087 } /* Name.Builtin */
+.highlight .nc { color: #3E8087 } /* Name.Class */
+.highlight .no { color: #1C00CF } /* Name.Constant */
+.highlight .nd { color: #78492A } /* Name.Decorator */
+.highlight .ni { color: #1D1D1F } /* Name.Entity */
+.highlight .ne { color: #0B4F79 } /* Name.Exception */
+.highlight .nf { color: #0B4F79 } /* Name.Function */
+.highlight .nl { color: #1D1D1F } /* Name.Label */
+.highlight .nn { color: #3E8087 } /* Name.Namespace */
+.highlight .nx { color: #1D1D1F } /* Name.Other */
+.highlight .py { color: #1D1D1F } /* Name.Property */
+.highlight .nt { color: #AD3DA4 } /* Name.Tag */
+.highlight .nv { color: #1D1D1F } /* Name.Variable */
+.highlight .ow { color: #AD3DA4 } /* Operator.Word */
+.highlight .pm { color: #1D1D1F } /* Punctuation.Marker */
+.highlight .w { color: #1D1D1F } /* Text.Whitespace */
+.highlight .mb { color: #1C00CF } /* Literal.Number.Bin */
+.highlight .mf { color: #1C00CF } /* Literal.Number.Float */
+.highlight .mh { color: #1C00CF } /* Literal.Number.Hex */
+.highlight .mi { color: #1C00CF } /* Literal.Number.Integer */
+.highlight .mo { color: #1C00CF } /* Literal.Number.Oct */
+.highlight .sa { color: #C41A16 } /* Literal.String.Affix */
+.highlight .sb { color: #C41A16 } /* Literal.String.Backtick */
+.highlight .sc { color: #C41A16 } /* Literal.String.Char */
+.highlight .dl { color: #C41A16 } /* Literal.String.Delimiter */
+.highlight .sd { color: #C41A16 } /* Literal.String.Doc */
+.highlight .s2 { color: #C41A16 } /* Literal.String.Double */
+.highlight .se { color: #A0410D } /* Literal.String.Escape */
+.highlight .sh { color: #C41A16 } /* Literal.String.Heredoc */
+.highlight .si { color: #C41A16 } /* Literal.String.Interpol */
+.highlight .sx { color: #C41A16 } /* Literal.String.Other */
+.highlight .sr { color: #C41A16 } /* Literal.String.Regex */
+.highlight .s1 { color: #C41A16 } /* Literal.String.Single */
+.highlight .ss { color: #C41A16 } /* Literal.String.Symbol */
+.highlight .bp { color: #3E8087 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #0B4F79 } /* Name.Function.Magic */
+.highlight .vc { color: #1D1D1F } /* Name.Variable.Class */
+.highlight .vg { color: #1D1D1F } /* Name.Variable.Global */
+.highlight .vi { color: #1D1D1F } /* Name.Variable.Instance */
+.highlight .vm { color: #3E8087 } /* Name.Variable.Magic */
+.highlight .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 
-        
+pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+pre.code-block .hll { background-color: #eaeaf0 }
+pre.code-block { background: #f5f5f7; color: #1D1D1F }
+pre.code-block .c { color: #707F8C } /* Comment */
+pre.code-block .err { color: #C41A16 } /* Error */
+pre.code-block .k { color: #AD3DA4 } /* Keyword */
+pre.code-block .n { color: #1D1D1F } /* Name */
+pre.code-block .o { color: #1D1D1F } /* Operator */
+pre.code-block .p { color: #1D1D1F } /* Punctuation */
+pre.code-block .ch { color: #707F8C } /* Comment.Hashbang */
+pre.code-block .cm { color: #707F8C } /* Comment.Multiline */
+pre.code-block .cp { color: #78492A } /* Comment.Preproc */
+pre.code-block .cpf { color: #707F8C } /* Comment.PreprocFile */
+pre.code-block .c1 { color: #707F8C } /* Comment.Single */
+pre.code-block .cs { color: #707F8C } /* Comment.Special */
+pre.code-block .gd { color: #C41A16 } /* Generic.Deleted */
+pre.code-block .ge { font-style: italic } /* Generic.Emph */
+pre.code-block .gr { color: #C41A16 } /* Generic.Error */
+pre.code-block .gh { color: #1D1D1F; font-weight: bold } /* Generic.Heading */
+pre.code-block .gi { color: #248A3D } /* Generic.Inserted */
+pre.code-block .go { color: #6E6E73 } /* Generic.Output */
+pre.code-block .gp { color: #707F8C } /* Generic.Prompt */
+pre.code-block .gs { font-weight: bold } /* Generic.Strong */
+pre.code-block .gu { color: #1D1D1F; font-weight: bold } /* Generic.Subheading */
+pre.code-block .gt { color: #C41A16 } /* Generic.Traceback */
+pre.code-block .kc { color: #AD3DA4 } /* Keyword.Constant */
+pre.code-block .kd { color: #AD3DA4 } /* Keyword.Declaration */
+pre.code-block .kn { color: #AD3DA4 } /* Keyword.Namespace */
+pre.code-block .kp { color: #AD3DA4 } /* Keyword.Pseudo */
+pre.code-block .kr { color: #AD3DA4 } /* Keyword.Reserved */
+pre.code-block .kt { color: #0B4F79 } /* Keyword.Type */
+pre.code-block .m { color: #1C00CF } /* Literal.Number */
+pre.code-block .s { color: #C41A16 } /* Literal.String */
+pre.code-block .na { color: #1D1D1F } /* Name.Attribute */
+pre.code-block .nb { color: #3E8087 } /* Name.Builtin */
+pre.code-block .nc { color: #3E8087 } /* Name.Class */
+pre.code-block .no { color: #1C00CF } /* Name.Constant */
+pre.code-block .nd { color: #78492A } /* Name.Decorator */
+pre.code-block .ni { color: #1D1D1F } /* Name.Entity */
+pre.code-block .ne { color: #0B4F79 } /* Name.Exception */
+pre.code-block .nf { color: #0B4F79 } /* Name.Function */
+pre.code-block .nl { color: #1D1D1F } /* Name.Label */
+pre.code-block .nn { color: #3E8087 } /* Name.Namespace */
+pre.code-block .nx { color: #1D1D1F } /* Name.Other */
+pre.code-block .py { color: #1D1D1F } /* Name.Property */
+pre.code-block .nt { color: #AD3DA4 } /* Name.Tag */
+pre.code-block .nv { color: #1D1D1F } /* Name.Variable */
+pre.code-block .ow { color: #AD3DA4 } /* Operator.Word */
+pre.code-block .pm { color: #1D1D1F } /* Punctuation.Marker */
+pre.code-block .w { color: #1D1D1F } /* Text.Whitespace */
+pre.code-block .mb { color: #1C00CF } /* Literal.Number.Bin */
+pre.code-block .mf { color: #1C00CF } /* Literal.Number.Float */
+pre.code-block .mh { color: #1C00CF } /* Literal.Number.Hex */
+pre.code-block .mi { color: #1C00CF } /* Literal.Number.Integer */
+pre.code-block .mo { color: #1C00CF } /* Literal.Number.Oct */
+pre.code-block .sa { color: #C41A16 } /* Literal.String.Affix */
+pre.code-block .sb { color: #C41A16 } /* Literal.String.Backtick */
+pre.code-block .sc { color: #C41A16 } /* Literal.String.Char */
+pre.code-block .dl { color: #C41A16 } /* Literal.String.Delimiter */
+pre.code-block .sd { color: #C41A16 } /* Literal.String.Doc */
+pre.code-block .s2 { color: #C41A16 } /* Literal.String.Double */
+pre.code-block .se { color: #A0410D } /* Literal.String.Escape */
+pre.code-block .sh { color: #C41A16 } /* Literal.String.Heredoc */
+pre.code-block .si { color: #C41A16 } /* Literal.String.Interpol */
+pre.code-block .sx { color: #C41A16 } /* Literal.String.Other */
+pre.code-block .sr { color: #C41A16 } /* Literal.String.Regex */
+pre.code-block .s1 { color: #C41A16 } /* Literal.String.Single */
+pre.code-block .ss { color: #C41A16 } /* Literal.String.Symbol */
+pre.code-block .bp { color: #3E8087 } /* Name.Builtin.Pseudo */
+pre.code-block .fm { color: #0B4F79 } /* Name.Function.Magic */
+pre.code-block .vc { color: #1D1D1F } /* Name.Variable.Class */
+pre.code-block .vg { color: #1D1D1F } /* Name.Variable.Global */
+pre.code-block .vi { color: #1D1D1F } /* Name.Variable.Instance */
+pre.code-block .vm { color: #3E8087 } /* Name.Variable.Magic */
+pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
+
+/* ===== 代码窗容器：浅灰底 ===== */
+.highlight {
+    background:#f5f5f7; color:#1d1d1f;
+    border-radius:14px; padding:18px 20px;
+    overflow-x:auto; margin:16px 0;
+}
+.highlight pre { margin:0; background:transparent; padding:0; }
+.highlight code { background:transparent; color:inherit; padding:0; }
+
     .file-info {
-        background:#f0f0f0; padding:10px 15px; border-radius:6px;
-        margin-bottom:15px; font-size:14px; color:#666;
+        background:#f5f5f7; padding:10px 16px; border-radius:12px;
+        margin-bottom:18px; font-size:14px; color:#6e6e73;
         display:flex; align-items:center; justify-content:space-between;
         flex-wrap:wrap; gap:8px;
     }
     .file-info .info-left { display:flex; align-items:center; gap:8px; }
     .download-btn {
         display:inline-flex; align-items:center; gap:5px;
-        background:#4caf50; color:#fff; border:none;
-        padding:6px 14px; border-radius:4px; font-size:13px;
+        background:#0071e3; color:#fff; border:none;
+        padding:7px 16px; border-radius:980px; font-size:13px;
         text-decoration:none; cursor:pointer; white-space:nowrap;
-        transition: background 0.2s;
+        transition: background .2s;
     }
-    .download-btn:hover { background:#388e3c; }
+    .download-btn:hover { background:#0077ed; }
+
+@media print { body { background:#fff; padding:0; } .main-content { box-shadow:none; } .nav-sidebar { display:none; } .back-top { display:none; } }
+@media (max-width:900px) {
+    .nav-sidebar { width:200px; min-width:200px; font-size:13px; padding:16px 10px; }
+    .header h1 { font-size:1.8em; }
+    .content { padding:24px; }
+}
+@media (max-width:650px) {
+    .nav-wrapper { flex-direction:column; }
+    .nav-sidebar { width:100%; min-width:100%; height:auto; position:relative; flex-direction:row; flex-wrap:wrap; gap:5px; padding:12px; }
+    .nav-sidebar h3, .nav-sidebar h4 { display:none; }
+}
+
+    
     
     </style>
 </head>
@@ -229,335 +348,265 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <a class="" href="tutorial_01_decorators.html">装饰器 8 步教程</a>
 <a class="" href="tutorial_02_async.html">异步 9 步教程</a>
 <h4>Day 1-3 (基础)</h4>
+<a class="" href="day01_lesson.html">Day 1 - 学习</a>
 <a class="" href="day01_practice_template.html">Day 1 - 模板</a>
 <a class="" href="day01_practice_validator.html">Day 1 - 验收</a>
+<a class="" href="day02_lesson.html">Day 2 - 学习</a>
 <a class="" href="day02_practice_template.html">Day 2 - 模板</a>
 <a class="" href="day02_practice_validator.html">Day 2 - 验收</a>
+<a class="" href="day03_lesson.html">Day 3 - 学习</a>
 <a class="" href="day03_practice_template.html">Day 3 - 模板</a>
 <a class="" href="day03_practice_validator.html">Day 3 - 验收</a>
 <h4>Day 4-5 (LLM)</h4>
+<a class="" href="day04_lesson.html">Day 4 - 学习</a>
 <a class="" href="day04_practice_template.html">Day 4 - 模板</a>
 <a class="" href="day04_practice_validator.html">Day 4 - 验收</a>
+<a class="" href="day05_lesson.html">Day 5 - 学习</a>
 <a class="" href="day05_practice_template.html">Day 5 - 模板</a>
 <a class="" href="day05_practice_validator.html">Day 5 - 验收</a>
 <h4>Day 6-7 (Agent)</h4>
+<a class="" href="day06_lesson.html">Day 6 - 学习</a>
 <a class="" href="day06_practice_template.html">Day 6 - 模板</a>
 <a class="active" href="day06_practice_validator.html">Day 6 - 验收</a>
+<a class="" href="day07_lesson.html">Day 7 - 学习</a>
 <a class="" href="day07_practice_template.html">Day 7 - 模板</a>
 <a class="" href="day07_practice_validator.html">Day 7 - 验收</a>
 <h4>Day 8-10 (高级)</h4>
+<a class="" href="day08_lesson.html">Day 8 - 学习</a>
 <a class="" href="day08_practice_template.html">Day 8 - 模板</a>
+<a class="" href="day09_lesson.html">Day 9 - 学习</a>
 <a class="" href="day09_practice_template.html">Day 9 - 模板</a>
+<a class="" href="day10_lesson.html">Day 10 - 学习</a>
 <a class="" href="day10_practice_template.html">Day 10 - 模板</a>
 </div>
 <div class="main-content">
     <div class="header"><h1>🐍 Day06 Practice Validator</h1></div>
     <div class="content">
         <div class="file-info"><div class="info-left">📄 文件: <code>day06_practice_validator.py</code></div><a class="download-btn" href="day06_practice_validator.py" download>⬇ 下载 .py 文件</a></div>
-<div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Day 6 练习验收脚本</span>
-<span class="sd">验收内容：纯 Python 手写 ReAct Agent 循环</span>
+<div class="highlight"><pre><span></span><span class="sd">"""</span>
+<span class="sd">Day 6 练习项目验收脚本（行为级验收）</span>
+<span class="sd">不依赖框架，纯 Python 手写 ReAct Agent 循环</span>
 
-<span class="sd">使用方法：</span>
-<span class="sd">    python day06_practice_validator.py</span>
-<span class="sd">    python day06_practice_validator.py --file day06_practice.py</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">运行方式：</span>
+<span class="sd">    python day06_practice_validator.py                  # 验收默认模板文件</span>
+<span class="sd">    python day06_practice_validator.py --file 你的练习.py</span>
 
+<span class="sd">验收方式：</span>
+<span class="sd">    直接调用你的解析函数、执行你的工具、跑通你的 ReAct 主循环，</span>
+<span class="sd">    检查 Agent 是否真的能"调用工具 → 拿到观察 → 给出最终答案"。</span>
+<span class="sd">    空白模板无法通过验收，只有真正完成 TODO 才能得分。</span>
+<span class="sd">"""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">ast</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">importlib.util</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">redirect_stdout</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
 
-<span class="n">TIMEOUT</span> <span class="o">=</span> <span class="mi">30</span>
+<span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>  <span class="c1"># 让 Windows 终端支持 ANSI 颜色</span>
+
+<span class="n">DEFAULT_FILE</span> <span class="o">=</span> <span class="s2">"day06_practice_template.py"</span>
+<span class="n">满分</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">通过线</span> <span class="o">=</span> <span class="mi">60</span>
+<span class="n">优秀线</span> <span class="o">=</span> <span class="mi">80</span>
+
+<span class="c1"># 测试样本：一个 Action 响应，一个 Final Answer 响应</span>
+<span class="n">SAMPLE_ACTION</span> <span class="o">=</span> <span class="s2">"""Thought: 我需要计算这个表达式的结果</span>
+<span class="s2">Action: Calculator</span>
+<span class="s2">Action Input: 3 + 5 * 2"""</span>
+
+<span class="n">SAMPLE_FINAL</span> <span class="o">=</span> <span class="s2">"""Thought: 我已经获得了所需信息</span>
+<span class="s2">Final Answer: 根据查询结果，答案是 13。"""</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">C</span><span class="p">:</span>
-    <span class="n">GREEN</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[92m&quot;</span>
-    <span class="n">RED</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[91m&quot;</span>
-    <span class="n">YELLOW</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[93m&quot;</span>
-    <span class="n">BLUE</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[94m&quot;</span>
-    <span class="n">CYAN</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[96m&quot;</span>
-    <span class="n">BOLD</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[1m&quot;</span>
-    <span class="n">END</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[0m&quot;</span>
+    <span class="n">GREEN</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\033</span><span class="s2">[92m"</span>
+    <span class="n">YELLOW</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\033</span><span class="s2">[93m"</span>
+    <span class="n">RED</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\033</span><span class="s2">[91m"</span>
+    <span class="n">CYAN</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\033</span><span class="s2">[96m"</span>
+    <span class="n">END</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\033</span><span class="s2">[0m"</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">打印</span><span class="p">(</span><span class="n">内容</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">颜色</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">END</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">C</span><span class="o">.</span><span class="n">BOLD</span><span class="si">}{</span><span class="n">颜色</span><span class="si">}{</span><span class="n">内容</span><span class="si">}{</span><span class="n">C</span><span class="o">.</span><span class="n">END</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">打印</span><span class="p">(</span><span class="n">文本</span><span class="p">,</span> <span class="n">颜色</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">颜色</span><span class="si">}{</span><span class="n">文本</span><span class="si">}{</span><span class="n">C</span><span class="o">.</span><span class="n">END</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">颜色</span> <span class="k">else</span> <span class="n">文本</span><span class="p">)</span>
 
 
-<span class="c1"># ==================== 检查项 ====================</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">检查_react循环</span><span class="p">(</span><span class="n">代码</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;检查 1：是否实现了 ReAct 主循环（for/while + max_steps）&quot;&quot;&quot;</span>
-    <span class="n">树</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">代码</span><span class="p">)</span>
-    <span class="n">找到了循环</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">找到了上限</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">详情</span> <span class="o">=</span> <span class="p">[]</span>
-    
-    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">ast</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">树</span><span class="p">):</span>
-        <span class="c1"># 检查 for 或 while 循环</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">For</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">While</span><span class="p">)):</span>
-            <span class="n">找到了循环</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">详情</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✅ 找到循环：</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            
-            <span class="c1"># 检查是否有 max_steps 或类似上限</span>
-            <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">ast</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Constant</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">child</span><span class="o">.</span><span class="n">value</span> <span class="o">&lt;=</span> <span class="mi">20</span><span class="p">:</span>
-                        <span class="n">找到了上限</span> <span class="o">=</span> <span class="kc">True</span>
-                        <span class="n">详情</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   └─ 疑似步数上限：</span><span class="si">{</span><span class="n">child</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    
-    <span class="k">if</span> <span class="n">找到了循环</span> <span class="ow">and</span> <span class="n">找到了上限</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">详情</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">找到了循环</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">详情</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">⚠️ 未找到明确的 max_steps 上限&quot;</span>
-    <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;❌ 未找到 ReAct 主循环（需要 for/while 循环）&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">加载学生模块</span><span class="p">(</span><span class="n">文件路径</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
+    <span class="n">spec</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spec_from_file_location</span><span class="p">(</span><span class="s2">"学生练习_day06"</span><span class="p">,</span> <span class="n">文件路径</span><span class="p">)</span>
+    <span class="n">模块</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">module_from_spec</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+    <span class="n">spec</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">exec_module</span><span class="p">(</span><span class="n">模块</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">模块</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">检查_async_await</span><span class="p">(</span><span class="n">代码</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;检查 2：是否使用了 async/await&quot;&quot;&quot;</span>
-    <span class="n">树</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">代码</span><span class="p">)</span>
-    <span class="n">有_async</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">有_await</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">详情</span> <span class="o">=</span> <span class="p">[]</span>
-    
-    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">ast</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">树</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">AsyncFunctionDef</span><span class="p">):</span>
-            <span class="n">有_async</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">详情</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✅ 找到异步函数：</span><span class="si">{</span><span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Await</span><span class="p">):</span>
-            <span class="n">有_await</span> <span class="o">=</span> <span class="kc">True</span>
-    
-    <span class="k">if</span> <span class="n">有_async</span> <span class="ow">and</span> <span class="n">有_await</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">详情</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">✅ 找到 await 表达式&quot;</span>
-    <span class="k">elif</span> <span class="n">有_async</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">详情</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">⚠️ 找到 async 函数但未找到 await&quot;</span>
-    <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;❌ 未找到 async/await（ReAct Agent 应该用异步）&quot;</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">验收器</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">总分</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">检查</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">名称</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">分值</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">函数</span><span class="p">,</span> <span class="o">*</span><span class="n">参数</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""运行单个检查；检查函数返回 (得分, 消息)，抛异常记 0 分"""</span>
+        <span class="n">打印</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">【</span><span class="si">{</span><span class="n">名称</span><span class="si">}</span><span class="s2">】（</span><span class="si">{</span><span class="n">分值</span><span class="si">}</span><span class="s2">分）"</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">CYAN</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">iscoroutinefunction</span><span class="p">(</span><span class="n">函数</span><span class="p">):</span>
+                <span class="n">得分</span><span class="p">,</span> <span class="n">消息</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait_for</span><span class="p">(</span><span class="n">函数</span><span class="p">(</span><span class="o">*</span><span class="n">参数</span><span class="p">),</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">40</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">得分</span><span class="p">,</span> <span class="n">消息</span> <span class="o">=</span> <span class="n">函数</span><span class="p">(</span><span class="o">*</span><span class="n">参数</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">:</span>
+            <span class="n">得分</span><span class="p">,</span> <span class="n">消息</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"❌ 检查超时——ReAct 循环可能没有终止（检查 max_steps）"</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">得分</span><span class="p">,</span> <span class="n">消息</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"❌ </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span>
+        <span class="n">得分</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">得分</span><span class="p">),</span> <span class="n">分值</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">总分</span> <span class="o">+=</span> <span class="n">得分</span>
+        <span class="n">颜色</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">GREEN</span> <span class="k">if</span> <span class="n">得分</span> <span class="o">==</span> <span class="n">分值</span> <span class="k">else</span> <span class="p">(</span><span class="n">C</span><span class="o">.</span><span class="n">YELLOW</span> <span class="k">if</span> <span class="n">得分</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">C</span><span class="o">.</span><span class="n">RED</span><span class="p">)</span>
+        <span class="n">打印</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">消息</span><span class="si">}</span><span class="s2">  [得分 </span><span class="si">{</span><span class="n">得分</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">分值</span><span class="si">}</span><span class="s2">]"</span><span class="p">,</span> <span class="n">颜色</span><span class="p">)</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">检查_工具注册</span><span class="p">(</span><span class="n">代码</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;检查 3：是否有工具注册机制&quot;&quot;&quot;</span>
-    <span class="n">树</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">代码</span><span class="p">)</span>
-    <span class="n">找到了</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">详情</span> <span class="o">=</span> <span class="p">[]</span>
-    
-    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">ast</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">树</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Assign</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">targets</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Subscript</span><span class="p">):</span>
-                    <span class="n">找到了</span> <span class="o">=</span> <span class="kc">True</span>
-                    <span class="n">详情</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;✅ 找到工具注册逻辑（字典下标赋值）&quot;</span><span class="p">)</span>
-    
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">找到了</span><span class="p">:</span>
-        <span class="c1"># 再检查是否有 TOOLS/registry 变量</span>
-        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">ast</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">树</span><span class="p">):</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Assign</span><span class="p">):</span>
-                <span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">targets</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Name</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;tool&quot;</span> <span class="ow">in</span> <span class="n">target</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">or</span> <span class="s2">&quot;registry&quot;</span> <span class="ow">in</span> <span class="n">target</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">lower</span><span class="p">()):</span>
-                        <span class="n">找到了</span> <span class="o">=</span> <span class="kc">True</span>
-                        <span class="n">详情</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✅ 找到工具变量：</span><span class="si">{</span><span class="n">target</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    
-    <span class="k">if</span> <span class="n">找到了</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">详情</span><span class="p">)</span>
-    <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;❌ 未找到工具注册机制&quot;</span>
+<span class="c1"># ==================== 各项检查 ====================</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">检查_工具描述</span><span class="p">(</span><span class="n">模块</span><span class="p">):</span>
+    <span class="n">get_desc</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">模块</span><span class="p">,</span> <span class="s2">"get_tools_description"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">callable</span><span class="p">(</span><span class="n">get_desc</span><span class="p">),</span> <span class="s2">"没有找到 get_tools_description 函数（TODO 1.2）"</span>
+    <span class="n">描述</span> <span class="o">=</span> <span class="n">get_desc</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">描述</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">描述</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="sa">f</span><span class="s2">"应返回非空字符串，实际 </span><span class="si">{</span><span class="n">描述</span><span class="si">!r}</span><span class="s2">"</span>
+    <span class="k">assert</span> <span class="s2">"Calculator"</span> <span class="ow">in</span> <span class="n">描述</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"工具描述应包含 Calculator，实际：</span><span class="si">{</span><span class="n">描述</span><span class="p">[:</span><span class="mi">80</span><span class="p">]</span><span class="si">!r}</span><span class="s2">"</span>
+    <span class="k">assert</span> <span class="s2">"Weather"</span> <span class="ow">in</span> <span class="n">描述</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"工具描述应包含 Weather，实际：</span><span class="si">{</span><span class="n">描述</span><span class="p">[:</span><span class="mi">80</span><span class="p">]</span><span class="si">!r}</span><span class="s2">"</span>
+    <span class="k">return</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">"✅ 工具描述包含全部注册工具（将放入 System Prompt）"</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">检查_react格式解析</span><span class="p">(</span><span class="n">代码</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;检查 4：是否解析 ReAct 格式（Thought/Action/Observation）&quot;&quot;&quot;</span>
-    <span class="n">关键词</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Thought&quot;</span><span class="p">,</span> <span class="s2">&quot;Action&quot;</span><span class="p">,</span> <span class="s2">&quot;Action Input&quot;</span><span class="p">,</span> <span class="s2">&quot;Observation&quot;</span><span class="p">,</span> <span class="s2">&quot;Final Answer&quot;</span><span class="p">]</span>
-    <span class="n">找到了</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">关键词</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">代码</span><span class="p">:</span>
-            <span class="n">找到了</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kw</span><span class="p">)</span>
-    
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">找到了</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;✅ 找到 ReAct 格式关键词：</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">找到了</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">找到了</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;⚠️ 只找到部分关键词：</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">找到了</span><span class="p">)</span><span class="si">}</span><span class="s2">（建议包含 Thought/Action/Observation/Final Answer）&quot;</span>
-    <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;❌ 未找到 ReAct 格式解析（需要解析 Thought/Action 等）&quot;</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">检查_正则或字符串解析</span><span class="p">(</span><span class="n">代码</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;检查 5：是否用正则或字符串方法解析响应&quot;&quot;&quot;</span>
-    <span class="n">树</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">代码</span><span class="p">)</span>
-    <span class="n">找到了</span> <span class="o">=</span> <span class="p">[]</span>
-    
-    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">ast</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">树</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Attribute</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">attr</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;search&quot;</span><span class="p">,</span> <span class="s2">&quot;findall&quot;</span><span class="p">,</span> <span class="s2">&quot;match&quot;</span><span class="p">,</span> <span class="s2">&quot;find&quot;</span><span class="p">,</span> <span class="s2">&quot;split&quot;</span><span class="p">,</span> <span class="s2">&quot;index&quot;</span><span class="p">):</span>
-                <span class="n">找到了</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">attr</span><span class="p">)</span>
-    
-    <span class="k">if</span> <span class="s2">&quot;search&quot;</span> <span class="ow">in</span> <span class="n">找到了</span> <span class="ow">or</span> <span class="s2">&quot;findall&quot;</span> <span class="ow">in</span> <span class="n">找到了</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;✅ 找到正则解析（</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">找到了</span><span class="p">))</span><span class="si">}</span><span class="s2">）&quot;</span>
-    <span class="k">elif</span> <span class="n">找到了</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;✅ 找到字符串解析（</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">找到了</span><span class="p">))</span><span class="si">}</span><span class="s2">）&quot;</span>
-    <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;⚠️ 未找到明确的解析逻辑（可用正则或字符串方法）&quot;</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">检查_工具执行</span><span class="p">(</span><span class="n">代码</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;检查 6：是否有工具执行逻辑&quot;&quot;&quot;</span>
-    <span class="n">关键词</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;execute_tool&quot;</span><span class="p">,</span> <span class="s2">&quot;call_tool&quot;</span><span class="p">,</span> <span class="s2">&quot;执行工具&quot;</span><span class="p">,</span> <span class="s2">&quot;调用工具&quot;</span><span class="p">]</span>
-    <span class="n">找到了</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">关键词</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">代码</span><span class="p">:</span>
-            <span class="n">找到了</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kw</span><span class="p">)</span>
-    
-    <span class="k">if</span> <span class="n">找到了</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;✅ 找到工具执行函数：</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">找到了</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-    <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;⚠️ 未找到明确的工具执行函数（建议命名为 execute_tool）&quot;</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">检查_步骤记录</span><span class="p">(</span><span class="n">代码</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;检查 7：是否记录了执行步骤（用于调试和上下文）&quot;&quot;&quot;</span>
-    <span class="n">关键词</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;steps&quot;</span><span class="p">,</span> <span class="s2">&quot;history&quot;</span><span class="p">,</span> <span class="s2">&quot;messages&quot;</span><span class="p">,</span> <span class="s2">&quot;步骤&quot;</span><span class="p">,</span> <span class="s2">&quot;历史&quot;</span><span class="p">]</span>
-    <span class="n">找到了</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">关键词</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">代码</span><span class="p">:</span>
-            <span class="n">找到了</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kw</span><span class="p">)</span>
-    
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">找到了</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;✅ 找到步骤记录变量：</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">找到了</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-    <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;⚠️ 未找到步骤记录（建议用 list 记录每步的 Thought/Action/Observation）&quot;</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">检查_类型注解</span><span class="p">(</span><span class="n">代码</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;检查 8：是否有类型注解&quot;&quot;&quot;</span>
-    <span class="n">树</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">代码</span><span class="p">)</span>
-    <span class="n">有注解</span> <span class="o">=</span> <span class="mi">0</span>
-    
-    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">ast</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">树</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">FunctionDef</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">AsyncFunctionDef</span><span class="p">)):</span>
-            <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">returns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">有注解</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">arg</span><span class="o">.</span><span class="n">annotation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">有注解</span> <span class="o">+=</span> <span class="mi">1</span>
-    
-    <span class="k">if</span> <span class="n">有注解</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;✅ 类型注解较好（</span><span class="si">{</span><span class="n">有注解</span><span class="si">}</span><span class="s2"> 处注解）&quot;</span>
-    <span class="k">elif</span> <span class="n">有注解</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;⚠️ 类型注解较少（</span><span class="si">{</span><span class="n">有注解</span><span class="si">}</span><span class="s2"> 处注解，建议多加）&quot;</span>
-    <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;❌ 未找到类型注解（建议加上）&quot;</span>
-
-
-<span class="c1"># ==================== 运行检查 ====================</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">运行用户代码</span><span class="p">(</span><span class="n">文件路径</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">开始</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-        <span class="n">结果</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">文件路径</span><span class="p">)],</span>
-            <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">TIMEOUT</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">耗时</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">开始</span>
-        <span class="k">if</span> <span class="n">结果</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">结果</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="n">耗时</span>
-        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;运行失败：</span><span class="se">\n</span><span class="si">{</span><span class="n">结果</span><span class="o">.</span><span class="n">stderr</span><span class="p">[:</span><span class="mi">500</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">耗时</span>
-    <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">TimeoutExpired</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;⏰ 运行超时（</span><span class="si">{</span><span class="n">TIMEOUT</span><span class="si">}</span><span class="s2"> 秒）&quot;</span><span class="p">,</span> <span class="n">TIMEOUT</span>
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;运行出错：</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="mf">0.0</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">检查_代码可运行</span><span class="p">(</span><span class="n">文件路径</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-    <span class="n">成功</span><span class="p">,</span> <span class="n">输出</span><span class="p">,</span> <span class="n">耗时</span> <span class="o">=</span> <span class="n">运行用户代码</span><span class="p">(</span><span class="n">文件路径</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">成功</span><span class="p">:</span>
-        <span class="c1"># 检查输出是否包含 Agent 回答</span>
-        <span class="k">if</span> <span class="s2">&quot;最终回答&quot;</span> <span class="ow">in</span> <span class="n">输出</span> <span class="ow">or</span> <span class="s2">&quot;Answer&quot;</span> <span class="ow">in</span> <span class="n">输出</span> <span class="ow">or</span> <span class="s2">&quot;答案&quot;</span> <span class="ow">in</span> <span class="n">输出</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;✅ 代码运行成功，Agent 有输出（耗时 </span><span class="si">{</span><span class="n">耗时</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> 秒）&quot;</span>
-        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;✅ 代码运行成功（耗时 </span><span class="si">{</span><span class="n">耗时</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> 秒）</span><span class="se">\n</span><span class="s2">   输出预览：</span><span class="se">\n</span><span class="si">{</span><span class="n">输出</span><span class="p">[:</span><span class="mi">300</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
-    <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;❌ 代码运行失败：</span><span class="se">\n</span><span class="si">{</span><span class="n">输出</span><span class="p">[:</span><span class="mi">500</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
-
-
-<span class="c1"># ==================== 主逻辑 ====================</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">验收</span><span class="p">(</span><span class="n">文件路径</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-    <span class="n">打印</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">60</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">CYAN</span><span class="p">)</span>
-    <span class="n">打印</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Day 6 练习验收：</span><span class="si">{</span><span class="n">文件路径</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">CYAN</span><span class="p">)</span>
-    <span class="n">打印</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">60</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">CYAN</span><span class="p">)</span>
-    
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">文件路径</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-        <span class="n">打印</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;❌ 文件不存在：</span><span class="si">{</span><span class="n">文件路径</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">RED</span><span class="p">)</span>
-        <span class="n">打印</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   请创建 </span><span class="si">{</span><span class="n">文件路径</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">，或指定正确路径&quot;</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">YELLOW</span><span class="p">)</span>
-        <span class="k">return</span> <span class="mi">0</span>
-    
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">文件路径</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">代码</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-    
-    <span class="n">检查项</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="p">(</span><span class="s2">&quot;ReAct 主循环（for/while + max_steps）&quot;</span><span class="p">,</span> <span class="n">检查_react循环</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;async/await 使用&quot;</span><span class="p">,</span> <span class="n">检查_async_await</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;工具注册机制&quot;</span><span class="p">,</span> <span class="n">检查_工具注册</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;ReAct 格式解析（Thought/Action/...）&quot;</span><span class="p">,</span> <span class="n">检查_react格式解析</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;正则/字符串解析逻辑&quot;</span><span class="p">,</span> <span class="n">检查_正则或字符串解析</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;工具执行函数&quot;</span><span class="p">,</span> <span class="n">检查_工具执行</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;步骤记录（上下文管理）&quot;</span><span class="p">,</span> <span class="n">检查_步骤记录</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;类型注解&quot;</span><span class="p">,</span> <span class="n">检查_类型注解</span><span class="p">),</span>
-    <span class="p">]</span>
-    
-    <span class="n">分数</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">满分</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">检查项</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span> <span class="o">+</span> <span class="mi">20</span>
-    
-    <span class="k">for</span> <span class="n">名称</span><span class="p">,</span> <span class="n">检查函数</span> <span class="ow">in</span> <span class="n">检查项</span><span class="p">:</span>
-        <span class="n">通过</span><span class="p">,</span> <span class="n">消息</span> <span class="o">=</span> <span class="n">检查函数</span><span class="p">(</span><span class="n">代码</span><span class="p">)</span>
-        <span class="n">打印</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  [</span><span class="si">{</span><span class="n">名称</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">BLUE</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">通过</span> <span class="ow">and</span> <span class="s2">&quot;⚠️&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">消息</span><span class="p">:</span>
-            <span class="n">打印</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">消息</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">GREEN</span><span class="p">)</span>
-            <span class="n">分数</span> <span class="o">+=</span> <span class="mi">10</span>
-        <span class="k">elif</span> <span class="s2">&quot;⚠️&quot;</span> <span class="ow">in</span> <span class="n">消息</span><span class="p">:</span>
-            <span class="n">打印</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">消息</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">YELLOW</span><span class="p">)</span>
-            <span class="n">分数</span> <span class="o">+=</span> <span class="mi">5</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">打印</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">消息</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">RED</span><span class="p">)</span>
-    
-    <span class="c1"># 运行检查</span>
-    <span class="n">打印</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  [代码可运行 + Agent 有输出]&quot;</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">BLUE</span><span class="p">)</span>
-    <span class="n">通过</span><span class="p">,</span> <span class="n">消息</span> <span class="o">=</span> <span class="n">检查_代码可运行</span><span class="p">(</span><span class="n">文件路径</span><span class="p">)</span>
-    <span class="n">打印</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">消息</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">GREEN</span> <span class="k">if</span> <span class="n">通过</span> <span class="k">else</span> <span class="n">C</span><span class="o">.</span><span class="n">RED</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">通过</span><span class="p">:</span>
-        <span class="n">分数</span> <span class="o">+=</span> <span class="mi">20</span>
-    
-    <span class="n">打印</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">60</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">CYAN</span><span class="p">)</span>
-    <span class="n">颜色</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">GREEN</span> <span class="k">if</span> <span class="n">分数</span> <span class="o">&gt;=</span> <span class="mi">80</span> <span class="k">else</span> <span class="p">(</span><span class="n">C</span><span class="o">.</span><span class="n">YELLOW</span> <span class="k">if</span> <span class="n">分数</span> <span class="o">&gt;=</span> <span class="mi">60</span> <span class="k">else</span> <span class="n">C</span><span class="o">.</span><span class="n">RED</span><span class="p">)</span>
-    <span class="n">打印</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  总分：</span><span class="si">{</span><span class="n">分数</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">满分</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">颜色</span><span class="p">)</span>
-    
-    <span class="k">if</span> <span class="n">分数</span> <span class="o">&gt;=</span> <span class="mi">80</span><span class="p">:</span>
-        <span class="n">打印</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  🎉 验收通过！你成功手写了 ReAct Agent！&quot;</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">GREEN</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">分数</span> <span class="o">&gt;=</span> <span class="mi">60</span><span class="p">:</span>
-        <span class="n">打印</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  ⚠️ 基本通过，建议改进后再继续&quot;</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">YELLOW</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">检查_执行工具</span><span class="p">(</span><span class="n">模块</span><span class="p">):</span>
+    <span class="n">execute</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">模块</span><span class="p">,</span> <span class="s2">"execute_tool"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">callable</span><span class="p">(</span><span class="n">execute</span><span class="p">),</span> <span class="s2">"没有找到 execute_tool 函数（TODO 1.3）"</span>
+    <span class="n">结果</span> <span class="o">=</span> <span class="n">execute</span><span class="p">(</span><span class="s2">"Calculator"</span><span class="p">,</span> <span class="s2">"3 + 5 * 2"</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">结果</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">"execute_tool 返回 None——TODO 1.3 还没实现"</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">结果</span><span class="p">,</span> <span class="s2">"output"</span><span class="p">):</span>
+        <span class="n">输出</span><span class="p">,</span> <span class="n">成功</span> <span class="o">=</span> <span class="n">结果</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">结果</span><span class="p">,</span> <span class="s2">"success"</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">结果</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">输出</span><span class="p">,</span> <span class="n">成功</span> <span class="o">=</span> <span class="n">结果</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"output"</span><span class="p">),</span> <span class="n">结果</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"success"</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">打印</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  ❌ 还需努力，参考上面提示改进&quot;</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">RED</span><span class="p">)</span>
-    
-    <span class="n">打印</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">60</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">CYAN</span><span class="p">)</span>
-    
-    <span class="k">if</span> <span class="n">分数</span> <span class="o">&lt;</span> <span class="mi">80</span><span class="p">:</span>
-        <span class="n">打印</span><span class="p">(</span><span class="s2">&quot;📋 改进建议：&quot;</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">YELLOW</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">检查_react循环</span><span class="p">(</span><span class="n">代码</span><span class="p">)[</span><span class="mi">0</span><span class="p">]:</span>
-            <span class="n">打印</span><span class="p">(</span><span class="s2">&quot;  • 实现 ReAct 主循环：for step in range(max_steps):&quot;</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">YELLOW</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">检查_async_await</span><span class="p">(</span><span class="n">代码</span><span class="p">)[</span><span class="mi">0</span><span class="p">]:</span>
-            <span class="n">打印</span><span class="p">(</span><span class="s2">&quot;  • 用 async def 定义 Agent，内部用 await 调用 LLM&quot;</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">YELLOW</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">检查_react格式解析</span><span class="p">(</span><span class="n">代码</span><span class="p">)[</span><span class="mi">0</span><span class="p">]:</span>
-            <span class="n">打印</span><span class="p">(</span><span class="s2">&quot;  • 解析 LLM 响应中的 Thought/Action/Action Input/Observation&quot;</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">YELLOW</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">检查_工具执行</span><span class="p">(</span><span class="n">代码</span><span class="p">)[</span><span class="mi">0</span><span class="p">]:</span>
-            <span class="n">打印</span><span class="p">(</span><span class="s2">&quot;  • 实现 execute_tool() 函数，根据 Action 调用对应工具&quot;</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">YELLOW</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">()</span>
-    
-    <span class="k">return</span> <span class="n">分数</span>
+        <span class="n">输出</span><span class="p">,</span> <span class="n">成功</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">结果</span><span class="p">),</span> <span class="kc">True</span>
+    <span class="k">assert</span> <span class="n">成功</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"工具应执行成功，实际：</span><span class="si">{</span><span class="n">结果</span><span class="si">!r}</span><span class="s2">"</span>
+    <span class="k">assert</span> <span class="s2">"13"</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">输出</span><span class="p">),</span> <span class="sa">f</span><span class="s2">"3 + 5 * 2 的输出应包含 13，实际 </span><span class="si">{</span><span class="n">输出</span><span class="si">!r}</span><span class="s2">"</span>
+    <span class="k">return</span> <span class="mi">15</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"✅ Calculator 工具执行正确，输出：</span><span class="si">{</span><span class="n">输出</span><span class="si">!r}</span><span class="s2">"</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">检查_解析_Action</span><span class="p">(</span><span class="n">模块</span><span class="p">):</span>
+    <span class="n">parse</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">模块</span><span class="p">,</span> <span class="s2">"parse_react_response"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">callable</span><span class="p">(</span><span class="n">parse</span><span class="p">),</span> <span class="s2">"没有找到 parse_react_response 函数（TODO 3.1）"</span>
+    <span class="n">thought</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">action_input</span> <span class="o">=</span> <span class="n">parse</span><span class="p">(</span><span class="n">SAMPLE_ACTION</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">action</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s2">"Calculator"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"action 应为 'Calculator'，实际 </span><span class="si">{</span><span class="n">action</span><span class="si">!r}</span><span class="s2">"</span>
+    <span class="k">assert</span> <span class="n">action_input</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s2">"3 + 5 * 2"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"action_input 应为 '3 + 5 * 2'，实际 </span><span class="si">{</span><span class="n">action_input</span><span class="si">!r}</span><span class="s2">"</span>
+    <span class="k">assert</span> <span class="n">thought</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="sa">f</span><span class="s2">"thought 不应为空，实际 </span><span class="si">{</span><span class="n">thought</span><span class="si">!r}</span><span class="s2">"</span>
+    <span class="k">return</span> <span class="mi">13</span><span class="p">,</span> <span class="s2">"✅ Action 响应解析正确（Thought/Action/Action Input）"</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">检查_解析_FinalAnswer</span><span class="p">(</span><span class="n">模块</span><span class="p">):</span>
+    <span class="n">thought</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">action_input</span> <span class="o">=</span> <span class="n">模块</span><span class="o">.</span><span class="n">parse_react_response</span><span class="p">(</span><span class="n">SAMPLE_FINAL</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">action</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s2">""</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"Final Answer 响应的 action 应为空字符串，实际 </span><span class="si">{</span><span class="n">action</span><span class="si">!r}</span><span class="s2">"</span>
+    <span class="k">assert</span> <span class="s2">"13"</span> <span class="ow">in</span> <span class="n">action_input</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"最终答案应放在 action_input 中返回，实际 </span><span class="si">{</span><span class="n">action_input</span><span class="si">!r}</span><span class="s2">"</span>
+    <span class="k">return</span> <span class="mi">12</span><span class="p">,</span> <span class="s2">"✅ Final Answer 响应解析正确（action 为空，答案在 action_input）"</span>
+
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">跑_agent</span><span class="p">(</span><span class="n">模块</span><span class="p">,</span> <span class="n">问题</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">redirect_stdout</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()):</span>
+        <span class="n">回答</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait_for</span><span class="p">(</span>
+            <span class="n">模块</span><span class="o">.</span><span class="n">react_agent</span><span class="p">(</span><span class="n">user_input</span><span class="o">=</span><span class="n">问题</span><span class="p">,</span> <span class="n">max_steps</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">回答</span>
+
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">检查_Agent_计算</span><span class="p">(</span><span class="n">模块</span><span class="p">):</span>
+    <span class="n">回答</span> <span class="o">=</span> <span class="k">await</span> <span class="n">跑_agent</span><span class="p">(</span><span class="n">模块</span><span class="p">,</span> <span class="s2">"帮我计算 3 + 5 * 2 等于多少？"</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">回答</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">回答</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="sa">f</span><span class="s2">"应返回字符串，实际 </span><span class="si">{</span><span class="n">回答</span><span class="si">!r}</span><span class="s2">（TODO 4.1）"</span>
+    <span class="k">assert</span> <span class="s2">"最大步数"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">回答</span> <span class="ow">and</span> <span class="s2">"最大轮数"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">回答</span><span class="p">,</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"Agent 没有正常终止（返回：</span><span class="si">{</span><span class="n">回答</span><span class="p">[:</span><span class="mi">60</span><span class="p">]</span><span class="si">!r}</span><span class="s2">）。"</span>
+        <span class="s2">"提示：把历史 Thought/Action/Observation 拼进 prompt，第 2 轮 mock 会给出 Final Answer"</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="s2">"13"</span> <span class="ow">in</span> <span class="n">回答</span><span class="p">,</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"最终回答应包含工具算出的 13（说明工具真的执行了），实际：</span><span class="si">{</span><span class="n">回答</span><span class="p">[:</span><span class="mi">80</span><span class="p">]</span><span class="si">!r}</span><span class="s2">"</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="mi">20</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"✅ ReAct 循环完整跑通：</span><span class="si">{</span><span class="n">回答</span><span class="p">[:</span><span class="mi">50</span><span class="p">]</span><span class="si">!r}</span><span class="s2">"</span>
+
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">检查_Agent_天气</span><span class="p">(</span><span class="n">模块</span><span class="p">):</span>
+    <span class="n">回答</span> <span class="o">=</span> <span class="k">await</span> <span class="n">跑_agent</span><span class="p">(</span><span class="n">模块</span><span class="p">,</span> <span class="s2">"北京今天天气怎么样？"</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">回答</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">回答</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="sa">f</span><span class="s2">"应返回字符串，实际 </span><span class="si">{</span><span class="n">回答</span><span class="si">!r}</span><span class="s2">"</span>
+    <span class="k">assert</span> <span class="s2">"25"</span> <span class="ow">in</span> <span class="n">回答</span> <span class="ow">or</span> <span class="s2">"晴"</span> <span class="ow">in</span> <span class="n">回答</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"天气回答应包含查询结果（25°C/晴），实际：</span><span class="si">{</span><span class="n">回答</span><span class="p">[:</span><span class="mi">80</span><span class="p">]</span><span class="si">!r}</span><span class="s2">"</span>
+    <span class="k">return</span> <span class="mi">15</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"✅ 天气问题闭环成功：</span><span class="si">{</span><span class="n">回答</span><span class="p">[:</span><span class="mi">50</span><span class="p">]</span><span class="si">!r}</span><span class="s2">"</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">检查_循环结构</span><span class="p">(</span><span class="n">文件路径</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""AST 检查：react_agent 必须有 for 循环 + await（异步 LLM 调用）"""</span>
+    <span class="n">树</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">文件路径</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">节点</span> <span class="ow">in</span> <span class="n">ast</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">树</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">节点</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">AsyncFunctionDef</span><span class="p">)</span> <span class="ow">and</span> <span class="n">节点</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"react_agent"</span><span class="p">:</span>
+            <span class="n">有for</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">子</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">For</span><span class="p">)</span> <span class="k">for</span> <span class="n">子</span> <span class="ow">in</span> <span class="n">ast</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">节点</span><span class="p">))</span>
+            <span class="n">有await</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">子</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Await</span><span class="p">)</span> <span class="k">for</span> <span class="n">子</span> <span class="ow">in</span> <span class="n">ast</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">节点</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">有for</span> <span class="ow">and</span> <span class="n">有await</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">"✅ react_agent 内有 for 循环（步数上限）和 await（异步调用）"</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"❌ react_agent 内缺少 for 循环或 await——必须有 max_steps 循环和异步 LLM 调用"</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"❌ 没有找到 react_agent 函数"</span>
+
+
+<span class="c1"># ==================== 主流程 ====================</span>
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">运行验收</span><span class="p">(</span><span class="n">验收员</span><span class="p">,</span> <span class="n">模块</span><span class="p">,</span> <span class="n">文件路径</span><span class="p">):</span>
+    <span class="k">await</span> <span class="n">验收员</span><span class="o">.</span><span class="n">检查</span><span class="p">(</span><span class="s2">"工具描述生成"</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">检查_工具描述</span><span class="p">,</span> <span class="n">模块</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">验收员</span><span class="o">.</span><span class="n">检查</span><span class="p">(</span><span class="s2">"执行工具"</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="n">检查_执行工具</span><span class="p">,</span> <span class="n">模块</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">验收员</span><span class="o">.</span><span class="n">检查</span><span class="p">(</span><span class="s2">"解析：Action 响应"</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="n">检查_解析_Action</span><span class="p">,</span> <span class="n">模块</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">验收员</span><span class="o">.</span><span class="n">检查</span><span class="p">(</span><span class="s2">"解析：Final Answer 响应"</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="n">检查_解析_FinalAnswer</span><span class="p">,</span> <span class="n">模块</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">验收员</span><span class="o">.</span><span class="n">检查</span><span class="p">(</span><span class="s2">"Agent 端到端：计算问题"</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">检查_Agent_计算</span><span class="p">,</span> <span class="n">模块</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">验收员</span><span class="o">.</span><span class="n">检查</span><span class="p">(</span><span class="s2">"Agent 端到端：天气问题"</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="n">检查_Agent_天气</span><span class="p">,</span> <span class="n">模块</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">验收员</span><span class="o">.</span><span class="n">检查</span><span class="p">(</span><span class="s2">"循环结构：for + await"</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">检查_循环结构</span><span class="p">,</span> <span class="n">文件路径</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
-    <span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
-    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Day 6 练习验收脚本&quot;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--file&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;day06_practice_template.py&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;练习文件路径&quot;</span><span class="p">)</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Day 6 练习验收脚本（行为级验收）"</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"--file"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">DEFAULT_FILE</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">"练习文件路径（默认 </span><span class="si">%(default)s</span><span class="s2">）"</span><span class="p">)</span>
     <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
     <span class="n">文件路径</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">file</span><span class="p">)</span>
-    <span class="n">验收</span><span class="p">(</span><span class="n">文件路径</span><span class="p">)</span>
+
+    <span class="n">打印</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="n">打印</span><span class="p">(</span><span class="s2">"📋 Day 6 练习验收 —— 纯 Python 手写 ReAct Agent"</span><span class="p">)</span>
+    <span class="n">打印</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="n">打印</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">📂 验收文件：</span><span class="si">{</span><span class="n">文件路径</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">文件路径</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="n">打印</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">❌ 文件不存在：</span><span class="si">{</span><span class="n">文件路径</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">RED</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"请先完成 day06_practice_template.py 中的 TODO，或用 --file 指定你的练习文件"</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">打印</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">【加载练习代码】（5分）"</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">CYAN</span><span class="p">)</span>
+    <span class="n">加载分</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">模块</span> <span class="o">=</span> <span class="n">加载学生模块</span><span class="p">(</span><span class="n">文件路径</span><span class="p">)</span>
+        <span class="n">打印</span><span class="p">(</span><span class="s2">"  ✅ 代码加载成功，没有语法错误"</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">GREEN</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">加载分</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">模块</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">打印</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  ❌ 加载失败：</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">RED</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"  💡 请先修复语法/运行错误再验收"</span><span class="p">)</span>
+
+    <span class="n">验收员</span> <span class="o">=</span> <span class="n">验收器</span><span class="p">()</span>
+    <span class="n">验收员</span><span class="o">.</span><span class="n">总分</span> <span class="o">+=</span> <span class="n">加载分</span>
+    <span class="k">if</span> <span class="n">模块</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">运行验收</span><span class="p">(</span><span class="n">验收员</span><span class="p">,</span> <span class="n">模块</span><span class="p">,</span> <span class="n">文件路径</span><span class="p">))</span>
+
+    <span class="n">总分</span> <span class="o">=</span> <span class="n">验收员</span><span class="o">.</span><span class="n">总分</span>
+    <span class="n">打印</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">总分</span> <span class="o">&gt;=</span> <span class="n">优秀线</span><span class="p">:</span>
+        <span class="n">打印</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  总分：</span><span class="si">{</span><span class="n">总分</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">满分</span><span class="si">}</span><span class="s2">   🎉 验收通过！你手写了一个能跑的 ReAct Agent！"</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">GREEN</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">总分</span> <span class="o">&gt;=</span> <span class="n">通过线</span><span class="p">:</span>
+        <span class="n">打印</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  总分：</span><span class="si">{</span><span class="n">总分</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">满分</span><span class="si">}</span><span class="s2">   ⚠️ 基本通过，建议按上面的提示完善"</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">YELLOW</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">打印</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  总分：</span><span class="si">{</span><span class="n">总分</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">满分</span><span class="si">}</span><span class="s2">   ❌ 未通过——先完成模板中标红的 TODO 再来验收"</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">RED</span><span class="p">)</span>
+    <span class="n">打印</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
 

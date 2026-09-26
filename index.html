@@ -5,116 +5,334 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Python 工程师 AI Agent 开发 15 天学习路线图</title>
     <style>
-        
-* { margin:0; padding:0; box-sizing:border-box; }
-body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    line-height:1.6; color:#333;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding:0;
+/* ===== Maple Mono 代码字体（自托管，OFL 开源协议） ===== */
+@font-face {
+    font-family:"Maple Mono";
+    font-style:normal; font-weight:400; font-display:swap;
+    src:url("fonts/maple-mono-latin-400-normal.woff2") format("woff2");
 }
+@font-face {
+    font-family:"Maple Mono";
+    font-style:normal; font-weight:700; font-display:swap;
+    src:url("fonts/maple-mono-latin-700-normal.woff2") format("woff2");
+}
+@font-face {
+    font-family:"Maple Mono";
+    font-style:italic; font-weight:400; font-display:swap;
+    src:url("fonts/maple-mono-latin-400-italic.woff2") format("woff2");
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    line-height:1.65; color:#1d1d1f;
+    background:#f5f5f7;
+    padding:0;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+}
+.nav-wrapper { display:flex; min-height:100vh; }
 .nav-sidebar {
     width:250px; min-width:250px;
-    background: #181825;
-    color: #ffffff;
-    padding: 20px 15px;
+    background:rgba(255,255,255,0.72);
+    -webkit-backdrop-filter:saturate(180%) blur(20px);
+    backdrop-filter:saturate(180%) blur(20px);
+    border-right:1px solid rgba(0,0,0,0.06);
+    color:#1d1d1f;
+    padding:24px 14px;
     font-size:14px;
     overflow-y:auto;
     height:100vh;
     position:sticky; top:0;
-    display:flex; flex-direction:column;
-    gap:2px;
+    display:flex; flex-direction:column; gap:2px;
 }
 .nav-sidebar h3 {
-    color:#f5c2e7; font-size:15px; margin:18px 0 8px 0;
-    border-bottom:1px solid #45475a; padding-bottom:6px;
+    color:#1d1d1f; font-size:15px; font-weight:700; margin:18px 0 10px;
 }
 .nav-sidebar h3:first-child { margin-top:0; }
 .nav-sidebar h4 {
-    color:#a6e3a1; font-size:13px; margin:14px 0 4px 0;
-    font-weight:600;
+    color:#86868b; font-size:11px; font-weight:600; margin:16px 0 4px;
+    text-transform:uppercase; letter-spacing:0.05em;
 }
 .nav-sidebar a {
-    color:#89dceb; display:block; padding:5px 12px; font-size:13px;
-    border-radius:4px; text-decoration:none; transition:background 0.2s, color 0.2s;
+    color:#424245; display:block; padding:6px 12px; font-size:13px;
+    border-radius:8px; text-decoration:none; transition:background .2s, color .2s;
 }
-.nav-sidebar a:hover {
-    background:#313244; color:#ffffff; text-decoration:none;
-}
-.nav-sidebar a.active {
-    background:#45475a; color:#ffffff; font-weight:700;
-    border-left:3px solid #f5c2e7; padding-left:9px;
-}
-.nav-wrapper { display:flex; min-height:100vh; }
+.nav-sidebar a:hover { background:rgba(0,0,0,0.05); color:#1d1d1f; text-decoration:none; }
+.nav-sidebar a.active { background:#0071e3; color:#ffffff; font-weight:600; }
 .main-content {
     flex:1; min-width:0;
-    margin:20px 20px 20px 0; background:white; border-radius:10px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    margin:16px 16px 16px 0;
+    background:#ffffff; border-radius:18px;
+    box-shadow:0 4px 24px rgba(0,0,0,0.05);
     overflow:hidden;
 }
 /* 返回顶部按钮 */
 .back-top {
-    position:fixed; bottom:30px; right:30px;
-    background:#667eea; color:white; border:none;
-    width:48px; height:48px; border-radius:50%;
-    cursor:pointer; font-size:20px;
-    box-shadow:0 4px 12px rgba(0,0,0,0.3); display:none; z-index:999;
-    transition:background 0.3s;
+    position:fixed; bottom:28px; right:28px;
+    background:rgba(255,255,255,0.82);
+    -webkit-backdrop-filter:saturate(180%) blur(16px);
+    backdrop-filter:saturate(180%) blur(16px);
+    color:#1d1d1f; border:1px solid rgba(0,0,0,0.08);
+    width:44px; height:44px; border-radius:50%;
+    cursor:pointer; font-size:18px;
+    box-shadow:0 4px 16px rgba(0,0,0,0.12); display:none; z-index:999;
+    transition:transform .2s, background .2s;
 }
-.back-top:hover { background:#764ba2; }
+.back-top:hover { background:#ffffff; transform:translateY(-2px); }
 
 /* ── 内容区样式 ── */
 .header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color:white; padding:40px; text-align:center;
+    background:#ffffff; color:#1d1d1f;
+    padding:56px 40px 40px; text-align:center;
+    border-bottom:1px solid rgba(0,0,0,0.06);
 }
-.header h1 { font-size:2.2em; margin-bottom:10px; text-shadow:2px 2px 4px rgba(0,0,0,0.2); }
-.header .meta { font-size:1.1em; opacity:0.9; }
-.content { padding:40px; }
-h1 { color:#667eea; border-bottom:3px solid #667eea; padding-bottom:10px; margin-top:30px; margin-bottom:20px; }
-h2 { color:#764ba2; margin-top:25px; margin-bottom:15px; border-left:5px solid #764ba2; padding-left:15px; }
-h3 { color:#555; margin-top:20px; margin-bottom:10px; }
-p { margin-bottom:15px; }
-.styled-table {
-    width:100%; border-collapse:collapse; margin:20px 0;
-    box-shadow:0 2px 15px rgba(0,0,0,0.1); border-radius:8px; overflow:hidden;
+.header h1 { font-size:2.4em; font-weight:700; letter-spacing:-0.02em; margin-bottom:10px; }
+.header .meta { font-size:1.05em; color:#86868b; }
+.content { padding:44px 48px; }
+h1 { color:#1d1d1f; font-size:2em; font-weight:700; letter-spacing:-0.02em; margin:36px 0 18px; }
+.content > h1:first-child { margin-top:0; }
+h2 { color:#1d1d1f; font-size:1.5em; font-weight:700; letter-spacing:-0.01em; margin:36px 0 16px; }
+h3 { color:#1d1d1f; font-size:1.15em; font-weight:600; margin:26px 0 10px; }
+h4 { color:#1d1d1f; font-size:1em; font-weight:600; margin:20px 0 8px; }
+p { margin-bottom:14px; color:#424245; }
+li { margin-bottom:8px; color:#424245; }
+strong { color:#1d1d1f; font-weight:600; }
+ul, ol { margin-left:24px; margin-bottom:14px; }
+a { color:#0071e3; text-decoration:none; transition:color .2s; }
+a:hover { color:#0077ed; text-decoration:underline; }
+hr { border:none; height:1px; background:#e8e8ed; margin:32px 0; }
+code {
+    font-family:"Maple Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+    font-size:0.88em;
+    background:rgba(0,0,0,0.055);
+    color:#1d1d1f;
+    padding:2px 6px; border-radius:6px;
 }
-.styled-table thead { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white; }
-.styled-table th, .styled-table td { padding:12px 15px; text-align:left; border-bottom:1px solid #ddd; }
-.styled-table tbody tr:hover { background-color:#f5f5f5; }
-.styled-table tbody tr:nth-of-type(even) { background-color:#f9f9f9; }
+pre { position:relative; overflow-x:auto; font-family:"Maple Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace; }
 .code-block {
-    background:#282c34; color:#abb2bf; padding:15px;
-    border-radius:8px; overflow-x:auto; margin:15px 0;
-    box-shadow:0 4px 6px rgba(0,0,0,0.1);
+    background:#f5f5f7; color:#1d1d1f; padding:18px 20px;
+    border-radius:14px; overflow-x:auto; margin:16px 0;
+    font-size:13.5px; line-height:1.55;
 }
-code { background:#f4f4f4; padding:2px 6px; border-radius:3px; font-family:'Courier New',monospace; color:#e83e8c; }
-.code-block code { background:transparent; color:inherit; padding:0; }
+.code-block code { background:transparent; color:inherit; padding:0; font-size:inherit; }
+.styled-table {
+    width:100%; border-collapse:separate; border-spacing:0;
+    margin:18px 0; border:1px solid #e8e8ed;
+    border-radius:12px; overflow:hidden;
+    font-size:14.5px;
+}
+.styled-table thead { background:#f5f5f7; }
+.styled-table th { padding:11px 16px; text-align:left; font-weight:600; color:#1d1d1f; }
+.styled-table td { padding:11px 16px; text-align:left; border-top:1px solid #e8e8ed; color:#424245; }
+.styled-table tbody tr:hover { background-color:#fafafa; }
 .note-block {
-    background:#fff3cd; border-left:5px solid #ffc107;
-    padding:15px; margin:15px 0; border-radius:4px;
+    background:#f5f5f7;
+    border-left:3px solid #0071e3;
+    padding:16px 20px; margin:18px 0; border-radius:12px;
 }
-ul, ol { margin-left:25px; margin-bottom:15px; }
-li { margin-bottom:8px; }
-a { color:#667eea; text-decoration:none; transition:color 0.3s; }
-a:hover { color:#764ba2; text-decoration:underline; }
-hr { border:none; height:2px; background:linear-gradient(to right,#667eea,#764ba2); margin:30px 0; }
-pre { position:relative; overflow-x:auto; }
-@media print { body { background:white; padding:0; } .main-content { box-shadow:none; } .nav-sidebar { display:none; } .back-top { display:none; } }
+.note-block p { margin-bottom:6px; color:#424245; }
+.note-block p:last-child { margin-bottom:0; }
+
+/* ===== 代码高亮配色（Xcode 浅色，Apple 文档风） ===== */
+pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: #eaeaf0 }
+.highlight { background: #f5f5f7; color: #1D1D1F }
+.highlight .c { color: #707F8C } /* Comment */
+.highlight .err { color: #C41A16 } /* Error */
+.highlight .k { color: #AD3DA4 } /* Keyword */
+.highlight .n { color: #1D1D1F } /* Name */
+.highlight .o { color: #1D1D1F } /* Operator */
+.highlight .p { color: #1D1D1F } /* Punctuation */
+.highlight .ch { color: #707F8C } /* Comment.Hashbang */
+.highlight .cm { color: #707F8C } /* Comment.Multiline */
+.highlight .cp { color: #78492A } /* Comment.Preproc */
+.highlight .cpf { color: #707F8C } /* Comment.PreprocFile */
+.highlight .c1 { color: #707F8C } /* Comment.Single */
+.highlight .cs { color: #707F8C } /* Comment.Special */
+.highlight .gd { color: #C41A16 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #C41A16 } /* Generic.Error */
+.highlight .gh { color: #1D1D1F; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #248A3D } /* Generic.Inserted */
+.highlight .go { color: #6E6E73 } /* Generic.Output */
+.highlight .gp { color: #707F8C } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #1D1D1F; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #C41A16 } /* Generic.Traceback */
+.highlight .kc { color: #AD3DA4 } /* Keyword.Constant */
+.highlight .kd { color: #AD3DA4 } /* Keyword.Declaration */
+.highlight .kn { color: #AD3DA4 } /* Keyword.Namespace */
+.highlight .kp { color: #AD3DA4 } /* Keyword.Pseudo */
+.highlight .kr { color: #AD3DA4 } /* Keyword.Reserved */
+.highlight .kt { color: #0B4F79 } /* Keyword.Type */
+.highlight .m { color: #1C00CF } /* Literal.Number */
+.highlight .s { color: #C41A16 } /* Literal.String */
+.highlight .na { color: #1D1D1F } /* Name.Attribute */
+.highlight .nb { color: #3E8087 } /* Name.Builtin */
+.highlight .nc { color: #3E8087 } /* Name.Class */
+.highlight .no { color: #1C00CF } /* Name.Constant */
+.highlight .nd { color: #78492A } /* Name.Decorator */
+.highlight .ni { color: #1D1D1F } /* Name.Entity */
+.highlight .ne { color: #0B4F79 } /* Name.Exception */
+.highlight .nf { color: #0B4F79 } /* Name.Function */
+.highlight .nl { color: #1D1D1F } /* Name.Label */
+.highlight .nn { color: #3E8087 } /* Name.Namespace */
+.highlight .nx { color: #1D1D1F } /* Name.Other */
+.highlight .py { color: #1D1D1F } /* Name.Property */
+.highlight .nt { color: #AD3DA4 } /* Name.Tag */
+.highlight .nv { color: #1D1D1F } /* Name.Variable */
+.highlight .ow { color: #AD3DA4 } /* Operator.Word */
+.highlight .pm { color: #1D1D1F } /* Punctuation.Marker */
+.highlight .w { color: #1D1D1F } /* Text.Whitespace */
+.highlight .mb { color: #1C00CF } /* Literal.Number.Bin */
+.highlight .mf { color: #1C00CF } /* Literal.Number.Float */
+.highlight .mh { color: #1C00CF } /* Literal.Number.Hex */
+.highlight .mi { color: #1C00CF } /* Literal.Number.Integer */
+.highlight .mo { color: #1C00CF } /* Literal.Number.Oct */
+.highlight .sa { color: #C41A16 } /* Literal.String.Affix */
+.highlight .sb { color: #C41A16 } /* Literal.String.Backtick */
+.highlight .sc { color: #C41A16 } /* Literal.String.Char */
+.highlight .dl { color: #C41A16 } /* Literal.String.Delimiter */
+.highlight .sd { color: #C41A16 } /* Literal.String.Doc */
+.highlight .s2 { color: #C41A16 } /* Literal.String.Double */
+.highlight .se { color: #A0410D } /* Literal.String.Escape */
+.highlight .sh { color: #C41A16 } /* Literal.String.Heredoc */
+.highlight .si { color: #C41A16 } /* Literal.String.Interpol */
+.highlight .sx { color: #C41A16 } /* Literal.String.Other */
+.highlight .sr { color: #C41A16 } /* Literal.String.Regex */
+.highlight .s1 { color: #C41A16 } /* Literal.String.Single */
+.highlight .ss { color: #C41A16 } /* Literal.String.Symbol */
+.highlight .bp { color: #3E8087 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #0B4F79 } /* Name.Function.Magic */
+.highlight .vc { color: #1D1D1F } /* Name.Variable.Class */
+.highlight .vg { color: #1D1D1F } /* Name.Variable.Global */
+.highlight .vi { color: #1D1D1F } /* Name.Variable.Instance */
+.highlight .vm { color: #3E8087 } /* Name.Variable.Magic */
+.highlight .il { color: #1C00CF } /* Literal.Number.Integer.Long */
+
+pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+pre.code-block .hll { background-color: #eaeaf0 }
+pre.code-block { background: #f5f5f7; color: #1D1D1F }
+pre.code-block .c { color: #707F8C } /* Comment */
+pre.code-block .err { color: #C41A16 } /* Error */
+pre.code-block .k { color: #AD3DA4 } /* Keyword */
+pre.code-block .n { color: #1D1D1F } /* Name */
+pre.code-block .o { color: #1D1D1F } /* Operator */
+pre.code-block .p { color: #1D1D1F } /* Punctuation */
+pre.code-block .ch { color: #707F8C } /* Comment.Hashbang */
+pre.code-block .cm { color: #707F8C } /* Comment.Multiline */
+pre.code-block .cp { color: #78492A } /* Comment.Preproc */
+pre.code-block .cpf { color: #707F8C } /* Comment.PreprocFile */
+pre.code-block .c1 { color: #707F8C } /* Comment.Single */
+pre.code-block .cs { color: #707F8C } /* Comment.Special */
+pre.code-block .gd { color: #C41A16 } /* Generic.Deleted */
+pre.code-block .ge { font-style: italic } /* Generic.Emph */
+pre.code-block .gr { color: #C41A16 } /* Generic.Error */
+pre.code-block .gh { color: #1D1D1F; font-weight: bold } /* Generic.Heading */
+pre.code-block .gi { color: #248A3D } /* Generic.Inserted */
+pre.code-block .go { color: #6E6E73 } /* Generic.Output */
+pre.code-block .gp { color: #707F8C } /* Generic.Prompt */
+pre.code-block .gs { font-weight: bold } /* Generic.Strong */
+pre.code-block .gu { color: #1D1D1F; font-weight: bold } /* Generic.Subheading */
+pre.code-block .gt { color: #C41A16 } /* Generic.Traceback */
+pre.code-block .kc { color: #AD3DA4 } /* Keyword.Constant */
+pre.code-block .kd { color: #AD3DA4 } /* Keyword.Declaration */
+pre.code-block .kn { color: #AD3DA4 } /* Keyword.Namespace */
+pre.code-block .kp { color: #AD3DA4 } /* Keyword.Pseudo */
+pre.code-block .kr { color: #AD3DA4 } /* Keyword.Reserved */
+pre.code-block .kt { color: #0B4F79 } /* Keyword.Type */
+pre.code-block .m { color: #1C00CF } /* Literal.Number */
+pre.code-block .s { color: #C41A16 } /* Literal.String */
+pre.code-block .na { color: #1D1D1F } /* Name.Attribute */
+pre.code-block .nb { color: #3E8087 } /* Name.Builtin */
+pre.code-block .nc { color: #3E8087 } /* Name.Class */
+pre.code-block .no { color: #1C00CF } /* Name.Constant */
+pre.code-block .nd { color: #78492A } /* Name.Decorator */
+pre.code-block .ni { color: #1D1D1F } /* Name.Entity */
+pre.code-block .ne { color: #0B4F79 } /* Name.Exception */
+pre.code-block .nf { color: #0B4F79 } /* Name.Function */
+pre.code-block .nl { color: #1D1D1F } /* Name.Label */
+pre.code-block .nn { color: #3E8087 } /* Name.Namespace */
+pre.code-block .nx { color: #1D1D1F } /* Name.Other */
+pre.code-block .py { color: #1D1D1F } /* Name.Property */
+pre.code-block .nt { color: #AD3DA4 } /* Name.Tag */
+pre.code-block .nv { color: #1D1D1F } /* Name.Variable */
+pre.code-block .ow { color: #AD3DA4 } /* Operator.Word */
+pre.code-block .pm { color: #1D1D1F } /* Punctuation.Marker */
+pre.code-block .w { color: #1D1D1F } /* Text.Whitespace */
+pre.code-block .mb { color: #1C00CF } /* Literal.Number.Bin */
+pre.code-block .mf { color: #1C00CF } /* Literal.Number.Float */
+pre.code-block .mh { color: #1C00CF } /* Literal.Number.Hex */
+pre.code-block .mi { color: #1C00CF } /* Literal.Number.Integer */
+pre.code-block .mo { color: #1C00CF } /* Literal.Number.Oct */
+pre.code-block .sa { color: #C41A16 } /* Literal.String.Affix */
+pre.code-block .sb { color: #C41A16 } /* Literal.String.Backtick */
+pre.code-block .sc { color: #C41A16 } /* Literal.String.Char */
+pre.code-block .dl { color: #C41A16 } /* Literal.String.Delimiter */
+pre.code-block .sd { color: #C41A16 } /* Literal.String.Doc */
+pre.code-block .s2 { color: #C41A16 } /* Literal.String.Double */
+pre.code-block .se { color: #A0410D } /* Literal.String.Escape */
+pre.code-block .sh { color: #C41A16 } /* Literal.String.Heredoc */
+pre.code-block .si { color: #C41A16 } /* Literal.String.Interpol */
+pre.code-block .sx { color: #C41A16 } /* Literal.String.Other */
+pre.code-block .sr { color: #C41A16 } /* Literal.String.Regex */
+pre.code-block .s1 { color: #C41A16 } /* Literal.String.Single */
+pre.code-block .ss { color: #C41A16 } /* Literal.String.Symbol */
+pre.code-block .bp { color: #3E8087 } /* Name.Builtin.Pseudo */
+pre.code-block .fm { color: #0B4F79 } /* Name.Function.Magic */
+pre.code-block .vc { color: #1D1D1F } /* Name.Variable.Class */
+pre.code-block .vg { color: #1D1D1F } /* Name.Variable.Global */
+pre.code-block .vi { color: #1D1D1F } /* Name.Variable.Instance */
+pre.code-block .vm { color: #3E8087 } /* Name.Variable.Magic */
+pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
+
+/* ===== 代码窗容器：浅灰底 ===== */
+.highlight {
+    background:#f5f5f7; color:#1d1d1f;
+    border-radius:14px; padding:18px 20px;
+    overflow-x:auto; margin:16px 0;
+}
+.highlight pre { margin:0; background:transparent; padding:0; }
+.highlight code { background:transparent; color:inherit; padding:0; }
+
+    .file-info {
+        background:#f5f5f7; padding:10px 16px; border-radius:12px;
+        margin-bottom:18px; font-size:14px; color:#6e6e73;
+        display:flex; align-items:center; justify-content:space-between;
+        flex-wrap:wrap; gap:8px;
+    }
+    .file-info .info-left { display:flex; align-items:center; gap:8px; }
+    .download-btn {
+        display:inline-flex; align-items:center; gap:5px;
+        background:#0071e3; color:#fff; border:none;
+        padding:7px 16px; border-radius:980px; font-size:13px;
+        text-decoration:none; cursor:pointer; white-space:nowrap;
+        transition: background .2s;
+    }
+    .download-btn:hover { background:#0077ed; }
+
+@media print { body { background:#fff; padding:0; } .main-content { box-shadow:none; } .nav-sidebar { display:none; } .back-top { display:none; } }
 @media (max-width:900px) {
-    .nav-sidebar { width:200px; min-width:200px; font-size:13px; padding:15px 10px; }
-    .header h1 { font-size:1.6em; }
-    .content { padding:20px; }
+    .nav-sidebar { width:200px; min-width:200px; font-size:13px; padding:16px 10px; }
+    .header h1 { font-size:1.8em; }
+    .content { padding:24px; }
 }
 @media (max-width:650px) {
     .nav-wrapper { flex-direction:column; }
-    .nav-sidebar { width:100%; min-width:100%; height:auto; position:relative; flex-direction:row; flex-wrap:wrap; gap:5px; padding:10px; }
+    .nav-sidebar { width:100%; min-width:100%; height:auto; position:relative; flex-direction:row; flex-wrap:wrap; gap:5px; padding:12px; }
     .nav-sidebar h3, .nav-sidebar h4 { display:none; }
 }
-
-        
-        
-    </style>
+</style>
 </head>
 <body>
 <div class="nav-wrapper">
@@ -126,25 +344,35 @@ pre { position:relative; overflow-x:auto; }
 <a class="" href="tutorial_01_decorators.html">装饰器 8 步教程</a>
 <a class="" href="tutorial_02_async.html">异步 9 步教程</a>
 <h4>Day 1-3 (基础)</h4>
+<a class="" href="day01_lesson.html">Day 1 - 学习</a>
 <a class="" href="day01_practice_template.html">Day 1 - 模板</a>
 <a class="" href="day01_practice_validator.html">Day 1 - 验收</a>
+<a class="" href="day02_lesson.html">Day 2 - 学习</a>
 <a class="" href="day02_practice_template.html">Day 2 - 模板</a>
 <a class="" href="day02_practice_validator.html">Day 2 - 验收</a>
+<a class="" href="day03_lesson.html">Day 3 - 学习</a>
 <a class="" href="day03_practice_template.html">Day 3 - 模板</a>
 <a class="" href="day03_practice_validator.html">Day 3 - 验收</a>
 <h4>Day 4-5 (LLM)</h4>
+<a class="" href="day04_lesson.html">Day 4 - 学习</a>
 <a class="" href="day04_practice_template.html">Day 4 - 模板</a>
 <a class="" href="day04_practice_validator.html">Day 4 - 验收</a>
+<a class="" href="day05_lesson.html">Day 5 - 学习</a>
 <a class="" href="day05_practice_template.html">Day 5 - 模板</a>
 <a class="" href="day05_practice_validator.html">Day 5 - 验收</a>
 <h4>Day 6-7 (Agent)</h4>
+<a class="" href="day06_lesson.html">Day 6 - 学习</a>
 <a class="" href="day06_practice_template.html">Day 6 - 模板</a>
 <a class="" href="day06_practice_validator.html">Day 6 - 验收</a>
+<a class="" href="day07_lesson.html">Day 7 - 学习</a>
 <a class="" href="day07_practice_template.html">Day 7 - 模板</a>
 <a class="" href="day07_practice_validator.html">Day 7 - 验收</a>
 <h4>Day 8-10 (高级)</h4>
+<a class="" href="day08_lesson.html">Day 8 - 学习</a>
 <a class="" href="day08_practice_template.html">Day 8 - 模板</a>
+<a class="" href="day09_lesson.html">Day 9 - 学习</a>
 <a class="" href="day09_practice_template.html">Day 9 - 模板</a>
+<a class="" href="day10_lesson.html">Day 10 - 学习</a>
 <a class="" href="day10_practice_template.html">Day 10 - 模板</a>
 </div>
 <div class="main-content">
@@ -154,7 +382,8 @@ pre { position:relative; overflow-x:auto; }
 <blockquote class="note-block">
 <p><strong>目标</strong>: 15 天后能独立开发 AI Agent<br/>
 <strong>每日投入</strong>: 约 2 小时（总计约 30 小时）<br/>
-<strong>学习方式</strong>: 理论 30% + 编码 50% + 项目实战 20%</p>
+<strong>学习方式</strong>: 理论 30% + 编码 50% + 项目实战 20%<br/>
+<strong>环境要求</strong>: Python ≥ 3.11（教程用到 <code>asyncio.timeout</code>），依赖见 <code>requirements.txt</code></p>
 </blockquote>
 <hr/>
 <h2 id="_1">总览：三阶段递进</h2>
@@ -168,6 +397,7 @@ pre { position:relative; overflow-x:auto; }
 <p><strong>目标</strong>: 补齐 Python 异步/并发/类型系统等高级特性，掌握 LLM API 调用与 Prompt 工程</p>
 </blockquote>
 <h3 id="day-1">Day 1：异步编程核心</h3>
+<p>📖 <strong><a href="day01_lesson.html">打开 Day 1 学习页</a></strong>：今天学什么、按什么顺序学、每一步做到什么程度，都在这一页里</p>
 <table class="styled-table">
 <thead>
 <tr>
@@ -284,15 +514,20 @@ pre { position:relative; overflow-x:auto; }
     <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">结果们</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"🔧 </span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">'工具'</span><span class="p">]</span><span class="si">}</span><span class="s2">：</span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">'结果'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </code></pre></div>
-<p><strong>免费资源</strong>:
-- <a href="https://realpython.com/async-io-python/">Real Python: Async IO in Python</a>
-- <a href="https://docs.python.org/3/library/asyncio.html">Python 官方 asyncio 文档</a></p>
-<p><strong>避坑</strong>:
-- ❌ 不要在 async 函数里用 <code>time.sleep()</code>，用 <code>asyncio.sleep()</code>
-- ❌ <code>asyncio.run()</code> 只能在主线程调用一次
-- ✅ 优先用 <code>asyncio.gather()</code> 而非逐个 <code>await</code></p>
+<p><strong>免费资源</strong>:</p>
+<ul>
+<li><a href="https://realpython.com/async-io-python/">Real Python: Async IO in Python</a></li>
+<li><a href="https://docs.python.org/3/library/asyncio.html">Python 官方 asyncio 文档</a></li>
+</ul>
+<p><strong>避坑</strong>:</p>
+<ul>
+<li>❌ 不要在 async 函数里用 <code>time.sleep()</code>，用 <code>asyncio.sleep()</code></li>
+<li>❌ <code>asyncio.run()</code> 只能在主线程调用一次</li>
+<li>✅ 优先用 <code>asyncio.gather()</code> 而非逐个 <code>await</code></li>
+</ul>
 <hr/>
 <h3 id="day-2">Day 2：类型系统与装饰器进阶</h3>
+<p>📖 <strong><a href="day02_lesson.html">打开 Day 2 学习页</a></strong>：今天学什么、按什么顺序学、每一步做到什么程度，都在这一页里</p>
 <table class="styled-table">
 <thead>
 <tr>
@@ -440,14 +675,19 @@ pre { position:relative; overflow-x:auto; }
 <span class="nb">print</span><span class="p">(</span><span class="n">查天气</span><span class="p">(</span><span class="s2">"北京"</span><span class="p">))</span>         <span class="c1"># 输出: {'城市': '北京', '温度': '25°C', ...}</span>
 </code></pre></div>
 <p><strong>练习项目</strong>: 用 Pydantic 定义 Agent 的 Tool 输入输出 Schema，并用装饰器实现工具注册机制</p>
-<p><strong>免费资源</strong>:
-- <a href="https://mypy.readthedocs.io/">mypy 官方文档</a>
-- <a href="https://docs.pydantic.dev/latest/">Pydantic V2 文档</a></p>
-<p><strong>避坑</strong>:
-- ❌ Pydantic v1 和 v2 API 不兼容，确认版本用 v2
-- ✅ 类型提示不是运行时检查，配合 mypy 做静态检查</p>
+<p><strong>免费资源</strong>:</p>
+<ul>
+<li><a href="https://mypy.readthedocs.io/">mypy 官方文档</a></li>
+<li><a href="https://docs.pydantic.dev/latest/">Pydantic V2 文档</a></li>
+</ul>
+<p><strong>避坑</strong>:</p>
+<ul>
+<li>❌ Pydantic v1 和 v2 API 不兼容，确认版本用 v2</li>
+<li>✅ 类型提示不是运行时检查，配合 mypy 做静态检查</li>
+</ul>
 <hr/>
 <h3 id="day-3">Day 3：生成器、迭代器与上下文管理器</h3>
+<p>📖 <strong><a href="day03_lesson.html">打开 Day 3 学习页</a></strong>：今天学什么、按什么顺序学、每一步做到什么程度，都在这一页里</p>
 <table class="styled-table">
 <thead>
 <tr>
@@ -475,14 +715,19 @@ pre { position:relative; overflow-x:auto; }
 </tbody>
 </table>
 <p><strong>练习项目</strong>: 实现一个流式 LLM 响应的异步生成器包装器</p>
-<p><strong>免费资源</strong>:
-- <a href="https://docs.python.org/3/library/itertools.html">Python 官方 itertools 文档</a>
-- <a href="https://realpython.com/introduction-to-python-generators/">Real Python: Generators</a></p>
-<p><strong>避坑</strong>:
-- ❌ 生成器只能遍历一次，需要重复使用转为 <code>list</code>
-- ✅ 大文件/流式数据必须用生成器，否则内存爆</p>
+<p><strong>免费资源</strong>:</p>
+<ul>
+<li><a href="https://docs.python.org/3/library/itertools.html">Python 官方 itertools 文档</a></li>
+<li><a href="https://realpython.com/introduction-to-python-generators/">Real Python: Generators</a></li>
+</ul>
+<p><strong>避坑</strong>:</p>
+<ul>
+<li>❌ 生成器只能遍历一次，需要重复使用转为 <code>list</code></li>
+<li>✅ 大文件/流式数据必须用生成器，否则内存爆</li>
+</ul>
 <hr/>
 <h3 id="day-4llm-api-prompt">Day 4：LLM API 调用与 Prompt 工程</h3>
+<p>📖 <strong><a href="day04_lesson.html">打开 Day 4 学习页</a></strong>：今天学什么、按什么顺序学、每一步做到什么程度，都在这一页里</p>
 <table class="styled-table">
 <thead>
 <tr>
@@ -510,16 +755,21 @@ pre { position:relative; overflow-x:auto; }
 </tbody>
 </table>
 <p><strong>练习项目</strong>: 实现一个支持 Function Calling 的 LLM 客户端，LLM 能调用你预先注册的 Python 函数</p>
-<p><strong>免费资源</strong>:
-- <a href="https://platform.openai.com/docs/guides/function-calling">OpenAI Function Calling 指南</a>
-- <a href="https://platform.deepseek.com/api-docs/">DeepSeek API 文档</a>（免费额度）
-- <a href="https://www.promptingguide.ai/zh">Prompt Engineering Guide</a></p>
-<p><strong>避坑</strong>:
-- ❌ Function Calling 返回的 JSON 可能格式错误，必须加 try/except + 重试
-- ✅ System Prompt 要精简，太长 LLM 容易忽略
-- ✅ 国内用 DeepSeek / Qwen / Moonshot API 都有免费额度</p>
+<p><strong>免费资源</strong>:</p>
+<ul>
+<li><a href="https://platform.openai.com/docs/guides/function-calling">OpenAI Function Calling 指南</a></li>
+<li><a href="https://api-docs.deepseek.com/">DeepSeek API 文档</a>（免费额度）</li>
+<li><a href="https://www.promptingguide.ai/zh">Prompt Engineering Guide</a></li>
+</ul>
+<p><strong>避坑</strong>:</p>
+<ul>
+<li>❌ Function Calling 返回的 JSON 可能格式错误，必须加 try/except + 重试</li>
+<li>✅ System Prompt 要精简，太长 LLM 容易忽略</li>
+<li>✅ 国内用 DeepSeek / Qwen / Moonshot API 都有免费额度</li>
+</ul>
 <hr/>
 <h3 id="day-5-ai">Day 5：阶段一实战——命令行 AI 助手</h3>
+<p>📖 <strong><a href="day05_lesson.html">打开 Day 5 学习页</a></strong>：今天学什么、按什么顺序学、每一步做到什么程度，都在这一页里</p>
 <table class="styled-table">
 <thead>
 <tr>
@@ -536,18 +786,21 @@ pre { position:relative; overflow-x:auto; }
 </tr>
 </tbody>
 </table>
-<p><strong>项目需求</strong>:
-- 用户输入自然语言，LLM 理解意图
-- 支持工具调用：查天气（模拟）、计算器、文件搜索
-- 异步并发处理多个工具调用
-- 流式输出回复内容
-- 用 Pydantic 定义所有数据结构</p>
+<p><strong>项目需求</strong>:</p>
+<ul>
+<li>用户输入自然语言，LLM 理解意图</li>
+<li>支持工具调用：查天气（模拟）、计算器、文件搜索</li>
+<li>异步并发处理多个工具调用</li>
+<li>流式输出回复内容</li>
+<li>用 Pydantic 定义所有数据结构</li>
+</ul>
 <hr/>
 <h2 id="ai-agent-day-6-10">阶段二：AI Agent 核心架构（Day 6-10）</h2>
 <blockquote class="note-block">
 <p><strong>目标</strong>: 掌握 Agent 四大核心模块——规划(Planning)、工具(Tools)、记忆(Memory)、执行(Action)，能用 LangChain/LangGraph 构建多步推理 Agent</p>
 </blockquote>
 <h3 id="day-6agent">Day 6：Agent 架构原理</h3>
+<p>📖 <strong><a href="day06_lesson.html">打开 Day 6 学习页</a></strong>：今天学什么、按什么顺序学、每一步做到什么程度，都在这一页里</p>
 <table class="styled-table">
 <thead>
 <tr>
@@ -581,14 +834,19 @@ pre { position:relative; overflow-x:auto; }
             <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">content</span>  <span class="c1"># 最终回答</span>
     <span class="k">return</span> <span class="s2">"达到最大步数限制"</span>
 </code></pre></div>
-<p><strong>免费资源</strong>:
-- <a href="https://arxiv.org/abs/2210.03629">ReAct 论文解读</a>
-- <a href="https://lilianweng.github.io/posts/2023-06-23-agent/">Lilian Weng: LLM Powered Autonomous Agents</a></p>
-<p><strong>避坑</strong>:
-- ❌ 不设 <code>max_steps</code> 上限，Agent 可能无限循环
-- ✅ 每步记录 token 消耗，防止成本失控</p>
+<p><strong>免费资源</strong>:</p>
+<ul>
+<li><a href="https://arxiv.org/abs/2210.03629">ReAct 论文解读</a></li>
+<li><a href="https://lilianweng.github.io/posts/2023-06-23-agent/">Lilian Weng: LLM Powered Autonomous Agents</a></li>
+</ul>
+<p><strong>避坑</strong>:</p>
+<ul>
+<li>❌ 不设 <code>max_steps</code> 上限，Agent 可能无限循环</li>
+<li>✅ 每步记录 token 消耗，防止成本失控</li>
+</ul>
 <hr/>
 <h3 id="day-7langchain-langgraph">Day 7：LangChain + LangGraph 入门</h3>
+<p>📖 <strong><a href="day07_lesson.html">打开 Day 7 学习页</a></strong>：今天学什么、按什么顺序学、每一步做到什么程度，都在这一页里</p>
 <table class="styled-table">
 <thead>
 <tr>
@@ -616,15 +874,20 @@ pre { position:relative; overflow-x:auto; }
 </tbody>
 </table>
 <p><strong>练习项目</strong>: 用 LangGraph 实现一个带条件分支的 ReAct Agent</p>
-<p><strong>免费资源</strong>:
-- <a href="https://langchain-ai.github.io/langgraph/tutorials/">LangGraph 官方教程</a>
-- <a href="https://python.langchain.com/docs/">LangChain 文档</a></p>
-<p><strong>避坑</strong>:
-- ❌ LangChain 版本更新频繁（0.1 → 0.2 → 0.3），注意看文档版本
-- ❌ 不要过度依赖 LangChain 高层封装，理解底层原理后再用
-- ✅ LangGraph 比 LangChain AgentExecutor 更灵活，优先学</p>
+<p><strong>免费资源</strong>:</p>
+<ul>
+<li><a href="https://langchain-ai.github.io/langgraph/tutorials/">LangGraph 官方教程</a></li>
+<li><a href="https://python.langchain.com/docs/">LangChain 文档</a></li>
+</ul>
+<p><strong>避坑</strong>:</p>
+<ul>
+<li>❌ LangChain 版本更新频繁（0.1 → 0.2 → 0.3），注意看文档版本</li>
+<li>❌ 不要过度依赖 LangChain 高层封装，理解底层原理后再用</li>
+<li>✅ LangGraph 比 LangChain AgentExecutor 更灵活，优先学</li>
+</ul>
 <hr/>
 <h3 id="day-8-mcp">Day 8：工具系统与 MCP 协议</h3>
+<p>📖 <strong><a href="day08_lesson.html">打开 Day 8 学习页</a></strong>：今天学什么、按什么顺序学、每一步做到什么程度，都在这一页里</p>
 <table class="styled-table">
 <thead>
 <tr>
@@ -652,15 +915,20 @@ pre { position:relative; overflow-x:auto; }
 </tbody>
 </table>
 <p><strong>练习项目</strong>: 写一个简单的 MCP Server（提供文件操作工具），在 Agent 中调用</p>
-<p><strong>免费资源</strong>:
-- <a href="https://modelcontextprotocol.io/">MCP 官方文档</a>
-- <a href="https://github.com/modelcontextprotocol/python-sdk">MCP Python SDK</a></p>
-<p><strong>避坑</strong>:
-- ❌ 工具描述（docstring）要清晰精确，这直接影响 LLM 选择工具的正确率
-- ✅ 每个工具函数加超时装饰器，防止工具卡死整个 Agent
-- ✅ 工具返回结果要结构化（JSON），方便 LLM 理解</p>
+<p><strong>免费资源</strong>:</p>
+<ul>
+<li><a href="https://modelcontextprotocol.io/">MCP 官方文档</a></li>
+<li><a href="https://github.com/modelcontextprotocol/python-sdk">MCP Python SDK</a></li>
+</ul>
+<p><strong>避坑</strong>:</p>
+<ul>
+<li>❌ 工具描述（docstring）要清晰精确，这直接影响 LLM 选择工具的正确率</li>
+<li>✅ 每个工具函数加超时装饰器，防止工具卡死整个 Agent</li>
+<li>✅ 工具返回结果要结构化（JSON），方便 LLM 理解</li>
+</ul>
 <hr/>
 <h3 id="day-9-rag">Day 9：记忆系统与 RAG</h3>
+<p>📖 <strong><a href="day09_lesson.html">打开 Day 9 学习页</a></strong>：今天学什么、按什么顺序学、每一步做到什么程度，都在这一页里</p>
 <table class="styled-table">
 <thead>
 <tr>
@@ -688,15 +956,20 @@ pre { position:relative; overflow-x:auto; }
 </tbody>
 </table>
 <p><strong>练习项目</strong>: 实现一个能记住对话历史、并能从文档库检索知识的 Agent</p>
-<p><strong>免费资源</strong>:
-- <a href="https://docs.trychroma.com/">ChromaDB 文档</a>
-- <a href="https://python.langchain.com/docs/tutorials/rag/">LangChain RAG 教程</a></p>
-<p><strong>避坑</strong>:
-- ❌ 对话历史过长超出 token 限制 → 必须实现滑动窗口或摘要压缩
-- ❌ Embedding 模型选错（中英文不匹配）→ 中文用 <code>text-embedding-3-small</code> 或 <code>bge-large-zh</code>
-- ✅ 记忆不是越长越好，关键是相关性检索</p>
+<p><strong>免费资源</strong>:</p>
+<ul>
+<li><a href="https://docs.trychroma.com/">ChromaDB 文档</a></li>
+<li><a href="https://python.langchain.com/docs/tutorials/rag/">LangChain RAG 教程</a></li>
+</ul>
+<p><strong>避坑</strong>:</p>
+<ul>
+<li>❌ 对话历史过长超出 token 限制 → 必须实现滑动窗口或摘要压缩</li>
+<li>❌ Embedding 模型选错（中英文不匹配）→ 中文用 <code>text-embedding-3-small</code> 或 <code>bge-large-zh</code></li>
+<li>✅ 记忆不是越长越好，关键是相关性检索</li>
+</ul>
 <hr/>
 <h3 id="day-10-agent">Day 10：阶段二实战——多工具 Agent</h3>
+<p>📖 <strong><a href="day10_lesson.html">打开 Day 10 学习页</a></strong>：今天学什么、按什么顺序学、每一步做到什么程度，都在这一页里</p>
 <table class="styled-table">
 <thead>
 <tr>
@@ -713,24 +986,29 @@ pre { position:relative; overflow-x:auto; }
 </tr>
 </tbody>
 </table>
-<p><strong>项目需求</strong>:
-- 至少集成 4 个工具（计算器、网页搜索、文件读写、代码执行）
-- ReAct 循环 + 条件路由
-- 对话记忆（短期 10 轮 + 长期向量存储）
-- 流式输出
-- 错误恢复（工具调用失败自动重试或降级）</p>
+<p><strong>项目需求</strong>:</p>
+<ul>
+<li>至少集成 4 个工具（计算器、网页搜索、文件读写、代码执行）</li>
+<li>ReAct 循环 + 条件路由</li>
+<li>对话记忆（短期 10 轮 + 长期向量存储）</li>
+<li>流式输出</li>
+<li>错误恢复（工具调用失败自动重试或降级）</li>
+</ul>
 <hr/>
 <h2 id="agent-day-11-15">阶段三：完整 Agent 实战项目（Day 11-15）</h2>
 <blockquote class="note-block">
-<p><strong>目标</strong>: 从零开发一个完整的、可部署的 AI Agent 应用</p>
+<p><strong>目标</strong>: 从零开发一个完整的、可部署的 AI Agent 应用<br/>
+<strong>说明</strong>: 阶段三是自主项目实战，不提供固定模板——按下面的路线和<a href="ACCEPTANCE_CRITERIA.html">验收标准文档</a>中的 Day 11-15 交付清单推进，架构可参考 Day 1-10 已完成的模块</p>
 </blockquote>
 <h3 id="day-11-12">Day 11-12：项目设计与核心开发</h3>
-<p><strong>项目选题——「智能开发助手 Agent」</strong>:
-- 理解用户自然语言需求
-- 能搜索文档/代码
-- 能读写文件
-- 能执行 Shell 命令
-- 多步推理完成任务</p>
+<p><strong>项目选题——「智能开发助手 Agent」</strong>:</p>
+<ul>
+<li>理解用户自然语言需求</li>
+<li>能搜索文档/代码</li>
+<li>能读写文件</li>
+<li>能执行 Shell 命令</li>
+<li>多步推理完成任务</li>
+</ul>
 <table class="styled-table">
 <thead>
 <tr>

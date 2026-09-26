@@ -77,13 +77,17 @@ class MockMCPServer:
             
             @functools.wraps(func)
             async def wrapper(*args, **kwargs):
-                # 超时控制
+                # 超时控制：异步工具直接 await，同步工具放到线程池
+                # （注意：两种分支各自只调用一次 func，不要重复调用！）
                 try:
-                    result = await asyncio.wait_for(
-                        func(*args, **kwargs) if asyncio.iscoroutine(func(*args, **kwargs))
-                        else asyncio.to_thread(func, *args, **kwargs),
-                        timeout=30
-                    )
+                    if asyncio.iscoroutinefunction(func):
+                        result = await asyncio.wait_for(
+                            func(*args, **kwargs), timeout=30
+                        )
+                    else:
+                        result = await asyncio.wait_for(
+                            asyncio.to_thread(func, *args, **kwargs), timeout=30
+                        )
                     return result
                 except asyncio.TimeoutError:
                     return "工具执行超时"
@@ -195,6 +199,14 @@ async def main():
     print("Day 8 练习：MCP Server")
     print("=" * 60)
     
+    # 友好提示：TODO 2.1 未完成时给出指引，而不是直接崩溃
+    if mcp_server.get_tool_list() is None:
+        print("\n⚠️ 检测到 TODO 2.1（get_tool_list）尚未实现，测试无法进行。请先完成：")
+        print("   1. TODO 2.1：实现 MockMCPServer.get_tool_list")
+        print("   2. TODO 2.2：实现 MockMCPServer.call_tool")
+        print("   3. TODO 4.x：实现 MCPClient 和 Agent 集成")
+        return
+    
     # 测试 1：查看 MCP Server 中的工具
     print("\n📝 测试 1：查看注册的工具")
     tool_list = mcp_server.get_tool_list()
@@ -216,9 +228,14 @@ async def main():
     print(f"  Agent 回答: {result}")
     
     print("\n" + "=" * 60)
-    print("✅ 所有测试完成！现在运行 python day08_practice_validator.py 验收")
+    print("✅ 所有测试完成！")
+    print("📋 本 Day 没有自动验收脚本，请按 ACCEPTANCE_CRITERIA.html 的 Day 8 清单自查")
     print("=" * 60)
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except Exception as e:
+        print(f"\n⚠️ 运行中断：{type(e).__name__}: {e}")
+        print("💡 这通常是因为上面的 TODO 还没有完成。请先实现各个任务函数，再运行本文件。")

@@ -189,23 +189,49 @@ async def mock_llm_call(prompt: str) -> str:
     """
     模拟 LLM 调用（用于本地测试，不消耗 API 额度）
     
-    根据 prompt 的内容，返回一个符合 ReAct 格式的模拟响应
-    用于测试 ReAct 循环逻辑是否正确
+    根据 prompt 的内容，返回一个符合 ReAct 格式的模拟响应。
+    判定规则：
+    1. 找 prompt 中最后一个真实的 Action 行（忽略格式说明里的占位行）；
+    2. 如果该 Action 后面已经跟了 Observation，说明工具已执行过，
+       返回引用工具结果的 Final Answer → 循环正常终止；
+    3. 否则返回对应的 Action，让 Agent 去执行工具。
+    
+    因此只要你的 react_agent 按 ReAct 格式把历史步骤拼进 prompt，
+    第 2 轮就会拿到 Final Answer，不会死循环。
     """
-    # 检测是否包含计算相关问题
-    if "计算" in prompt or "加" in prompt or "减" in prompt or "+" in prompt:
+    # 1. 找最后一个真实 Action（排除格式说明中的占位行，如 "Action: [工具名]"）
+    real_actions = [
+        m for m in re.finditer(r"Action:\s*(.+)", prompt)
+        if "[" not in m.group(1) and "工具名" not in m.group(1)
+    ]
+    
+    if real_actions:
+        last = real_actions[-1]
+        after_action = prompt[last.end():]
+        if "Observation:" in after_action:
+            obs_match = re.search(r"Observation:\s*(.+)", after_action)
+            observation = obs_match.group(1).strip() if obs_match else ""
+            return f"""Thought: 我已经通过工具调用获得了所需信息
+Final Answer: 根据工具返回的结果（{observation}），问题已解决。"""
+    
+    # 2. 还没执行过工具 → 返回 Action 让 Agent 执行
+    #    关键词只匹配用户的 Question 行，避免被工具描述里的示例（如 "3 + 5 * 2"）干扰
+    question_match = re.search(r"Question:\s*(.+)$", prompt, re.MULTILINE)
+    判定文本 = question_match.group(1) if question_match else prompt
+
+    if "计算" in 判定文本 or "加" in 判定文本 or "减" in 判定文本 or "+" in 判定文本:
         return """Thought: 我需要计算这个表达式的结果
 Action: Calculator
 Action Input: 3 + 5 * 2"""
     
-    if "天气" in prompt:
+    if "天气" in 判定文本:
         return """Thought: 我需要查询北京的天气
 Action: Weather
 Action Input: 北京"""
     
-    # 默认最终回答
-    return """Thought: 我已经通过工具调用获得了所需信息
-Final Answer: 根据查询结果，答案是 13。"""
+    # 3. 不需要工具的问题，直接回答
+    return """Thought: 这个问题不需要使用工具
+Final Answer: 我是直接根据已知知识回答的。"""
 
 
 # ==================== 任务 5：用真实 LLM API 替换 mock ====================
@@ -263,4 +289,8 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except Exception as e:
+        print(f"\n⚠️ 运行中断：{type(e).__name__}: {e}")
+        print("💡 这通常是因为上面的 TODO 还没有完成。请先实现各个任务函数，再运行本文件。")

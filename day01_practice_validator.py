@@ -1,394 +1,217 @@
 """
-Day 1 练习项目验收脚本
+Day 1 练习项目验收脚本（行为级验收）
 异步批量调用多个 API（模拟 Agent 多工具并发调用）
 
-运行方式：python day01_practice_validator.py
-功能：自动检测你的练习代码并提供反馈
+运行方式：
+    python day01_practice_validator.py                  # 验收默认模板文件
+    python day01_practice_validator.py --file 你的练习.py
+
+验收方式：
+    直接调用你实现的函数，检查返回结果和真实耗时。
+    空白模板无法通过验收，只有真正完成 TODO 才能得分。
 """
 
+import argparse
+import ast
 import asyncio
-import time
-import inspect
 import importlib.util
+import inspect
+import io
+import os
+import sys
+import time
+import types
+from contextlib import redirect_stdout
 from pathlib import Path
 
-print("=" * 70)
-print("📋 Day 1 练习项目验收工具")
-print("=" * 70)
-print()
+os.system("")  # 让 Windows 终端支持 ANSI 颜色
 
-# ========================================
-# 第 1 步：检查是否有练习代码文件
-# ========================================
+DEFAULT_FILE = "day01_practice_template.py"
+满分 = 100
+通过线 = 60
+优秀线 = 80
 
-print("【第 1 步】检查练习代码文件...")
-print("-" * 70)
 
-练习文件列表 = [
-    "day01_practice.py",
-    "practice_day01.py", 
-    "async_practice.py",
-    "day1.py",
-]
+class C:
+    GREEN = "\033[92m"
+    YELLOW = "\033[93m"
+    RED = "\033[91m"
+    CYAN = "\033[96m"
+    END = "\033[0m"
 
-用户代码文件 = None
-for 文件名 in 练习文件列表:
-    if Path(文件名).exists():
-        用户代码文件 = 文件名
-        print(f"✅ 找到练习文件：{文件名}")
-        break
 
-if 用户代码文件 is None:
-    print("❌ 未找到练习代码文件")
-    print("请创建以下名称之一的文件：")
-    for 文件名 in 练习文件列表:
-        print(f"   - {文件名}")
-    print()
-    print("💡 如果文件名不同，请手动修改本脚本的「练习文件列表」")
-else:
-    print(f"📂 将加载：{用户代码文件}")
-    print()
+def 打印(文本, 颜色=None):
+    print(f"{颜色}{文本}{C.END}" if 颜色 else 文本)
 
-# ========================================
-# 第 2 步：加载用户的代码
-# ========================================
 
-if 用户代码文件:
-    print("【第 2 步】加载并分析你的代码...")
-    print("-" * 70)
-    
-    try:
-        # 动态加载用户的 Python 文件
-        spec = importlib.util.spec_from_file_location("user_code", 用户代码文件)
-        用户模块 = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(用户模块)
-        print(f"✅ 代码加载成功！没有语法错误")
-        
-        # 分析模块中有哪些函数/类
-        所有函数 = [name for name in dir(用户模块) if callable(getattr(用户模块, name)) and not name.startswith("_")]
-        print(f"📊 发现 {len(所有函数)} 个可调用对象：{', '.join(所有函数[:10])}")
-        print()
-        
-    except SyntaxError as e:
-        print(f"❌ 语法错误：{e}")
-        print("请修复语法错误后重新运行本脚本")
-        用户模块 = None
-    except Exception as e:
-        print(f"❌ 加载失败：{e}")
-        用户模块 = None
-else:
-    用户模块 = None
+def 加载学生模块(文件路径: Path):
+    """动态加载学生练习文件；失败会抛异常"""
+    spec = importlib.util.spec_from_file_location("学生练习_day01", 文件路径)
+    模块 = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(模块)
+    return 模块
 
-# ========================================
-# 第 3 步：性能验收测试
-# ========================================
 
-print("【第 3 步】性能验收测试（同步 vs 异步）")
-print("-" * 70)
-print("一个正确的异步实现应该比同步实现快很多！")
-print()
+class 验收器:
+    def __init__(self):
+        self.总分 = 0
 
-async def 模拟API调用(名称, 延迟):
-    """模拟 API 调用"""
-    await asyncio.sleep(延迟)
-    return f"{名称} 返回结果（延迟 {延迟}s）"
+    async def 检查(self, 名称: str, 分值: int, 函数, *参数):
+        """运行单个检查；检查函数返回 (得分, 消息)，抛异常记 0 分"""
+        打印(f"\n【{名称}】（{分值}分）", C.CYAN)
+        try:
+            if inspect.iscoroutinefunction(函数):
+                得分, 消息 = await asyncio.wait_for(函数(*参数), timeout=40)
+            else:
+                得分, 消息 = 函数(*参数)
+        except asyncio.TimeoutError:
+            得分, 消息 = 0, "❌ 检查超时——代码可能存在死循环或过长的 sleep"
+        except Exception as e:
+            得分, 消息 = 0, f"❌ {type(e).__name__}: {e}"
+        得分 = max(0, min(int(得分), 分值))
+        self.总分 += 得分
+        颜色 = C.GREEN if 得分 == 分值 else (C.YELLOW if 得分 > 0 else C.RED)
+        打印(f"  {消息}  [得分 {得分}/{分值}]", 颜色)
 
-def 测试同步调用():
-    """测试同步方式的耗时"""
-    开始 = time.time()
-    
-    结果1 = asyncio.run(模拟API调用("API-1", 1))
-    结果2 = asyncio.run(模拟API调用("API-2", 2))
-    结果3 = asyncio.run(模拟API调用("API-3", 1.5))
-    
-    耗时 = time.time() - 开始
-    return 耗时, [结果1, 结果2, 结果3]
 
-async def 测试异步调用():
-    """测试异步方式的耗时"""
-    开始 = time.time()
-    
-    结果们 = await asyncio.gather(
-        模拟API调用("API-1", 1),
-        模拟API调用("API-2", 2),
-        模拟API调用("API-3", 1.5),
-    )
-    
-    耗时 = time.time() - 开始
-    return 耗时, 结果们
+# ==================== 各项检查 ====================
 
-print("  🔍 测试 1：同步调用（作为基准）")
-同步耗时, 同步结果 = 测试同步调用()
-print(f"     结果：{同步耗时:.2f} 秒")
-print(f"     预期：~4.5 秒（1 + 2 + 1.5）")
-print()
+def 检查_异步请求协程(模块):
+    if not inspect.iscoroutinefunction(getattr(模块, "异步请求", None)):
+        return 0, "❌ 异步请求 不是协程函数（需要 async def）"
+    return 8, "✅ 异步请求 是 async 协程函数"
 
-print("  🔍 测试 2：异步并发调用（应该是这样）")
-异步耗时, 异步结果 = asyncio.run(测试异步调用())
-print(f"     结果：{异步耗时:.2f} 秒")
-print(f"     预期：~2.0 秒（取最长的延迟）")
-print()
 
-print("  📊 性能对比：")
-print(f"     同步：{同步耗时:.2f} 秒")
-print(f"     异步：{异步耗时:.2f} 秒")
-提升 = (同步耗时 - 异步耗时) / 同步耗时 * 100
-print(f"     性能提升：{提升:.1f}%")
-print()
+async def 检查_异步请求结果(模块):
+    结果 = await 模块.异步请求("https://test.example.com/users", 延迟秒=0.2)
+    assert isinstance(结果, dict), f"应返回字典，实际是 {type(结果).__name__}：{结果!r}"
+    for key in ("url", "status", "data"):
+        assert key in 结果, f"返回字典缺少字段：{key}（示例：{{'url': ..., 'status': 200, 'data': ...}}）"
+    return 12, f"✅ 返回结构正确（status={结果.get('status')}）"
 
-if 异步耗时 < 同步耗时 * 0.6:
-    print("  ✅ 验收通过！异步版本明显快于同步版本")
-else:
-    print("  ⚠️ 异步版本可能不正确，耗时没有显著减少")
-    print("     检查是否真的使用了 asyncio.gather() 或 create_task()")
-print()
 
-# ========================================
-# 第 4 步：代码质量检查
-# ========================================
-
-if 用户模块:
-    print("【第 4 步】代码质量检查")
-    print("-" * 70)
-    
-    评分 = 0
-    总分 = 0
-    
-    # 检查 1：是否使用了 async/await
-    总分 += 20
-    print("  🔍 检查 1：是否使用了 async def 定义异步函数？（20 分）")
-    
-    异步函数列表 = []
-    for name in dir(用户模块):
-        obj = getattr(用户模块, name)
-        if callable(obj) and inspect.iscoroutinefunction(obj):
-            异步函数列表.append(name)
-    
-    if len(异步函数列表) > 0:
-        print(f"     ✅ 发现 {len(异步函数列表)} 个异步函数：{', '.join(异步函数列表)}")
-        评分 += 20
-    else:
-        print("     ❌ 未找到异步函数（使用 async def 定义的函数）")
-        print("     💡 提示：确保你的函数用 async def 定义")
-    print()
-    
-    # 检查 2：是否使用了 asyncio.gather() 或 create_task()
-    总分 += 20
-    print("  🔍 检查 2：是否使用了 asyncio.gather() 或 create_task()？（20 分）")
-    
-    try:
-        with open(用户代码文件, "r", encoding="utf-8") as f:
-            代码内容 = f.read()
-        
-        if "asyncio.gather" in 代码内容:
-            print("     ✅ 使用了 asyncio.gather()")
-            评分 += 20
-        elif "create_task" in 代码内容:
-            print("     ✅ 使用了 asyncio.create_task()")
-            评分 += 20
-        else:
-            print("     ❌ 未找到 asyncio.gather() 或 create_task()")
-            print("     💡 提示：并发执行多个任务需要用这两个方法之一")
-    except:
-        print("     ⚠️ 无法读取代码文件")
-    print()
-    
-    # 检查 3：是否有错误处理（try/except）
-    总分 += 15
-    print("  🔍 检查 3：是否有错误处理（try/except）？（15 分）")
-    
-    if "try" in 代码内容 and "except" in 代码内容:
-        print("     ✅ 有错误处理")
-        评分 += 15
-    else:
-        print("     ⚠️ 未找到错误处理")
-        print("     💡 提示：真实 API 调用可能失败，应该加 try/except")
-    评分 += 15
-    print()
-    
-    # 检查 4：是否有超时控制（asyncio.timeout）
-    总分 += 15
-    print("  🔍 检查 4：是否有超时控制（asyncio.timeout）？（15 分）")
-    
-    if "timeout" in 代码内容.lower():
-        print("     ✅ 有超时控制")
-        评分 += 15
-    else:
-        print("     ⚠️ 未找到超时控制")
-        print("     💡 提示：API 调用可能卡死，应该用 async with asyncio.timeout():")
-    评分 += 15
-    print()
-    
-    # 检查 5：是否有类型注解
-    总分 += 10
-    print("  🔍 检查 5：是否有类型注解？（10 分）")
-    
-    if ":" in 代码内容 and "->" in 代码内容:
-        print("     ✅ 有类型注解")
-        评分 += 10
-    else:
-        print("     ⚠️ 未找到类型注解")
-        print("     💡 提示：类型注解可以帮助 IDE 提供更好的提示")
-    print()
-    
-    # 检查 6：是否有文档字符串（docstring）
-    总分 += 10
-    print("  🔍 检查 6：是否有文档字符串（docstring）？（10 分）")
-    
-    if '"""' in 代码内容 or "'''" in 代码内容:
-        print("     ✅ 有文档字符串")
-        评分 += 10
-    else:
-        print("     ⚠️ 未找到文档字符串")
-        print("     💡 提示：在函数内部第一行用三引号写文档")
-    print()
-    
-    # 检查 7：是否使用了 time.sleep()（常见错误）
-    总分 += 10
-    print("  🔍 检查 7：是否错误地在异步函数中使用了 time.sleep()？（扣分项）")
-    
-    if "time.sleep" in 代码内容 and "async def" in 代码内容:
-        print("     ❌ 发现 time.sleep()！这会阻塞事件循环！")
-        print("     💡 应该改为 await asyncio.sleep()")
-    else:
-        print("     ✅ 未误用 time.sleep()")
-        评分 += 10
-    print()
-    
-    # 总结评分
-    print("  " + "=" * 70)
-    print(f"  📈 代码质量评分：{评分}/{总分}")
-    print("  " + "=" * 70)
-    print()
-    
-    if 评分 >= 总分 * 0.8:
-        print("  🎉 优秀！代码质量很高")
-    elif 评分 >= 总分 * 0.6:
-        print("  👍 良好！还可以改进")
-    else:
-        print("  💪 需要努力！建议参考教程并重写")
-    print()
-
-# ========================================
-# 第 5 步：提供参考实现
-# ========================================
-
-print("【第 5 步】提供参考实现（如果卡住了可以参考）")
-print("-" * 70)
-print()
-
-print("以下是一个正确的实现示例：")
-print()
-
-print("""```python
-import asyncio
-import time
-from typing import List, Dict, Any
-
-async def 调用API(api名称: str, 参数: Dict[str, Any], 延迟: float = 1.0) -> Dict[str, Any]:
-    \"\"\"调用单个 API（异步）\"\"\"
-    print(f"  🔧 正在调用 {api名称}...")
-    try:
-        async with asyncio.timeout(5):  # 超时控制
-            await asyncio.sleep(延迟)  # 模拟网络延迟
-            result = {
-                "api": api名称,
-                "params": 参数,
-                "result": f"处理结果：{参数}",
-                "耗时": 延迟
-            }
-            print(f"  ✅ {api名称} 调用成功")
-            return result
-    except asyncio.TimeoutError:
-        print(f"  ❌ {api名称} 调用超时")
-        return {"error": "timeout"}
-    except Exception as e:
-        print(f"  ❌ {api名称} 调用失败：{e}")
-        return {"error": str(e)}
-
-async def 批量调用API_异步(api列表: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    \"\"\"异步并发调用多个 API\"\"\"
-    print(f"🚀 开始异步并发调用 {len(api列表)} 个 API...")
-    开始时间 = time.time()
-    
-    # 使用 gather 并发执行
-    results = await asyncio.gather(
-        *(调用API(api["name"], api["params"], api.get("delay", 1.0)) for api in api列表),
-        return_exceptions=True  # 即使有异常也不中断
-    )
-    
-    总耗时 = time.time() - 开始时间
-    print(f"✅ 全部完成！总耗时：{总耗时:.2f} 秒")
-    return results
-
-def 批量调用API_同步(api列表: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    \"\"\"同步逐个调用多个 API（作为对比）\"\"\"
-    print(f"🐢 开始同步逐个调用 {len(api列表)} 个 API...")
-    开始时间 = time.time()
-    
-    results = []
-    for api in api列表:
-        print(f"  🔧 正在调用 {api['name']}...")
-        time.sleep(api.get("delay", 1.0))  # ❌ 真实代码中不要用 time.sleep
-        results.append({
-            "api": api["name"],
-            "result": f"处理结果：{api['params']}"
-        })
-        print(f"  ✅ {api['name']} 调用成功")
-    
-    总耗时 = time.time() - 开始时间
-    print(f"✅ 全部完成！总耗时：{总耗时:.2f} 秒")
-    return results
-
-# 主函数
-async def main():
-    # 准备测试数据
-    api列表 = [
-        {"name": "天气API", "params": {"city": "北京"}, "delay": 2.0},
-        {"name": "翻译API", "params": {"text": "Hello"}, "delay": 1.5},
-        {"name": "搜索API", "params": {"query": "AI Agent"}, "delay": 1.0},
-        {"name": "计算API", "params": {"expr": "2+3*4"}, "delay": 0.5},
+async def 检查_并发请求(模块):
+    """并发请求：结果正确 + 真并发（用学生自己的单次耗时做基准）"""
+    urls = [
+        "https://a.example.com",
+        "https://b.example.com",
+        "https://c.example.com",
     ]
-    
-    print("=" * 70)
-    print("测试 1：同步调用（慢）")
-    print("=" * 70)
-    同步结果 = 批量调用API_同步(api列表)
-    print()
-    
-    print("=" * 70)
-    print("测试 2：异步并发调用（快）")
-    print("=" * 70)
-    异步结果 = await 批量调用API_异步(api列表)
-    print()
-    
-    print("=" * 70)
-    print("结果对比")
-    print("=" * 70)
-    for i, (同步, 异步) in enumerate(zip(同步结果, 异步结果)):
-        print(f"{i+1}. {api列表[i]['name']}")
-        print(f"   同步：{同步}")
-        print(f"   异步：{异步}")
+    开始 = time.time()
+    结果 = await 模块.并发请求(urls)
+    并发耗时 = time.time() - 开始
+
+    assert isinstance(结果, list) and len(结果) == 3, f"应返回 3 个结果，实际 {结果!r}"
+    assert all(isinstance(r, dict) for r in 结果), "每个结果都应是字典"
+
+    单次开始 = time.time()
+    await 模块.异步请求("https://single.example.com")
+    单次耗时 = time.time() - 单次开始
+
+    assert 并发耗时 < 单次耗时 * 2 + 0.2, (
+        f"3 个请求耗时 {并发耗时:.2f}s ≈ 3 × 单次({单次耗时:.2f}s)，"
+        "说明是逐个 await 而不是并发。请用 asyncio.gather() 或 create_task()"
+    )
+    return 25, f"✅ 3 个请求真并发完成：{并发耗时:.2f}s（单次基准 {单次耗时:.2f}s）"
+
+
+def 检查_同步请求(模块):
+    结果 = 模块.同步请求(["https://s1.example.com", "https://s2.example.com"])
+    assert isinstance(结果, list) and len(结果) == 2, f"应返回 2 个结果，实际 {结果!r}"
+    assert all(isinstance(r, dict) for r in 结果), "每个结果都应是字典"
+    return 8, "✅ 同步请求返回 2 个结果（作为性能对比的慢基准）"
+
+
+async def 检查_性能对比(模块):
+    缓冲 = io.StringIO()
+    with redirect_stdout(缓冲):
+        await 模块.性能对比()
+    输出 = 缓冲.getvalue()
+    assert "同步" in 输出 and "异步" in 输出, "性能对比应打印同步和异步两种耗时"
+    assert "秒" in 输出, "应打印耗时数值（秒）"
+    return 12, "✅ 性能对比完成并打印两种耗时（异步应显著快于同步）"
+
+
+async def 检查_重试机制(模块):
+    # 注入假 random：第 1 次"失败"（0.99 > 0.3），之后都成功
+    # 如果重试逻辑正确，函数会在重试后拿到成功结果
+    序列 = iter([0.99, 0.01, 0.01, 0.01, 0.01])
+    模块.random = types.SimpleNamespace(random=lambda: next(序列, 0.01))
+
+    结果 = await asyncio.wait_for(
+        模块.异步请求带重试("https://retry.example.com", 最大重试=3), timeout=15
+    )
+    assert isinstance(结果, dict), f"重试后应返回结果字典，实际 {结果!r}"
+    return 20, "✅ 第 1 次模拟失败后成功重试，返回了正常结果"
+
+
+def 检查_类型注解(文件路径):
+    树 = ast.parse(文件路径.read_text(encoding="utf-8"))
+    函数们 = [n for n in ast.walk(树) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))]
+    有注解 = [f for f in 函数们 if f.returns is not None]
+    assert len(有注解) >= 4, f"至少 4 个函数应有返回值类型注解，目前 {len(有注解)}/{len(函数们)}"
+    return 10, f"✅ {len(有注解)}/{len(函数们)} 个函数有返回值注解"
+
+
+# ==================== 主流程 ====================
+
+async def 运行验收(验收员, 模块, 文件路径):
+    await 验收员.检查("异步请求：是 async 协程函数", 8, 检查_异步请求协程, 模块)
+    await 验收员.检查("异步请求：返回结构正确", 12, 检查_异步请求结果, 模块)
+    await 验收员.检查("并发请求：结果正确且真并发", 25, 检查_并发请求, 模块)
+    await 验收员.检查("同步请求：作为慢基准可用", 8, 检查_同步请求, 模块)
+    await 验收员.检查("性能对比：打印两种耗时", 12, 检查_性能对比, 模块)
+    await 验收员.检查("重试机制：失败后能重试", 20, 检查_重试机制, 模块)
+    await 验收员.检查("类型注解", 10, 检查_类型注解, 文件路径)
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Day 1 练习验收脚本（行为级验收）")
+    parser.add_argument("--file", default=DEFAULT_FILE, help="练习文件路径（默认 %(default)s）")
+    args = parser.parse_args()
+    文件路径 = Path(args.file)
+
+    打印("=" * 60)
+    打印("📋 Day 1 练习验收 —— 异步批量调用多个 API")
+    打印("=" * 60)
+    打印(f"\n📂 验收文件：{文件路径}")
+
+    if not 文件路径.exists():
+        打印(f"\n❌ 文件不存在：{文件路径}", C.RED)
+        print("请先完成 day01_practice_template.py 中的 TODO，或用 --file 指定你的练习文件")
+        sys.exit(1)
+
+    打印("\n【加载练习代码】（5分）", C.CYAN)
+    加载分 = 5
+    try:
+        模块 = 加载学生模块(文件路径)
+        打印("  ✅ 代码加载成功，没有语法错误", C.GREEN)
+    except ImportError as e:
+        加载分 = 0
+        模块 = None
+        打印(f"  ❌ 缺少依赖：{e}", C.RED)
+        print("  💡 安装依赖后重试")
+    except Exception as e:
+        加载分 = 0
+        模块 = None
+        打印(f"  ❌ 加载失败：{type(e).__name__}: {e}", C.RED)
+        print("  💡 请先修复语法/运行错误再验收")
+
+    验收员 = 验收器()
+    验收员.总分 += 加载分
+    if 模块 is not None:
+        asyncio.run(运行验收(验收员, 模块, 文件路径))
+
+    总分 = 验收员.总分
+    打印("\n" + "=" * 60)
+    if 总分 >= 优秀线:
+        打印(f"  总分：{总分}/{满分}   🎉 验收通过！你掌握了 asyncio 并发！", C.GREEN)
+    elif 总分 >= 通过线:
+        打印(f"  总分：{总分}/{满分}   ⚠️ 基本通过，建议按上面的提示完善", C.YELLOW)
+    else:
+        打印(f"  总分：{总分}/{满分}   ❌ 未通过——先完成模板中标红的 TODO 再来验收", C.RED)
+    打印("=" * 60)
+
 
 if __name__ == "__main__":
-    asyncio.run(main())
-```""")
-
-print()
-print("=" * 70)
-print("📋 验收总结")
-print("=" * 70)
-print()
-print("✅ 你的练习项目正确的标志：")
-print("  1. 使用了 async/await 语法")
-print("  2. 使用了 asyncio.gather() 或 create_task() 实现并发")
-print("  3. 异步版本比同步版本快至少 30%")
-print("  4. 有错误处理（try/except）")
-print("  5. 有超时控制（asyncio.timeout）")
-print("  6. 没有在异步函数中使用 time.sleep()")
-print()
-print("🎯 下一步：")
-print("  如果通过了本验收，继续 Day 2 的学习！")
-print("  如果未通过，参考上面的代码示例并重写你的练习。")
-print()
-print("=" * 70)
+    main()

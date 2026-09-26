@@ -9,6 +9,7 @@ Day 1 练习：异步批量调用多个 API（模拟 Agent 多工具并发调用
 """
 
 import asyncio
+import random
 import time
 from typing import List, Dict, Any
 
@@ -149,6 +150,10 @@ async def main():
 
 if __name__ == "__main__":
     开始时间 = time.time()
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except Exception as e:
+        print(f"\n⚠️ 运行中断：{type(e).__name__}: {e}")
+        print("💡 这通常是因为上面的 TODO 还没有完成。请先实现各个任务函数，再运行本文件。")
     总耗时 = time.time() - 开始时间
     print(f"\n⏱ 总耗时：{总耗时:.2f} 秒")

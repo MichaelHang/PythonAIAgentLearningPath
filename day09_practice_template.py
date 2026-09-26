@@ -15,6 +15,7 @@ Day 9 练习：实现带记忆和 RAG 的 Agent
 
 import asyncio
 import json
+import time
 from typing import List, Dict, Any, Optional, Tuple
 from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
@@ -27,7 +28,7 @@ class ConversationMessage:
     """对话消息"""
     role: str  # "user" | "assistant" | "system" | "tool"
     content: str
-    timestamp: float = field(default_factory=lambda: __import__("time").time())
+    timestamp: float = field(default_factory=time.time)
 
 
 class ShortTermMemory:
@@ -117,12 +118,26 @@ class SimpleVectorStore(VectorStore):
 
 
 def simple_keyword_search(query: str, documents: List[str], top_k: int = 3) -> List[Tuple[str, float]]:
-    """简单的关键词搜索（不依赖 embedding 模型）"""
-    query_words = set(query.lower().split())
+    """
+    简单的关键词搜索（不依赖 embedding 模型）
+    
+    英文按空格分词；中文没有空格，整句会变成一个"词"导致检索失效，
+    所以对中文退化为按字（bigram）切分。正式项目请用 jieba 分词 + embedding。
+    """
+    def 分词(text: str):
+        text = text.lower()
+        if " " in text.strip():
+            return set(text.split())
+        # 中文：用相邻两字组成 bigram，保底单字
+        chars = [c for c in text if c.strip()]
+        bigrams = {chars[i] + chars[i + 1] for i in range(len(chars) - 1)}
+        return bigrams | set(chars)
+    
+    query_words = 分词(query)
     
     scores = []
     for doc in documents:
-        doc_words = set(doc.lower().split())
+        doc_words = 分词(doc)
         # Jaccard 相似度
         intersection = len(query_words & doc_words)
         union = len(query_words | doc_words)
@@ -244,6 +259,14 @@ async def main():
     print("Day 9 练习：记忆系统 + RAG")
     print("=" * 60)
     
+    # 友好提示：TODO 未完成时给出指引，而不是直接崩溃
+    _probe = ShortTermMemory(max_messages=3)
+    _probe.add("user", "hi")
+    if _probe.to_api_format() is None:
+        print("\n⚠️ 检测到 TODO 1.x（ShortTermMemory）尚未实现，测试 1 将无法进行。")
+        print("💡 请先完成 TODO 1.1 - 1.4，再运行本文件查看完整测试。\n")
+        return
+    
     # 测试 1：短期记忆
     print("\n📝 测试 1：短期记忆（添加 + 裁剪）")
     memory = ShortTermMemory(max_messages=5)
@@ -290,9 +313,14 @@ async def main():
     print(f"\n  注：如果 Agent 答对了，说明记忆系统正常工作 ✅")
     
     print("\n" + "=" * 60)
-    print("✅ 测试完成！现在运行 python day09_practice_validator.py 验收")
+    print("✅ 测试完成！")
+    print("📋 本 Day 没有自动验收脚本，请按 ACCEPTANCE_CRITERIA.html 的 Day 9 清单自查")
     print("=" * 60)
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except Exception as e:
+        print(f"\n⚠️ 运行中断：{type(e).__name__}: {e}")
+        print("💡 这通常是因为上面的 TODO 还没有完成。请先实现各个任务函数，再运行本文件。")

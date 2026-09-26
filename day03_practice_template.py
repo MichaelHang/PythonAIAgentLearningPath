@@ -195,12 +195,12 @@ class 流式LLM客户端:
     def __init__(self, 模型名称: str = "deepseek-chat"):
         self.模型名称 = 模型名称
     
-    def chat(self, 提示词: str) -> AsyncGenerator[str, None]:
+    async def chat(self, 提示词: str) -> AsyncGenerator[str, None]:
         """
         发起聊天请求，返回流式响应
         
         需求：
-        1. 这是一个异步生成器方法
+        1. 这是一个异步生成器方法（async def + yield，缺一不可）
         2. 用异步上下文管理器包装，自动打印耗时
         3. 逐 chunk yield 响应内容
         """
@@ -254,6 +254,10 @@ async def main():
 
 if __name__ == "__main__":
     开始时间 = time.time()
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except Exception as e:
+        print(f"\n⚠️ 运行中断：{type(e).__name__}: {e}")
+        print("💡 这通常是因为上面的 TODO 还没有完成。请先实现各个任务函数，再运行本文件。")
     总耗时 = time.time() - 开始时间
     print(f"\n⏱ 总耗时：{总耗时:.2f} 秒")

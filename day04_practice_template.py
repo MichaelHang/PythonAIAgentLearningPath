@@ -11,6 +11,7 @@ Day 4 练习：实现支持 Function Calling 的 LLM 客户端
 """
 
 import asyncio
+import functools
 import json
 import time
 from typing import List, Dict, Any, Optional, Callable
@@ -147,6 +148,20 @@ def mock_llm_response(messages: List[Dict], tools: Optional[List]) -> Dict:
     for msg in messages:
         if msg["role"] == "user":
             user_msg = msg["content"]
+    
+    # 如果工具结果已经回传（存在 tool role 消息），LLM 生成最终回答
+    # 这样无论第二轮是否携带 tools 参数，对话都能正常终止
+    if any(msg.get("role") == "tool" for msg in messages):
+        return {
+            "choices": [
+                {
+                    "message": {
+                        "role": "assistant",
+                        "content": "根据查询结果，答案是 13。"
+                    }
+                }
+            ]
+        }
     
     # 检测是否包含工具调用
     if tools and ("天气" in user_msg or "计算" in user_msg or "加" in user_msg):
@@ -307,4 +322,8 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except Exception as e:
+        print(f"\n⚠️ 运行中断：{type(e).__name__}: {e}")
+        print("💡 这通常是因为上面的 TODO 还没有完成。请先实现各个任务函数，再运行本文件。")

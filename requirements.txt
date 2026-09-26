@@ -1,0 +1,13 @@
+# 必装依赖
+pydantic>=2.5
+
+# 可选依赖（按需安装）：
+# Day 7 真实 LangGraph 练习
+# langgraph
+# langchain-openai
+# Day 8 MCP SDK 对照学习
+# mcp
+# Day 9 正式向量检索
+# chromadb        # 或 faiss-cpu + numpy
+# 真实 LLM API 调用（Day 4/5/6 可选任务）
+# aiohttp

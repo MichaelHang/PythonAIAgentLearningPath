@@ -109,7 +109,8 @@ def 工具(
 )
 def 计算(表达式: str) -> dict:
     """执行四则运算"""
-    # 注意：生产环境请用 ast.literal_eval 或更安全的方法
+    # 注意：eval 仅限练习使用。ast.literal_eval 无法计算算术表达式，
+    # 生产环境请用 ast 白名单解析或专门的表达式库
     try:
         result = eval(表达式, {"__builtins__": {}}, {})
         return {"结果": result, "表达式": 表达式}
@@ -166,7 +167,7 @@ def 列出所有工具() -> List[Dict[str, Any]]:
     ]
     """
     # TODO 4.2：实现工具列表生成（转换为 OpenAI Function Calling 格式）
-    # 提示：需要用 输入模型 的 schema() 方法获取 JSON Schema
+    # 提示：需要用 输入模型 的 model_json_schema() 方法获取 JSON Schema（Pydantic v2）
     pass
 
 
@@ -182,13 +183,17 @@ def main():
     结果 = 调用工具("计算器", 表达式="3 + 5 * 2")
     print(f"结果：{结果}")
     
-    # 测试 2：输入验证（应该失败）
-    print("\n📝 测试 2：输入验证")
+    # 测试 2：输入验证（错误类型应被 Pydantic 拦截）
+    print("\n📝 测试 2：输入验证（类型错误）")
     try:
-        调用工具("计算器", 表达式="import os; os.system('ls')")  # 危险输入
-        print("⚠️ 警告：危险输入没有被拦截！")
+        调用工具("计算器", 表达式=12345)  # ❌ 表达式应为 str，传入 int
+        print("❌ 输入验证未生效：错误类型没有被拦截，请检查 TODO 2.2")
+    except ValidationError as e:
+        print(f"✅ 输入验证生效（Pydantic 拦截了类型错误）：{e.errors()[0]['msg']}")
     except Exception as e:
         print(f"✅ 输入验证生效：{e}")
+    print("💡 注意：Pydantic 负责类型校验，不负责安全过滤——危险字符串是合法 str，")
+    print("   拦截它要靠工具内部的沙箱/白名单，两层防护缺一不可。")
     
     # 测试 3：列出所有工具（OpenAI Function Calling 格式）
     print("\n📝 测试 3：工具列表（供 LLM 使用）")
