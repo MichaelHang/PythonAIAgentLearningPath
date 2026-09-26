@@ -313,8 +313,7 @@ async def main():
     print(f"\n  注：如果 Agent 答对了，说明记忆系统正常工作 ✅")
     
     print("\n" + "=" * 60)
-    print("✅ 测试完成！")
-    print("📋 本 Day 没有自动验收脚本，请按 ACCEPTANCE_CRITERIA.html 的 Day 9 清单自查")
+    print("✅ 测试完成！现在运行 python day09_practice_validator.py 验收")
     print("=" * 60)
 
 

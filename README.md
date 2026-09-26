@@ -8,7 +8,7 @@
 | 阶段 | 内容 | 配套材料 |
 |---|---|---|
 | 阶段一（Day 1-5） | Python 异步/类型系统/生成器 + LLM API + Function Calling | 每天练习模板 + 自动验收脚本 |
-| 阶段二（Day 6-10） | ReAct Agent、LangGraph、MCP、RAG 与记忆系统 | Day 1-7 有验收脚本，Day 8-10 手动清单 |
+| 阶段二（Day 6-10） | ReAct Agent、LangGraph、MCP、RAG 与记忆系统 | 每天练习模板 + 自动验收脚本 |
 | 阶段三（Day 11-15） | 完整 Agent 项目实战（FastAPI + 部署） | 大纲 + 交付清单（自主实战） |
 
 ## 快速开始
@@ -38,8 +38,8 @@ python day01_practice_validator.py     # 行为级验收打分
 3. **练**：打开 `dayNN_practice_template.html`（或直接编辑 .py 文件），按学习页的指引完成里面的 TODO
 4. **验**：运行 `python dayNN_practice_validator.py`，验收脚本会**直接调用你实现的函数**、
    断言真实返回值和真实耗时，空白模板只有个位数分数，全部做对才能拿满分
-   （也可用 `--file 你的文件.py` 验收任意文件）
-5. Day 8-10 没有自动验收脚本，按 [ACCEPTANCE_CRITERIA.html](ACCEPTANCE_CRITERIA.html) 的手动清单自查
+   （也可用 `--file 你的文件.py` 验收任意文件；Day 1-10 全部有自动验收）
+5. [ACCEPTANCE_CRITERIA.html](ACCEPTANCE_CRITERIA.html) 提供每天的分值明细和手动清单，作为深度自查补充
 
 ## 目录结构
 
@@ -50,7 +50,7 @@ day01~day10_lesson.html          # 每天的学习页（目标/理论/实操步�
 tutorial_01_decorators.py/.html  # 装饰器 8 步实战教程（对应 Day 2）
 tutorial_02_async.py/.html       # 异步 9 步实战教程（对应 Day 1）
 day01~day10_practice_template.*  # 每天练习模板（含 TODO）
-day01~day07_practice_validator.* # 自动验收脚本（行为级打分）
+day01~day10_practice_validator.* # 自动验收脚本（行为级打分，全部 10 天）
 generate_html.py                 # 修改 .py 后重新生成对应代码页
 generate_lessons.py              # 学习页内容源文件（改课程内容后运行）
 fonts/                           # Maple Mono 代码字体（自托管 woff2，OFL 协议）

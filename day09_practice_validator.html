@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🐍 Day01 Practice Validator</title>
+    <title>🐍 Day09 Practice Validator</title>
     <style>
 
 
@@ -352,7 +352,7 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 <h4>Day 1-3 (基础)</h4>
 <a class="" href="day01_lesson.html">Day 1 - 学习</a>
 <a class="" href="day01_practice_template.html">Day 1 - 模板</a>
-<a class="active" href="day01_practice_validator.html">Day 1 - 验收</a>
+<a class="" href="day01_practice_validator.html">Day 1 - 验收</a>
 <a class="" href="day02_lesson.html">Day 2 - 学习</a>
 <a class="" href="day02_practice_template.html">Day 2 - 模板</a>
 <a class="" href="day02_practice_validator.html">Day 2 - 验收</a>
@@ -379,25 +379,26 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 <a class="" href="day08_practice_validator.html">Day 8 - 验收</a>
 <a class="" href="day09_lesson.html">Day 9 - 学习</a>
 <a class="" href="day09_practice_template.html">Day 9 - 模板</a>
-<a class="" href="day09_practice_validator.html">Day 9 - 验收</a>
+<a class="active" href="day09_practice_validator.html">Day 9 - 验收</a>
 <a class="" href="day10_lesson.html">Day 10 - 学习</a>
 <a class="" href="day10_practice_template.html">Day 10 - 模板</a>
 <a class="" href="day10_practice_validator.html">Day 10 - 验收</a>
 </div>
 <div class="main-content">
-    <div class="header"><h1>🐍 Day01 Practice Validator</h1></div>
+    <div class="header"><h1>🐍 Day09 Practice Validator</h1></div>
     <div class="content">
-        <div class="file-info"><div class="info-left">📄 文件: <code>day01_practice_validator.py</code></div><a class="download-btn" href="day01_practice_validator.py" download>⬇ 下载 .py 文件</a></div>
+        <div class="file-info"><div class="info-left">📄 文件: <code>day09_practice_validator.py</code></div><a class="download-btn" href="day09_practice_validator.py" download>⬇ 下载 .py 文件</a></div>
 <div class="highlight"><pre><span></span><span class="sd">"""</span>
-<span class="sd">Day 1 练习项目验收脚本（行为级验收）</span>
-<span class="sd">异步批量调用多个 API（模拟 Agent 多工具并发调用）</span>
+<span class="sd">Day 9 练习项目验收脚本（行为级验收）</span>
+<span class="sd">实现带记忆和 RAG 的 Agent</span>
 
 <span class="sd">运行方式：</span>
-<span class="sd">    python day01_practice_validator.py                  # 验收默认模板文件</span>
-<span class="sd">    python day01_practice_validator.py --file 你的练习.py</span>
+<span class="sd">    python day09_practice_validator.py                  # 验收默认模板文件</span>
+<span class="sd">    python day09_practice_validator.py --file 你的练习.py</span>
 
 <span class="sd">验收方式：</span>
-<span class="sd">    直接调用你实现的函数，检查返回结果和真实耗时。</span>
+<span class="sd">    直接操作你的短期记忆（裁剪/清空/格式转换）、你的向量存储（检索排序）、</span>
+<span class="sd">    你的 RAG 检索器，并跑两轮对话检查记忆是否真的留存。</span>
 <span class="sd">    空白模板无法通过验收，只有真正完成 TODO 才能得分。</span>
 <span class="sd">"""</span>
 
@@ -406,17 +407,13 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 <span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">importlib.util</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">types</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">redirect_stdout</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>  <span class="c1"># 让 Windows 终端支持 ANSI 颜色</span>
 
-<span class="n">DEFAULT_FILE</span> <span class="o">=</span> <span class="s2">"day01_practice_template.py"</span>
+<span class="n">DEFAULT_FILE</span> <span class="o">=</span> <span class="s2">"day09_practice_template.py"</span>
 <span class="n">满分</span> <span class="o">=</span> <span class="mi">100</span>
 <span class="n">通过线</span> <span class="o">=</span> <span class="mi">60</span>
 <span class="n">优秀线</span> <span class="o">=</span> <span class="mi">80</span>
@@ -435,8 +432,7 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">加载学生模块</span><span class="p">(</span><span class="n">文件路径</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""动态加载学生练习文件；失败会抛异常"""</span>
-    <span class="n">spec</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spec_from_file_location</span><span class="p">(</span><span class="s2">"学生练习_day01"</span><span class="p">,</span> <span class="n">文件路径</span><span class="p">)</span>
+    <span class="n">spec</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spec_from_file_location</span><span class="p">(</span><span class="s2">"学生练习_day09"</span><span class="p">,</span> <span class="n">文件路径</span><span class="p">)</span>
     <span class="n">模块</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">module_from_spec</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
     <span class="n">spec</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">exec_module</span><span class="p">(</span><span class="n">模块</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">模块</span>
@@ -451,11 +447,11 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
         <span class="n">打印</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">【</span><span class="si">{</span><span class="n">名称</span><span class="si">}</span><span class="s2">】（</span><span class="si">{</span><span class="n">分值</span><span class="si">}</span><span class="s2">分）"</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">CYAN</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">iscoroutinefunction</span><span class="p">(</span><span class="n">函数</span><span class="p">):</span>
-                <span class="n">得分</span><span class="p">,</span> <span class="n">消息</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait_for</span><span class="p">(</span><span class="n">函数</span><span class="p">(</span><span class="o">*</span><span class="n">参数</span><span class="p">),</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">40</span><span class="p">)</span>
+                <span class="n">得分</span><span class="p">,</span> <span class="n">消息</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait_for</span><span class="p">(</span><span class="n">函数</span><span class="p">(</span><span class="o">*</span><span class="n">参数</span><span class="p">),</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">得分</span><span class="p">,</span> <span class="n">消息</span> <span class="o">=</span> <span class="n">函数</span><span class="p">(</span><span class="o">*</span><span class="n">参数</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">:</span>
-            <span class="n">得分</span><span class="p">,</span> <span class="n">消息</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"❌ 检查超时——代码可能存在死循环或过长的 sleep"</span>
+            <span class="n">得分</span><span class="p">,</span> <span class="n">消息</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"❌ 检查超时"</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">得分</span><span class="p">,</span> <span class="n">消息</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"❌ </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span>
         <span class="n">得分</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">得分</span><span class="p">),</span> <span class="n">分值</span><span class="p">))</span>
@@ -466,73 +462,125 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 
 <span class="c1"># ==================== 各项检查 ====================</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">检查_异步请求协程</span><span class="p">(</span><span class="n">模块</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">inspect</span><span class="o">.</span><span class="n">iscoroutinefunction</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">模块</span><span class="p">,</span> <span class="s2">"异步请求"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)):</span>
-        <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"❌ 异步请求 不是协程函数（需要 async def）"</span>
-    <span class="k">return</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">"✅ 异步请求 是 async 协程函数"</span>
-
-
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">检查_异步请求结果</span><span class="p">(</span><span class="n">模块</span><span class="p">):</span>
-    <span class="n">结果</span> <span class="o">=</span> <span class="k">await</span> <span class="n">模块</span><span class="o">.</span><span class="n">异步请求</span><span class="p">(</span><span class="s2">"https://test.example.com/users"</span><span class="p">,</span> <span class="n">延迟秒</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">结果</span><span class="p">,</span> <span class="nb">dict</span><span class="p">),</span> <span class="sa">f</span><span class="s2">"应返回字典，实际是 </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">结果</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">：</span><span class="si">{</span><span class="n">结果</span><span class="si">!r}</span><span class="s2">"</span>
-    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"url"</span><span class="p">,</span> <span class="s2">"status"</span><span class="p">,</span> <span class="s2">"data"</span><span class="p">):</span>
-        <span class="k">assert</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">结果</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"返回字典缺少字段：</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">（示例：</span><span class="se">{{</span><span class="s2">'url': ..., 'status': 200, 'data': ...</span><span class="se">}}</span><span class="s2">）"</span>
-    <span class="k">return</span> <span class="mi">12</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"✅ 返回结构正确（status=</span><span class="si">{</span><span class="n">结果</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'status'</span><span class="p">)</span><span class="si">}</span><span class="s2">）"</span>
-
-
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">检查_并发请求</span><span class="p">(</span><span class="n">模块</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""并发请求：结果正确 + 真并发（用学生自己的单次耗时做基准）"""</span>
-    <span class="n">urls</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">"https://a.example.com"</span><span class="p">,</span>
-        <span class="s2">"https://b.example.com"</span><span class="p">,</span>
-        <span class="s2">"https://c.example.com"</span><span class="p">,</span>
-    <span class="p">]</span>
-    <span class="n">开始</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-    <span class="n">结果</span> <span class="o">=</span> <span class="k">await</span> <span class="n">模块</span><span class="o">.</span><span class="n">并发请求</span><span class="p">(</span><span class="n">urls</span><span class="p">)</span>
-    <span class="n">并发耗时</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">开始</span>
-
-    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">结果</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">结果</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"应返回 3 个结果，实际 </span><span class="si">{</span><span class="n">结果</span><span class="si">!r}</span><span class="s2">"</span>
-    <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">结果</span><span class="p">),</span> <span class="s2">"每个结果都应是字典"</span>
-
-    <span class="n">单次开始</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-    <span class="k">await</span> <span class="n">模块</span><span class="o">.</span><span class="n">异步请求</span><span class="p">(</span><span class="s2">"https://single.example.com"</span><span class="p">)</span>
-    <span class="n">单次耗时</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">单次开始</span>
-
-    <span class="k">assert</span> <span class="n">并发耗时</span> <span class="o">&lt;</span> <span class="n">单次耗时</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="mf">0.2</span><span class="p">,</span> <span class="p">(</span>
-        <span class="sa">f</span><span class="s2">"3 个请求耗时 </span><span class="si">{</span><span class="n">并发耗时</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s ≈ 3 × 单次(</span><span class="si">{</span><span class="n">单次耗时</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s)，"</span>
-        <span class="s2">"说明是逐个 await 而不是并发。请用 asyncio.gather() 或 create_task()"</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">检查_添加裁剪</span><span class="p">(</span><span class="n">模块</span><span class="p">):</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">模块</span><span class="o">.</span><span class="n">ShortTermMemory</span><span class="p">(</span><span class="n">max_messages</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="s2">"add"</span><span class="p">),</span> <span class="s2">"ShortTermMemory 缺少 add 方法（TODO 1.1）"</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"system"</span><span class="p">,</span> <span class="s2">"你是 AI 助手"</span><span class="p">)</span>
+    <span class="n">对话</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"消息一"</span><span class="p">,</span> <span class="s2">"消息二"</span><span class="p">,</span> <span class="s2">"消息三"</span><span class="p">,</span> <span class="s2">"消息四"</span><span class="p">,</span> <span class="s2">"消息五"</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">内容</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">对话</span><span class="p">):</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"user"</span> <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">"assistant"</span><span class="p">,</span> <span class="n">内容</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">messages</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">5</span><span class="p">,</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"max_messages=5 时应自动裁剪到 ≤5 条，实际存了 </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">messages</span><span class="p">)</span><span class="si">}</span><span class="s2"> 条"</span>
     <span class="p">)</span>
-    <span class="k">return</span> <span class="mi">25</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"✅ 3 个请求真并发完成：</span><span class="si">{</span><span class="n">并发耗时</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s（单次基准 </span><span class="si">{</span><span class="n">单次耗时</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s）"</span>
+    <span class="n">roles</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">role</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">messages</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="s2">"system"</span> <span class="ow">in</span> <span class="n">roles</span><span class="p">,</span> <span class="s2">"裁剪后 system message 丢失了——人设必须永远保留"</span>
+    <span class="k">assert</span> <span class="n">对话</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">content</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">messages</span><span class="p">],</span> <span class="s2">"最新消息不应被裁掉"</span>
+    <span class="k">assert</span> <span class="n">对话</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">content</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">messages</span><span class="p">],</span> <span class="s2">"最旧的非 system 消息应被裁掉"</span>
+    <span class="k">return</span> <span class="mi">12</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"✅ 裁剪正确：保留 </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">messages</span><span class="p">)</span><span class="si">}</span><span class="s2"> 条（含 system），最新消息在、最旧的被裁"</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">检查_同步请求</span><span class="p">(</span><span class="n">模块</span><span class="p">):</span>
-    <span class="n">结果</span> <span class="o">=</span> <span class="n">模块</span><span class="o">.</span><span class="n">同步请求</span><span class="p">([</span><span class="s2">"https://s1.example.com"</span><span class="p">,</span> <span class="s2">"https://s2.example.com"</span><span class="p">])</span>
-    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">结果</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">结果</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"应返回 2 个结果，实际 </span><span class="si">{</span><span class="n">结果</span><span class="si">!r}</span><span class="s2">"</span>
-    <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">结果</span><span class="p">),</span> <span class="s2">"每个结果都应是字典"</span>
-    <span class="k">return</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">"✅ 同步请求返回 2 个结果（作为性能对比的慢基准）"</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">检查_API格式</span><span class="p">(</span><span class="n">模块</span><span class="p">):</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">模块</span><span class="o">.</span><span class="n">ShortTermMemory</span><span class="p">(</span><span class="n">max_messages</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"system"</span><span class="p">,</span> <span class="s2">"你是助手"</span><span class="p">)</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"user"</span><span class="p">,</span> <span class="s2">"你好"</span><span class="p">)</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"assistant"</span><span class="p">,</span> <span class="s2">"你好！"</span><span class="p">)</span>
+    <span class="n">fmt</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">to_api_format</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fmt</span><span class="p">,</span> <span class="nb">list</span><span class="p">),</span> <span class="sa">f</span><span class="s2">"to_api_format 应返回列表，实际 </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">（TODO 1.3）"</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"应有 3 条消息，实际 </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span><span class="si">}</span><span class="s2"> 条"</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">fmt</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">"role"</span> <span class="ow">in</span> <span class="n">item</span> <span class="ow">and</span> <span class="s2">"content"</span> <span class="ow">in</span> <span class="n">item</span><span class="p">,</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"每条应为含 role/content 的字典，实际 </span><span class="si">{</span><span class="n">item</span><span class="si">!r}</span><span class="s2">"</span>
+        <span class="p">)</span>
+    <span class="k">assert</span> <span class="n">fmt</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">"role"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"system"</span> <span class="ow">and</span> <span class="n">fmt</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s2">"content"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"你好"</span><span class="p">,</span> <span class="s2">"消息顺序或内容不对"</span>
+    <span class="k">return</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">"✅ to_api_format 转换正确（可直接发给 LLM API）"</span>
 
 
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">检查_性能对比</span><span class="p">(</span><span class="n">模块</span><span class="p">):</span>
-    <span class="n">缓冲</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
-    <span class="k">with</span> <span class="n">redirect_stdout</span><span class="p">(</span><span class="n">缓冲</span><span class="p">):</span>
-        <span class="k">await</span> <span class="n">模块</span><span class="o">.</span><span class="n">性能对比</span><span class="p">()</span>
-    <span class="n">输出</span> <span class="o">=</span> <span class="n">缓冲</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
-    <span class="k">assert</span> <span class="s2">"同步"</span> <span class="ow">in</span> <span class="n">输出</span> <span class="ow">and</span> <span class="s2">"异步"</span> <span class="ow">in</span> <span class="n">输出</span><span class="p">,</span> <span class="s2">"性能对比应打印同步和异步两种耗时"</span>
-    <span class="k">assert</span> <span class="s2">"秒"</span> <span class="ow">in</span> <span class="n">输出</span><span class="p">,</span> <span class="s2">"应打印耗时数值（秒）"</span>
-    <span class="k">return</span> <span class="mi">12</span><span class="p">,</span> <span class="s2">"✅ 性能对比完成并打印两种耗时（异步应显著快于同步）"</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">检查_清空</span><span class="p">(</span><span class="n">模块</span><span class="p">):</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">模块</span><span class="o">.</span><span class="n">ShortTermMemory</span><span class="p">(</span><span class="n">max_messages</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"system"</span><span class="p">,</span> <span class="s2">"你是助手"</span><span class="p">)</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"user"</span><span class="p">,</span> <span class="s2">"第一条"</span><span class="p">)</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"user"</span><span class="p">,</span> <span class="s2">"第二条"</span><span class="p">)</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">messages</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"clear 后应只剩 system 1 条，实际 </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">messages</span><span class="p">)</span><span class="si">}</span><span class="s2"> 条"</span>
+    <span class="k">assert</span> <span class="n">m</span><span class="o">.</span><span class="n">messages</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s2">"system"</span><span class="p">,</span> <span class="s2">"clear 应保留 system message（TODO 1.4）"</span>
+    <span class="k">return</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">"✅ clear 只保留 system，历史被清空"</span>
 
 
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">检查_重试机制</span><span class="p">(</span><span class="n">模块</span><span class="p">):</span>
-    <span class="c1"># 注入假 random：第 1 次"失败"（0.99 &gt; 0.3），之后都成功</span>
-    <span class="c1"># 如果重试逻辑正确，函数会在重试后拿到成功结果</span>
-    <span class="n">序列</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">([</span><span class="mf">0.99</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">])</span>
-    <span class="n">模块</span><span class="o">.</span><span class="n">random</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">SimpleNamespace</span><span class="p">(</span><span class="n">random</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">next</span><span class="p">(</span><span class="n">序列</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">))</span>
-
-    <span class="n">结果</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait_for</span><span class="p">(</span>
-        <span class="n">模块</span><span class="o">.</span><span class="n">异步请求带重试</span><span class="p">(</span><span class="s2">"https://retry.example.com"</span><span class="p">,</span> <span class="n">最大重试</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">15</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">检查_向量存储</span><span class="p">(</span><span class="n">模块</span><span class="p">):</span>
+    <span class="n">store</span> <span class="o">=</span> <span class="n">模块</span><span class="o">.</span><span class="n">SimpleVectorStore</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="s2">"add"</span><span class="p">),</span> <span class="s2">"SimpleVectorStore 缺少 add 方法（TODO 2.1）"</span>
+    <span class="n">store</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"Python 是 AI 开发的主力语言"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+    <span class="n">store</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"AI Agent 的核心是 ReAct 循环"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="mi">2</span><span class="p">})</span>
+    <span class="n">store</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"今天北京天气晴朗"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="mi">3</span><span class="p">})</span>
+    <span class="n">结果</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">"AI Agent 核心"</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">结果</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="n">结果</span><span class="p">,</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"search 应返回非空列表，实际 </span><span class="si">{</span><span class="n">结果</span><span class="si">!r}</span><span class="s2">（TODO 2.2）"</span>
     <span class="p">)</span>
-    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">结果</span><span class="p">,</span> <span class="nb">dict</span><span class="p">),</span> <span class="sa">f</span><span class="s2">"重试后应返回结果字典，实际 </span><span class="si">{</span><span class="n">结果</span><span class="si">!r}</span><span class="s2">"</span>
-    <span class="k">return</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">"✅ 第 1 次模拟失败后成功重试，返回了正常结果"</span>
+    <span class="n">top</span> <span class="o">=</span> <span class="n">结果</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">文档</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">top</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">得分</span> <span class="o">=</span> <span class="n">top</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="s2">"Agent"</span> <span class="ow">in</span> <span class="n">文档</span> <span class="ow">or</span> <span class="s2">"核心"</span> <span class="ow">in</span> <span class="n">文档</span><span class="p">,</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"查询'AI Agent 核心'的最相关文档应是 Agent 那条，实际第一条是 </span><span class="si">{</span><span class="n">文档</span><span class="si">!r}</span><span class="s2">"</span>
+    <span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">float</span><span class="p">(</span><span class="n">得分</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"最相关文档的相似度应 &gt; 0，实际 </span><span class="si">{</span><span class="n">得分</span><span class="si">!r}</span><span class="s2">"</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+        <span class="k">pass</span>  <span class="c1"># 得分格式特殊时不强制</span>
+    <span class="k">return</span> <span class="mi">20</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"✅ 检索排序正确：'</span><span class="si">{</span><span class="n">文档</span><span class="p">[:</span><span class="mi">20</span><span class="p">]</span><span class="si">}</span><span class="s2">…' 排第一"</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">检查_RAG检索</span><span class="p">(</span><span class="n">模块</span><span class="p">):</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">模块</span><span class="o">.</span><span class="n">RAGRetriever</span><span class="p">(</span><span class="n">模块</span><span class="o">.</span><span class="n">SimpleVectorStore</span><span class="p">())</span>
+    <span class="k">assert</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="s2">"add_knowledge"</span><span class="p">),</span> <span class="s2">"RAGRetriever 缺少 add_knowledge（TODO 3.1）"</span>
+    <span class="n">r</span><span class="o">.</span><span class="n">add_knowledge</span><span class="p">(</span><span class="s2">"LangGraph 是图工作流框架"</span><span class="p">)</span>
+    <span class="n">r</span><span class="o">.</span><span class="n">add_knowledge</span><span class="p">(</span><span class="s2">"ChromaDB 是向量数据库"</span><span class="p">)</span>
+    <span class="n">retrieve</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="s2">"retrieve"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">callable</span><span class="p">(</span><span class="n">retrieve</span><span class="p">),</span> <span class="s2">"RAGRetriever 缺少 retrieve（TODO 3.2）"</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">retrieve</span><span class="p">(</span><span class="s2">"LangGraph 是什么"</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">out</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="sa">f</span><span class="s2">"retrieve 应返回文本，实际 </span><span class="si">{</span><span class="n">out</span><span class="si">!r}</span><span class="s2">"</span>
+    <span class="k">assert</span> <span class="s2">"LangGraph"</span> <span class="ow">in</span> <span class="n">out</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"检索结果应包含相关资料（LangGraph），实际 </span><span class="si">{</span><span class="n">out</span><span class="p">[:</span><span class="mi">80</span><span class="p">]</span><span class="si">!r}</span><span class="s2">"</span>
+    <span class="k">return</span> <span class="mi">15</span><span class="p">,</span> <span class="s2">"✅ RAG 检索：问题能命中最相关的知识并格式化输出"</span>
+
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">检查_记忆对话</span><span class="p">(</span><span class="n">模块</span><span class="p">):</span>
+    <span class="n">agent</span> <span class="o">=</span> <span class="n">模块</span><span class="o">.</span><span class="n">MemoryAgent</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">agent</span><span class="p">,</span> <span class="s2">"chat"</span><span class="p">),</span> <span class="s2">"MemoryAgent 缺少 chat（TODO 4.1）"</span>
+    <span class="k">assert</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">agent</span><span class="p">,</span> <span class="s2">"short_memory"</span><span class="p">),</span> <span class="s2">"MemoryAgent 应有 short_memory 属性"</span>
+
+    <span class="k">with</span> <span class="nb">__import__</span><span class="p">(</span><span class="s2">"contextlib"</span><span class="p">)</span><span class="o">.</span><span class="n">redirect_stdout</span><span class="p">(</span><span class="nb">__import__</span><span class="p">(</span><span class="s2">"io"</span><span class="p">)</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()):</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait_for</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">chat</span><span class="p">(</span><span class="s2">"我叫张三，我喜欢 Python"</span><span class="p">),</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+    <span class="n">roles</span> <span class="o">=</span> <span class="p">[(</span><span class="n">m</span><span class="o">.</span><span class="n">role</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">content</span><span class="p">))</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">agent</span><span class="o">.</span><span class="n">short_memory</span><span class="o">.</span><span class="n">messages</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="nb">any</span><span class="p">(</span><span class="n">r</span> <span class="o">==</span> <span class="s2">"user"</span> <span class="ow">and</span> <span class="s2">"张三"</span> <span class="ow">in</span> <span class="n">c</span> <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">roles</span><span class="p">),</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"第一轮对话后，用户消息应写入短期记忆，实际 </span><span class="si">{</span><span class="n">roles</span><span class="si">!r}</span><span class="s2">"</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">"✅ 第一轮：用户消息已写入短期记忆"</span>
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">检查_记忆留存</span><span class="p">(</span><span class="n">模块</span><span class="p">):</span>
+    <span class="n">agent</span> <span class="o">=</span> <span class="n">模块</span><span class="o">.</span><span class="n">MemoryAgent</span><span class="p">()</span>
+    <span class="k">with</span> <span class="nb">__import__</span><span class="p">(</span><span class="s2">"contextlib"</span><span class="p">)</span><span class="o">.</span><span class="n">redirect_stdout</span><span class="p">(</span><span class="nb">__import__</span><span class="p">(</span><span class="s2">"io"</span><span class="p">)</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()):</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait_for</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">chat</span><span class="p">(</span><span class="s2">"我叫张三，我喜欢 Python"</span><span class="p">),</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait_for</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">chat</span><span class="p">(</span><span class="s2">"我叫什么名字？"</span><span class="p">),</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+    <span class="n">roles</span> <span class="o">=</span> <span class="p">[(</span><span class="n">m</span><span class="o">.</span><span class="n">role</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">content</span><span class="p">))</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">agent</span><span class="o">.</span><span class="n">short_memory</span><span class="o">.</span><span class="n">messages</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="nb">any</span><span class="p">(</span><span class="n">r</span> <span class="o">==</span> <span class="s2">"user"</span> <span class="ow">and</span> <span class="s2">"张三"</span> <span class="ow">in</span> <span class="n">c</span> <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">roles</span><span class="p">),</span> <span class="s2">"第二轮之后第一轮的记忆丢了！"</span>
+    <span class="k">assert</span> <span class="nb">any</span><span class="p">(</span><span class="n">r</span> <span class="o">==</span> <span class="s2">"user"</span> <span class="ow">and</span> <span class="s2">"名字"</span> <span class="ow">in</span> <span class="n">c</span> <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">roles</span><span class="p">),</span> <span class="s2">"第二轮的用户消息没有写入记忆"</span>
+    <span class="k">return</span> <span class="mi">7</span><span class="p">,</span> <span class="s2">"✅ 第二轮：历史保留且新消息追加（多轮记忆正常）"</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">检查_压缩</span><span class="p">(</span><span class="n">模块</span><span class="p">):</span>
+    <span class="n">compress</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">模块</span><span class="p">,</span> <span class="s2">"compress_conversation"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">callable</span><span class="p">(</span><span class="n">compress</span><span class="p">),</span> <span class="s2">"没有找到 compress_conversation 函数（TODO 5.1）"</span>
+    <span class="n">msgs</span> <span class="o">=</span> <span class="p">[</span><span class="n">模块</span><span class="o">.</span><span class="n">ConversationMessage</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="s2">"system"</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="s2">"你是测试助手"</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">):</span>
+        <span class="n">msgs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">模块</span><span class="o">.</span><span class="n">ConversationMessage</span><span class="p">(</span>
+            <span class="n">role</span><span class="o">=</span><span class="s2">"user"</span> <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">"assistant"</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="sa">f</span><span class="s2">"这是第</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">轮对话的消息内容"</span><span class="p">,</span>
+        <span class="p">))</span>
+    <span class="n">结果</span> <span class="o">=</span> <span class="n">compress</span><span class="p">(</span><span class="n">msgs</span><span class="p">,</span> <span class="n">max_tokens</span><span class="o">=</span><span class="mi">80</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">结果</span><span class="p">,</span> <span class="nb">list</span><span class="p">),</span> <span class="sa">f</span><span class="s2">"应返回消息列表，实际 </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">结果</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">"</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">结果</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">msgs</span><span class="p">),</span> <span class="sa">f</span><span class="s2">"压缩后应变短：输入 </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">msgs</span><span class="p">)</span><span class="si">}</span><span class="s2"> 条，输出 </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">结果</span><span class="p">)</span><span class="si">}</span><span class="s2"> 条"</span>
+    <span class="k">assert</span> <span class="n">结果</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s2">"system"</span><span class="p">,</span> <span class="s2">"压缩后 system message 不能丢"</span>
+    <span class="k">assert</span> <span class="n">结果</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">content</span> <span class="o">==</span> <span class="n">msgs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="s2">"最新一条消息应被保留"</span>
+    <span class="k">return</span> <span class="mi">15</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"✅ 压缩正确：</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">msgs</span><span class="p">)</span><span class="si">}</span><span class="s2"> 条 → </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">结果</span><span class="p">)</span><span class="si">}</span><span class="s2"> 条，system 和最新消息都在"</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">检查_类型注解</span><span class="p">(</span><span class="n">文件路径</span><span class="p">):</span>
@@ -540,35 +588,37 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
     <span class="n">函数们</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">ast</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">树</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">FunctionDef</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">AsyncFunctionDef</span><span class="p">))]</span>
     <span class="n">有注解</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">函数们</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">returns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">有注解</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">4</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"至少 4 个函数应有返回值类型注解，目前 </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">有注解</span><span class="p">)</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">函数们</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
-    <span class="k">return</span> <span class="mi">10</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"✅ </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">有注解</span><span class="p">)</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">函数们</span><span class="p">)</span><span class="si">}</span><span class="s2"> 个函数有返回值注解"</span>
+    <span class="k">return</span> <span class="mi">5</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"✅ </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">有注解</span><span class="p">)</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">函数们</span><span class="p">)</span><span class="si">}</span><span class="s2"> 个函数有返回值注解"</span>
 
 
 <span class="c1"># ==================== 主流程 ====================</span>
 
 <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">运行验收</span><span class="p">(</span><span class="n">验收员</span><span class="p">,</span> <span class="n">模块</span><span class="p">,</span> <span class="n">文件路径</span><span class="p">):</span>
-    <span class="k">await</span> <span class="n">验收员</span><span class="o">.</span><span class="n">检查</span><span class="p">(</span><span class="s2">"异步请求：是 async 协程函数"</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="n">检查_异步请求协程</span><span class="p">,</span> <span class="n">模块</span><span class="p">)</span>
-    <span class="k">await</span> <span class="n">验收员</span><span class="o">.</span><span class="n">检查</span><span class="p">(</span><span class="s2">"异步请求：返回结构正确"</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="n">检查_异步请求结果</span><span class="p">,</span> <span class="n">模块</span><span class="p">)</span>
-    <span class="k">await</span> <span class="n">验收员</span><span class="o">.</span><span class="n">检查</span><span class="p">(</span><span class="s2">"并发请求：结果正确且真并发"</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="n">检查_并发请求</span><span class="p">,</span> <span class="n">模块</span><span class="p">)</span>
-    <span class="k">await</span> <span class="n">验收员</span><span class="o">.</span><span class="n">检查</span><span class="p">(</span><span class="s2">"同步请求：作为慢基准可用"</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="n">检查_同步请求</span><span class="p">,</span> <span class="n">模块</span><span class="p">)</span>
-    <span class="k">await</span> <span class="n">验收员</span><span class="o">.</span><span class="n">检查</span><span class="p">(</span><span class="s2">"性能对比：打印两种耗时"</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="n">检查_性能对比</span><span class="p">,</span> <span class="n">模块</span><span class="p">)</span>
-    <span class="k">await</span> <span class="n">验收员</span><span class="o">.</span><span class="n">检查</span><span class="p">(</span><span class="s2">"重试机制：失败后能重试"</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">检查_重试机制</span><span class="p">,</span> <span class="n">模块</span><span class="p">)</span>
-    <span class="k">await</span> <span class="n">验收员</span><span class="o">.</span><span class="n">检查</span><span class="p">(</span><span class="s2">"类型注解"</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">检查_类型注解</span><span class="p">,</span> <span class="n">文件路径</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">验收员</span><span class="o">.</span><span class="n">检查</span><span class="p">(</span><span class="s2">"短期记忆：添加 + 裁剪"</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="n">检查_添加裁剪</span><span class="p">,</span> <span class="n">模块</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">验收员</span><span class="o">.</span><span class="n">检查</span><span class="p">(</span><span class="s2">"短期记忆：to_api_format"</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="n">检查_API格式</span><span class="p">,</span> <span class="n">模块</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">验收员</span><span class="o">.</span><span class="n">检查</span><span class="p">(</span><span class="s2">"短期记忆：clear 保留 system"</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">检查_清空</span><span class="p">,</span> <span class="n">模块</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">验收员</span><span class="o">.</span><span class="n">检查</span><span class="p">(</span><span class="s2">"向量存储：检索排序"</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">检查_向量存储</span><span class="p">,</span> <span class="n">模块</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">验收员</span><span class="o">.</span><span class="n">检查</span><span class="p">(</span><span class="s2">"RAG 检索器"</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="n">检查_RAG检索</span><span class="p">,</span> <span class="n">模块</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">验收员</span><span class="o">.</span><span class="n">检查</span><span class="p">(</span><span class="s2">"MemoryAgent：第一轮写入记忆"</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="n">检查_记忆对话</span><span class="p">,</span> <span class="n">模块</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">验收员</span><span class="o">.</span><span class="n">检查</span><span class="p">(</span><span class="s2">"MemoryAgent：第二轮记忆留存"</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="n">检查_记忆留存</span><span class="p">,</span> <span class="n">模块</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">验收员</span><span class="o">.</span><span class="n">检查</span><span class="p">(</span><span class="s2">"上下文压缩"</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="n">检查_压缩</span><span class="p">,</span> <span class="n">模块</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">验收员</span><span class="o">.</span><span class="n">检查</span><span class="p">(</span><span class="s2">"类型注解"</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">检查_类型注解</span><span class="p">,</span> <span class="n">文件路径</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
-    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Day 1 练习验收脚本（行为级验收）"</span><span class="p">)</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Day 9 练习验收脚本（行为级验收）"</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"--file"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">DEFAULT_FILE</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">"练习文件路径（默认 </span><span class="si">%(default)s</span><span class="s2">）"</span><span class="p">)</span>
     <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
     <span class="n">文件路径</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">file</span><span class="p">)</span>
 
     <span class="n">打印</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
-    <span class="n">打印</span><span class="p">(</span><span class="s2">"📋 Day 1 练习验收 —— 异步批量调用多个 API"</span><span class="p">)</span>
+    <span class="n">打印</span><span class="p">(</span><span class="s2">"📋 Day 9 练习验收 —— 记忆系统与 RAG"</span><span class="p">)</span>
     <span class="n">打印</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
     <span class="n">打印</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">📂 验收文件：</span><span class="si">{</span><span class="n">文件路径</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">文件路径</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
         <span class="n">打印</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">❌ 文件不存在：</span><span class="si">{</span><span class="n">文件路径</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">RED</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"请先完成 day01_practice_template.py 中的 TODO，或用 --file 指定你的练习文件"</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"请先完成 day09_practice_template.py 中的 TODO，或用 --file 指定你的练习文件"</span><span class="p">)</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="n">打印</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">【加载练习代码】（5分）"</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">CYAN</span><span class="p">)</span>
@@ -576,11 +626,6 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
     <span class="k">try</span><span class="p">:</span>
         <span class="n">模块</span> <span class="o">=</span> <span class="n">加载学生模块</span><span class="p">(</span><span class="n">文件路径</span><span class="p">)</span>
         <span class="n">打印</span><span class="p">(</span><span class="s2">"  ✅ 代码加载成功，没有语法错误"</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">GREEN</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="n">加载分</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">模块</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">打印</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  ❌ 缺少依赖：</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">RED</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"  💡 安装依赖后重试"</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="n">加载分</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">模块</span> <span class="o">=</span> <span class="kc">None</span>
@@ -595,7 +640,7 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
     <span class="n">总分</span> <span class="o">=</span> <span class="n">验收员</span><span class="o">.</span><span class="n">总分</span>
     <span class="n">打印</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">总分</span> <span class="o">&gt;=</span> <span class="n">优秀线</span><span class="p">:</span>
-        <span class="n">打印</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  总分：</span><span class="si">{</span><span class="n">总分</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">满分</span><span class="si">}</span><span class="s2">   🎉 验收通过！你掌握了 asyncio 并发！"</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">GREEN</span><span class="p">)</span>
+        <span class="n">打印</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  总分：</span><span class="si">{</span><span class="n">总分</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">满分</span><span class="si">}</span><span class="s2">   🎉 验收通过！Agent 有记忆了！"</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">GREEN</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">总分</span> <span class="o">&gt;=</span> <span class="n">通过线</span><span class="p">:</span>
         <span class="n">打印</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  总分：</span><span class="si">{</span><span class="n">总分</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">满分</span><span class="si">}</span><span class="s2">   ⚠️ 基本通过，建议按上面的提示完善"</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">YELLOW</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>

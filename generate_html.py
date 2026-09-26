@@ -35,8 +35,11 @@ from pygments.formatters import HtmlFormatter
     ("day07_practice_template.py", "🐍 Day07 Practice Template"),
     ("day07_practice_validator.py", "🐍 Day07 Practice Validator"),
     ("day08_practice_template.py", "🐍 Day08 Practice Template"),
+    ("day08_practice_validator.py", "🐍 Day08 Practice Validator"),
     ("day09_practice_template.py", "🐍 Day09 Practice Template"),
+    ("day09_practice_validator.py", "🐍 Day09 Practice Validator"),
     ("day10_practice_template.py", "🐍 Day10 Practice Template"),
+    ("day10_practice_validator.py", "🐍 Day10 Practice Validator"),
     ("tutorial_01_decorators.py", "🐍 Tutorial 01 Decorators"),
     ("tutorial_02_async.py", "🐍 Tutorial 02 Async"),
 ]
@@ -74,10 +77,13 @@ from pygments.formatters import HtmlFormatter
     ("day07_practice_validator.html", "Day 7 - 验收", None),
     ("day08_lesson.html", "Day 8 - 学习", "Day 8-10 (高级)"),
     ("day08_practice_template.html", "Day 8 - 模板", None),
+    ("day08_practice_validator.html", "Day 8 - 验收", None),
     ("day09_lesson.html", "Day 9 - 学习", None),
     ("day09_practice_template.html", "Day 9 - 模板", None),
+    ("day09_practice_validator.html", "Day 9 - 验收", None),
     ("day10_lesson.html", "Day 10 - 学习", None),
     ("day10_practice_template.html", "Day 10 - 模板", None),
+    ("day10_practice_validator.html", "Day 10 - 验收", None),
 ]
 
 

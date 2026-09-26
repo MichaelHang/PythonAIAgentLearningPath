@@ -369,11 +369,14 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 <a class="" href="day07_practice_validator.html">Day 7 - 验收</a>
 <h4>Day 8-10 (高级)</h4>
 <a class="" href="day08_lesson.html">Day 8 - 学习</a>
-<a class="" href="day08_practice_template.html">Day 8 - 模板</a>
+<a class="" href="day08_practice_template.html">
+<a class="" href="day08_practice_validator.html">Day 8 - 验收</a>Day 8 - 模板</a>
 <a class="" href="day09_lesson.html">Day 9 - 学习</a>
-<a class="" href="day09_practice_template.html">Day 9 - 模板</a>
+<a class="" href="day09_practice_template.html">
+<a class="" href="day09_practice_validator.html">Day 9 - 验收</a>Day 9 - 模板</a>
 <a class="" href="day10_lesson.html">Day 10 - 学习</a>
-<a class="" href="day10_practice_template.html">Day 10 - 模板</a>
+<a class="" href="day10_practice_template.html">
+<a class="" href="day10_practice_validator.html">Day 10 - 验收</a>Day 10 - 模板</a>
 </div>
 <div class="main-content">
     
@@ -566,16 +569,7 @@ python day04_practice_validator.py
 <hr/>
 <h2 id="day-8-mcp">📅 Day 8：工具系统与 MCP 协议</h2>
 <h3 id="mcp-server-agent">练习项目：写一个简单的 MCP Server，在 Agent 中调用</h3>
-<h4 id="_18">✅ 验收标准（手动检查清单）</h4>
-<ul>
-<li>[ ] 使用 <code>mcp</code> Python SDK 创建 MCP Server</li>
-<li>[ ] 定义了至少 2 个 Tool（用 <code>@server.tool()</code> 装饰器）</li>
-<li>[ ] Tool 有清晰的 <code>name</code>、<code>description</code>、<code>inputSchema</code></li>
-<li>[ ] MCP Server 能独立启动（用 <code>mcp run</code> 或代码启动）</li>
-<li>[ ] Agent 能连接到 MCP Server 并列出工具</li>
-<li>[ ] Agent 能调用 MCP 工具并获取结果</li>
-<li>[ ] 工具函数有超时控制</li>
-</ul>
+<h4>✅ 验收标准（自动验收，共 100 分）</h4><table class="styled-table"><thead><tr><th>序号</th><th>验收标准</th><th>验证方法（行为级：验收脚本真的调用你的代码）</th><th>分值</th></tr></thead><tbody><tr><td>1</td><td><strong>代码可以加载</strong></td><td>动态加载你的 .py 文件</td><td>5 分</td></tr><tr><td>2</td><td><strong>tools/list：MockMCPServer.get_tool_list 列出 ≥2 个工具（含 name/description）</strong></td><td>调用并检查结构</td><td>15 分</td></tr><tr><td>3</td><td><strong>tools/call：calculator 经服务器真的算出 30（10 + 20）</strong></td><td>调用你的 call_tool 核对结果</td><td>15 分</td></tr><tr><td>4</td><td><strong>超时控制：工具包装器内有 asyncio.wait_for</strong></td><td>AST 检查</td><td>10 分</td></tr><tr><td>5</td><td><strong>MCPClient：connect 后 list_tools 能拿到工具列表</strong></td><td>真的构建客户端并连接</td><td>15 分</td></tr><tr><td>6</td><td><strong>MCPClient.call_tool：calculator 算出 42</strong></td><td>经客户端调用核对</td><td>10 分</td></tr><tr><td>7</td><td><strong>Agent 集成：问'帮我计算 10 + 20'得到包含 30 的回答</strong></td><td>端到端跑你的 agent_with_mcp</td><td>20 分</td></tr><tr><td>8</td><td><strong>read_note 工具：能读取文件内容</strong></td><td>写临时文件 → 调用 → 核对内容</td><td>10 分</td></tr></tbody></table>
 <h4 id="_19">🔍 验收方式</h4>
 <div class="codehilite"><pre class="code-block"><span></span><code><span class="c1"># 终端 1：启动 MCP Server</span>
 mcp<span class="w"> </span>run<span class="w"> </span>your_mcp_server.py
@@ -586,16 +580,7 @@ python<span class="w"> </span>your_day08_agent.py
 <hr/>
 <h2 id="day-9-rag">📅 Day 9：记忆系统与 RAG</h2>
 <h3 id="agent">练习项目：实现能记住对话历史、并能从文档库检索知识的 Agent</h3>
-<h4 id="_20">✅ 验收标准（手动检查清单）</h4>
-<ul>
-<li>[ ] 实现了短期记忆（最近 N 轮对话历史）</li>
-<li>[ ] 对话历史超出限制时，有裁剪/压缩策略（滑动窗口或摘要）</li>
-<li>[ ] 实现了长期记忆（向量存储，如 ChromaDB/FAISS）</li>
-<li>[ ] 能对新输入做向量检索，找到相关历史记忆</li>
-<li>[ ] RAG：能从文档库检索相关知识，注入到 Prompt</li>
-<li>[ ] Embedding 使用合理（中文用 <code>bge-large-zh</code> 或 OpenAI embedding）</li>
-<li>[ ] 多轮对话测试：Agent 能"记住"之前说过的话</li>
-</ul>
+<h4>✅ 验收标准（自动验收，共 100 分）</h4><table class="styled-table"><thead><tr><th>序号</th><th>验收标准</th><th>验证方法（行为级：验收脚本真的调用你的代码）</th><th>分值</th></tr></thead><tbody><tr><td>1</td><td><strong>代码可以加载</strong></td><td>动态加载</td><td>5 分</td></tr><tr><td>2</td><td><strong>短期记忆：添加 + 裁剪（超限自动裁、system 永远保留、最新消息在）</strong></td><td>真加 6 条消息看裁剪结果</td><td>12 分</td></tr><tr><td>3</td><td><strong>短期记忆：to_api_format 转成 role/content 字典列表</strong></td><td>调用并检查结构</td><td>8 分</td></tr><tr><td>4</td><td><strong>短期记忆：clear 清空历史但保留 system</strong></td><td>调用后检查</td><td>5 分</td></tr><tr><td>5</td><td><strong>向量存储：添加文档后检索，最相关文档排第一且得分 > 0</strong></td><td>加 3 条文档、查询、核对排序</td><td>20 分</td></tr><tr><td>6</td><td><strong>RAG 检索器：retrieve 返回包含关键词的资料文本</strong></td><td>加知识 → 检索 → 核对</td><td>15 分</td></tr><tr><td>7</td><td><strong>MemoryAgent：两轮对话，第一轮用户消息被记住、第二轮历史仍保留</strong></td><td>真的跑两轮 chat 并检查记忆列表</td><td>15 分</td></tr><tr><td>8</td><td><strong>compress_conversation：压缩后变短、system 保留、最新消息保留</strong></td><td>构造 9 条消息、限制 token、核对</td><td>15 分</td></tr><tr><td>9</td><td><strong>类型注解：至少 4 个函数有返回值注解</strong></td><td>AST 检查</td><td>5 分</td></tr></tbody></table>
 <h4 id="_21">🔍 验收方式</h4>
 <div class="codehilite"><pre class="code-block"><span></span><code>python<span class="w"> </span>your_day09_agent.py
 
@@ -609,16 +594,7 @@ python<span class="w"> </span>your_day08_agent.py
 <hr/>
 <h2 id="day-10-agent">📅 Day 10：阶段二实战——多工具 Agent</h2>
 <h3 id="langgraph-agent">练习项目：用 LangGraph 构建多工具 Agent</h3>
-<h4 id="_22">✅ 验收标准（手动检查清单）</h4>
-<ul>
-<li>[ ] 集成了至少 4 个工具（计算器、网页搜索、文件读写、代码执行）</li>
-<li>[ ] 使用 LangGraph 的 <code>ToolNode</code> 或手写的工具执行节点</li>
-<li>[ ] ReAct 循环 + 条件路由（继续推理 or 调用工具 or 结束）</li>
-<li>[ ] 对话记忆：短期（最近 10 轮）+ 长期（向量存储）</li>
-<li>[ ] 流式输出（用 <code>astream_events()</code> 或类似方法）</li>
-<li>[ ] 错误恢复：工具调用失败自动重试或降级</li>
-<li>[ ] Token 消耗有记录（每次 LLM 调用记录 token 数）</li>
-</ul>
+<h4>✅ 验收标准（自动验收，共 100 分）</h4><table class="styled-table"><thead><tr><th>序号</th><th>验收标准</th><th>验证方法（行为级：验收脚本真的调用你的代码）</th><th>分值</th></tr></thead><tbody><tr><td>1</td><td><strong>代码可以加载</strong></td><td>动态加载</td><td>5 分</td></tr><tr><td>2</td><td><strong>工具系统：注册至少 4 个工具</strong></td><td>检查 TOOLS_REGISTRY</td><td>20 分</td></tr><tr><td>3</td><td><strong>工具包装器：calculator 经（超时+重试）包装器可异步调用</strong></td><td>真的 await 调用</td><td>10 分</td></tr><tr><td>4</td><td><strong>错误恢复成功路径：calculator → ToolResult(success=True, 含 13)</strong></td><td>调用 execute_tool_with_recovery</td><td>15 分</td></tr><tr><td>5</td><td><strong>错误恢复失败路径：不存在的工具不崩溃，返回 success=False</strong></td><td>传不存在的工具名试探</td><td>15 分</td></tr><tr><td>6</td><td><strong>Agent：返回真实回答（不是模板占位符'最终回答'）</strong></td><td>构造记忆桩、端到端调用</td><td>10 分</td></tr><tr><td>7</td><td><strong>Agent 真的执行了工具：用间谍函数拦截 calculator，至少被调用 1 次</strong></td><td>替换注册表函数为间谍后跑 Agent</td><td>20 分</td></tr><tr><td>8</td><td><strong>类型注解：至少 4 个函数有返回值注解</strong></td><td>AST 检查</td><td>5 分</td></tr></tbody></table>
 <hr/>
 <h2 id="day-11-15">📅 Day 11-15：完整项目实战</h2>
 <h3 id="agent_1">项目：智能开发助手 Agent</h3>
@@ -670,7 +646,7 @@ python<span class="w"> </span>your_day08_agent.py
 <tr>
 <td>阶段二</td>
 <td>Day 6-10</td>
-<td>Day 6-7 自动验收 ≥80 分；Day 8-10 完成检查清单</td>
+<td>每天自动验收 ≥80 分</td>
 <td>掌握 Agent 架构</td>
 </tr>
 <tr>
@@ -727,6 +703,21 @@ python<span class="w"> </span>your_day08_agent.py
 <td>Day 7</td>
 <td>检查 LangGraph 图结构</td>
 </tr>
+<tr>
+<td><code>day08_practice_validator.py</code></td>
+<td>Day 8</td>
+<td>检查 MCP Server / 客户端 / Agent 集成</td>
+</tr>
+<tr>
+<td><code>day09_practice_validator.py</code></td>
+<td>Day 9</td>
+<td>检查记忆裁剪 / 向量检索 / RAG / 多轮记忆</td>
+</tr>
+<tr>
+<td><code>day10_practice_validator.py</code></td>
+<td>Day 10</td>
+<td>检查多工具 / 错误恢复 / 间谍函数验证工具调用</td>
+</tr>
 </tbody>
 </table>
 <p><strong>使用方法</strong>：</p>
@@ -745,8 +736,8 @@ python<span class="w"> </span>day01_practice_validator.py<span class="w"> </span
 <p>A：仔细阅读脚本输出的"改进建议"部分，逐项修改你的代码，然后重新运行验收脚本。</p>
 <h3 id="q2">Q2：我的代码能运行，但验收脚本不给满分？</h3>
 <p>A：验收脚本不仅检查"能运行"，还检查"最佳实践"（类型注解、错误处理、代码规范等）。根据建议改进即可。</p>
-<h3 id="q3day-8910">Q3：Day 8/9/10 没有自动验收脚本？</h3>
-<p>A：这些天的练习更综合，难以完全自动化验收。请按照文档中的"手动检查清单"逐项自查。</p>
+<h3 id="q3day-8910">Q3：Day 8/9/10 的验收和其他天一样吗？</h3>
+<p>A：一样。<code>python day08/09/10_practice_validator.py</code> 都是行为级验收（真的调用你的 Server/记忆/Agent）。文档中的"手动检查清单"仍可作为深度自查的补充。</p>
 <h3 id="q4">Q4：我可以参考标准答案吗？</h3>
 <p>A：项目暂不提供标准答案——<strong>建议先自己尝试</strong>。卡住时可以：① 对照验收脚本的逐项提示（它会告诉你差在哪）；② 重读 TODO 的 docstring，需求都写在里面；③ 让 AI 助手帮你解读报错，但代码尽量自己写。</p>
 <hr/>

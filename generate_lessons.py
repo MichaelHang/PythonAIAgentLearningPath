@@ -806,8 +806,8 @@ def day08() -> str:
   <li>TODO 4.1-4.2：<code>agent_with_mcp()</code> —— 获取工具列表 → 走一遍简化 ReAct（Day 6 功底）</li>
   </ul></li>
 <li><strong>运行自测</strong>：<code>python day08_practice_template.py</code>（TODO 未完成时会有友好提示，不会裸崩）。</li>
-<li><strong>验收</strong>：本天没有自动脚本，按 <a href="ACCEPTANCE_CRITERIA.html">验收标准文档</a> Day 8 清单逐项自查：
-工具描述清晰吗？超时控制在哪？错误返回的是可读信息还是 traceback？</li>
+<li><strong>验收</strong>：<code>python day08_practice_validator.py</code> —— 验收会真的调用你的
+MCP Server（列工具/算数/读文件）、你的客户端，并端到端跑一遍 Agent 集成。</li>
 <li><strong>进阶（可选）</strong>：<code>pip install mcp</code>，用官方 SDK 把 calculator + read_note 实现成真 MCP Server，
 用 <code>mcp dev</code> 起服务后接进 Claude Desktop / Cursor 玩一圈。</li>
 </ol>
@@ -885,8 +885,9 @@ class ShortTermMemory:
 <li><strong>运行自测</strong>：<code>python day09_practice_template.py</code>。
 测试 4 是记忆的"图灵测试"：先告诉它"我叫张三，我喜欢 Python"，再问"我叫什么名字？"——
 答对了说明记忆链路通了。</li>
-<li><strong>验收</strong>：按 <a href="ACCEPTANCE_CRITERIA.html">验收标准文档</a> Day 9 清单自查，并回答三个问题：
-裁剪为什么保留 system？检索为什么比"把所有知识塞 prompt"好？压缩和滑动窗口各适合什么场景？</li>
+<li><strong>验收</strong>：<code>python day09_practice_validator.py</code> —— 验收会真的裁剪你的记忆、
+检索你的向量库、跑两轮对话检查记忆是否留存。</li>
+<li><strong>想清楚三个问题</strong>：裁剪为什么保留 system？检索为什么比"把所有知识塞 prompt"好？压缩和滑动窗口各适合什么场景？</li>
 </ol>
 <h2>⚠️ 避坑</h2>
 {链接列表([
@@ -955,8 +956,9 @@ def day10() -> str:
 <li><strong>6 个测试场景（写进 main）</strong>：
   普通对话 / 单工具调用 / 多工具并发（<code>asyncio.gather</code>，Day 1）/ 多轮对话带记忆（Day 9）/
   工具失败后自动恢复（把一个工具故意改成会报错）/ Token 统计打印。</li>
-<li><strong>验收</strong>：按 <a href="ACCEPTANCE_CRITERIA.html">验收标准文档</a> Day 10 清单自查。
-自测标准：跑 <code>python day10_practice_template.py</code>，6 个场景全部有真实输出（不是 print 占位）。</li>
+<li><strong>验收</strong>：<code>python day10_practice_validator.py</code> —— 验收会检查工具数量与错误恢复，
+并用"间谍函数"拦截 calculator 调用，确认你的 Agent 真的执行了工具。</li>
+<li><strong>自测</strong>：跑 <code>python day10_practice_template.py</code>，6 个场景全部有真实输出（不是 print 占位）。</li>
 </ol>
 <h2>⚠️ 避坑</h2>
 {链接列表([
@@ -980,9 +982,9 @@ def day10() -> str:
     (5, "阶段一综合实战：命令行 AI 助手", day05, True),
     (6, "Agent 架构原理：手写 ReAct", day06, True),
     (7, "LangGraph 入门", day07, True),
-    (8, "工具系统设计与 MCP 协议", day08, False),
-    (9, "记忆系统与 RAG", day09, False),
-    (10, "阶段二综合实战：多工具 Agent", day10, False),
+    (8, "工具系统设计与 MCP 协议", day08, True),
+    (9, "记忆系统与 RAG", day09, True),
+    (10, "阶段二综合实战：多工具 Agent", day10, True),
 ]
 
 

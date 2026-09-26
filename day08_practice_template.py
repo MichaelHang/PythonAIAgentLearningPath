@@ -228,8 +228,7 @@ async def main():
     print(f"  Agent 回答: {result}")
     
     print("\n" + "=" * 60)
-    print("✅ 所有测试完成！")
-    print("📋 本 Day 没有自动验收脚本，请按 ACCEPTANCE_CRITERIA.html 的 Day 8 清单自查")
+    print("✅ 所有测试完成！现在运行 python day08_practice_validator.py 验收")
     print("=" * 60)
 
 

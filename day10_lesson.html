@@ -7,6 +7,7 @@
     <style>
 
 
+
 /* ===== Maple Mono 代码字体（自托管，OFL 开源协议） ===== */
 @font-face {
     font-family:"Maple Mono";
@@ -338,6 +339,7 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
     
     
     
+    
     </style>
 </head>
 <body>
@@ -376,10 +378,13 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 <h4>Day 8-10 (高级)</h4>
 <a class="" href="day08_lesson.html">Day 8 - 学习</a>
 <a class="" href="day08_practice_template.html">Day 8 - 模板</a>
+<a class="" href="day08_practice_validator.html">Day 8 - 验收</a>
 <a class="" href="day09_lesson.html">Day 9 - 学习</a>
 <a class="" href="day09_practice_template.html">Day 9 - 模板</a>
+<a class="" href="day09_practice_validator.html">Day 9 - 验收</a>
 <a class="active" href="day10_lesson.html">Day 10 - 学习</a>
 <a class="" href="day10_practice_template.html">Day 10 - 模板</a>
+<a class="" href="day10_practice_validator.html">Day 10 - 验收</a>
 </div>
 <div class="main-content">
     <div class="header"><h1>📖 Day 10 学习页：阶段二综合实战：多工具 Agent</h1></div>
@@ -424,8 +429,9 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 <li><strong>6 个测试场景（写进 main）</strong>：
   普通对话 / 单工具调用 / 多工具并发（<code>asyncio.gather</code>，Day 1）/ 多轮对话带记忆（Day 9）/
   工具失败后自动恢复（把一个工具故意改成会报错）/ Token 统计打印。</li>
-<li><strong>验收</strong>：按 <a href="ACCEPTANCE_CRITERIA.html">验收标准文档</a> Day 10 清单自查。
-自测标准：跑 <code>python day10_practice_template.py</code>，6 个场景全部有真实输出（不是 print 占位）。</li>
+<li><strong>验收</strong>：<code>python day10_practice_validator.py</code> —— 验收会检查工具数量与错误恢复，
+并用"间谍函数"拦截 calculator 调用，确认你的 Agent 真的执行了工具。</li>
+<li><strong>自测</strong>：跑 <code>python day10_practice_template.py</code>，6 个场景全部有真实输出（不是 print 占位）。</li>
 </ol>
 <h2>⚠️ 避坑</h2>
 <ul><li>❌ 一上来就拼全部组件——先把单工具 ReAct 跑通，再一个个往上挂，每挂一个测一次</li><li>❌ 工具失败直接 raise → 整个 Agent 崩溃；错误要作为 Observation 回传给 LLM 自行纠正</li><li>❌ Token 消耗不记录 → 成本失控时你毫无感知；每次 LLM 调用都记 prompt/completion tokens</li><li>✅ 这是阶段二收官：做完回头把 Day 6 和今天的代码对比一下，你会直观看到'框架前 vs 总装后'的差距</li></ul>

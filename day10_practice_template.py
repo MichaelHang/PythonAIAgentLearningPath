@@ -225,7 +225,8 @@ async def main():
     print("\n" + "=" * 60)
     print("💡 提示：这是 Day 1-9 的综合练习")
     print("  把之前每个 Day 写的模块拼装起来即可")
-    print("📋 本 Day 没有自动验收脚本，请按 ACCEPTANCE_CRITERIA.html 的 Day 10 清单自查")
+    print("\n📋 本 Day 有自动验收脚本：python day10_practice_validator.py")
+    print("   （会检查工具数量、错误恢复，并用间谍函数验证工具真的被调用）")
     print("=" * 60)
 
 
