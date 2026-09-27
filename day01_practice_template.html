@@ -3,8 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
     <title>🐍 Day01 Practice Template</title>
     <style>
+
+
+
+
+
+
+
+
 
 
 
@@ -328,6 +337,85 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
     }
     .download-btn:hover { background:#0077ed; }
 
+
+/* ===== 代码块复制按钮 ===== */
+.code-copy-btn {
+    position:absolute; top:10px; right:10px;
+    padding:3px 12px; font-size:12px; font-family:inherit;
+    background:rgba(0,0,0,0.05); color:#6e6e73;
+    border:1px solid rgba(0,0,0,0.12); border-radius:8px;
+    cursor:pointer; opacity:0; transition:opacity .2s, background .2s, color .2s;
+}
+.highlight:hover .code-copy-btn, pre.code-block:hover .code-copy-btn,
+.code-copy-btn:focus { opacity:1; }
+.code-copy-btn:hover { background:rgba(0,0,0,0.09); color:#1d1d1f; }
+
+/* ===== 深色模式（跟随系统 prefers-color-scheme） ===== */
+@media (prefers-color-scheme: dark) {
+    body { background:#1a1a1c; color:#f5f5f7; }
+    a { color:#409cff; }
+    a:hover { color:#6cb2ff; }
+    hr { background:#3a3a3c; }
+    h1, h2, h3, h4, strong { color:#f5f5f7; }
+    p, li { color:#c7c7cc; }
+    .nav-sidebar { background:rgba(28,28,30,0.72); border-right-color:rgba(255,255,255,0.08); }
+    .nav-sidebar h3 { color:#f5f5f7; }
+    .nav-sidebar h4 { color:#98989d; }
+    .nav-sidebar a { color:#c7c7cc; }
+    .nav-sidebar a:hover { background:rgba(255,255,255,0.07); color:#f5f5f7; }
+    .nav-sidebar a.active { background:#0071e3; color:#fff; }
+    .main-content { background:#232326; box-shadow:0 4px 24px rgba(0,0,0,0.35); }
+    .header { background:#232326; color:#f5f5f7; border-bottom-color:rgba(255,255,255,0.08); }
+    .header h1 { color:#f5f5f7; }
+    .header .meta { color:#98989d; }
+    code { background:rgba(255,255,255,0.09); color:#f5f5f7; }
+    .code-block, pre.code-block, .highlight { background:#1d1d20; color:#e8e8ed; border:1px solid rgba(255,255,255,0.06); }
+    .highlight .hll, pre.code-block .hll { background-color:#3a3a3c; }
+    .styled-table { border-color:rgba(255,255,255,0.1); }
+    .styled-table thead { background:#2c2c2e; }
+    .styled-table th { color:#f5f5f7; }
+    .styled-table td { color:#c7c7cc; border-top-color:rgba(255,255,255,0.09); }
+    .styled-table tbody tr:hover { background-color:#2c2c2e; }
+    .note-block { background:#2c2c2e; }
+    .note-block p { color:#c7c7cc; }
+    .file-info { background:#2c2c2e; color:#a1a1a6; }
+    .back-top { background:rgba(44,44,46,0.85); color:#f5f5f7; border-color:rgba(255,255,255,0.12); }
+    .code-copy-btn { background:rgba(255,255,255,0.07); color:#a1a1a6; border-color:rgba(255,255,255,0.14); }
+    .code-copy-btn:hover { background:rgba(255,255,255,0.13); color:#f5f5f7; }
+    /* 语法配色 → Xcode Dark */
+    .highlight .k, .highlight .kc, .highlight .kd, .highlight .kn, .highlight .kp, .highlight .kr, .highlight .ow,
+    pre.code-block .k, pre.code-block .kc, pre.code-block .kd, pre.code-block .kn, pre.code-block .kp, pre.code-block .kr, pre.code-block .ow { color:#FC5FA3; }
+    .highlight .kt, pre.code-block .kt { color:#41A1C6; }
+    .highlight .s, .highlight .sa, .highlight .sb, .highlight .sc, .highlight .dl, .highlight .sd, .highlight .s2,
+    .highlight .se, .highlight .sh, .highlight .si, .highlight .sx, .highlight .sr, .highlight .s1, .highlight .ss,
+    pre.code-block .s, pre.code-block .sa, pre.code-block .sb, pre.code-block .sc, pre.code-block .dl, pre.code-block .sd,
+    pre.code-block .s2, pre.code-block .se, pre.code-block .sh, pre.code-block .si, pre.code-block .sx,
+    pre.code-block .sr, pre.code-block .s1, pre.code-block .ss { color:#FF8170; }
+    .highlight .m, .highlight .mb, .highlight .mf, .highlight .mh, .highlight .mi, .highlight .mo, .highlight .il,
+    pre.code-block .m, pre.code-block .mb, pre.code-block .mf, pre.code-block .mh, pre.code-block .mi,
+    pre.code-block .mo, pre.code-block .il { color:#D0BF69; }
+    .highlight .c, .highlight .ch, .highlight .cm, .highlight .cp, .highlight .cpf, .highlight .c1, .highlight .cs,
+    pre.code-block .c, pre.code-block .ch, pre.code-block .cm, pre.code-block .cp, pre.code-block .cpf,
+    pre.code-block .c1, pre.code-block .cs { color:#6C7986; }
+    .highlight .nb, .highlight .bp, .highlight .nc, .highlight .nn, .highlight .vm,
+    pre.code-block .nb, pre.code-block .bp, pre.code-block .nc, pre.code-block .nn, pre.code-block .vm { color:#5DD8FF; }
+    .highlight .nf, .highlight .fm, .highlight .ne,
+    pre.code-block .nf, pre.code-block .fm, pre.code-block .ne { color:#67B7A4; }
+    .highlight .nd, pre.code-block .nd { color:#D0BF69; }
+    .highlight .n, .highlight .na, .highlight .ni, .highlight .nl, .highlight .no,
+    .highlight .nx, .highlight .o, .highlight .p, .highlight .w, .highlight .x, .highlight .esc,
+    .highlight .g, .highlight .vc, .highlight .vg, .highlight .vi, .highlight .gh, .highlight .gu,
+    pre.code-block .n, pre.code-block .na, pre.code-block .ni, pre.code-block .nl, pre.code-block .no,
+    pre.code-block .nx, pre.code-block .o, pre.code-block .p, pre.code-block .w, pre.code-block .x,
+    pre.code-block .esc, pre.code-block .g, pre.code-block .vc, pre.code-block .vg, pre.code-block .vi,
+    pre.code-block .gh, pre.code-block .gu { color:#e8e8ed; }
+    .highlight .gp, pre.code-block .gp { color:#98989d; }
+    .highlight .go, pre.code-block .go { color:#98989d; }
+    .highlight .gt, pre.code-block .gt { color:#FF6482; }
+    .highlight .gi, pre.code-block .gi { color:#66E29A; }
+    .highlight .gd, pre.code-block .gd { color:#FF6482; }
+}
+
 @media print { body { background:#fff; padding:0; } .main-content { box-shadow:none; } .nav-sidebar { display:none; } .back-top { display:none; } }
 @media (max-width:900px) {
     .nav-sidebar { width:200px; min-width:200px; font-size:13px; padding:16px 10px; }
@@ -340,6 +428,14 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
     .nav-sidebar h3, .nav-sidebar h4 { display:none; }
 }
 
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     
@@ -400,7 +496,7 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 <a class="" href="day13_lesson.html">Day 13 - 学习</a>
 <a class="" href="day14_lesson.html">Day 14 - 学习</a>
 <a class="" href="day15_lesson.html">Day 15 - 学习</a>
-<a class="" href="project_day11_15/README.md">项目脚手架</a>
+<a class="" href="project_day11_15/README.html">项目脚手架</a>
 </div>
 <div class="main-content">
     <div class="header"><h1>🐍 Day01 Practice Template</h1></div>
@@ -572,5 +668,35 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 </div>
 <button class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="返回顶部">⬆</button>
 <script>window.addEventListener("scroll",function(){  var btn=document.querySelector(".back-top");  if(btn)btn.style.display=window.scrollY>300?"block":"none";});</script>
+<script>
+(function () {
+    document.querySelectorAll(".highlight, pre.code-block").forEach(function (block) {
+        var btn = document.createElement("button");
+        btn.className = "code-copy-btn";
+        btn.type = "button";
+        btn.textContent = "复制";
+        btn.addEventListener("click", function () {
+            var text = block.innerText;
+            var done = function () {
+                btn.textContent = "已复制 ✓";
+                setTimeout(function () { btn.textContent = "复制"; }, 1500);
+            };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(done).catch(function () { fallback(); });
+            } else { fallback(); }
+            function fallback() {
+                var ta = document.createElement("textarea");
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand("copy");
+                document.body.removeChild(ta);
+                done();
+            }
+        });
+        block.appendChild(btn);
+    });
+})();
+</script>
 </body>
 </html>

@@ -18,6 +18,37 @@ from pygments.formatters import HtmlFormatter
 
 根目录 = Path(__file__).parent
 
+# 代码块复制按钮（所有页面共用；挂在 </body> 前）
+复制脚本 = """<script>
+(function () {
+    document.querySelectorAll(".highlight, pre.code-block").forEach(function (block) {
+        var btn = document.createElement("button");
+        btn.className = "code-copy-btn";
+        btn.type = "button";
+        btn.textContent = "复制";
+        btn.addEventListener("click", function () {
+            var text = block.innerText;
+            var done = function () {
+                btn.textContent = "已复制 ✓";
+                setTimeout(function () { btn.textContent = "复制"; }, 1500);
+            };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(done).catch(function () { fallback(); });
+            } else { fallback(); }
+            function fallback() {
+                var ta = document.createElement("textarea");
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand("copy");
+                document.body.removeChild(ta);
+                done();
+            }
+        });
+        block.appendChild(btn);
+    });
+})();
+</script>"""
 # 代码页清单：(py 文件, 页面标题)
 页面清单 = [
     ("day01_practice_template.py", "🐍 Day01 Practice Template"),
@@ -43,6 +74,7 @@ from pygments.formatters import HtmlFormatter
     ("tutorial_01_decorators.py", "🐍 Tutorial 01 Decorators"),
     ("tutorial_02_async.py", "🐍 Tutorial 02 Async"),
     ("tutorial_03_real_api.py", "🐍 Tutorial 03 Real API"),
+    ("project_day11_15/README.md", "🛠 项目脚手架 · 使用说明"),
 ]
 
 # 侧边栏导航：(href, 显示文字, 分组标题或 None)
@@ -91,7 +123,7 @@ from pygments.formatters import HtmlFormatter
     ("day13_lesson.html", "Day 13 - 学习", None),
     ("day14_lesson.html", "Day 14 - 学习", None),
     ("day15_lesson.html", "Day 15 - 学习", None),
-    ("project_day11_15/README.md", "项目脚手架", None),
+    ("project_day11_15/README.html", "项目脚手架", None),
 ]
 
 
@@ -130,6 +162,7 @@ def 生成页面(py文件: str, 标题: str, 样式: str) -> str:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
     <title>{标题}</title>
     <style>
 {样式}
@@ -148,22 +181,66 @@ def 生成页面(py文件: str, 标题: str, 样式: str) -> str:
 </div>
 <button class="back-top" onclick="window.scrollTo({{top:0,behavior:'smooth'}})" title="返回顶部">⬆</button>
 <script>window.addEventListener("scroll",function(){{  var btn=document.querySelector(".back-top");  if(btn)btn.style.display=window.scrollY>300?"block":"none";}});</script>
+{复制脚本}
+</body>
+</html>"""
+
+
+def 生成文档页面(md文件: str, 标题: str, 样式: str) -> str:
+    """把 Markdown 文件渲染成带样式的 HTML 页（解决 .md 裸开乱码 + 无排版问题）"""
+    md路径 = 根目录 / md文件
+    import markdown
+    正文 = markdown.markdown(
+        md路径.read_text(encoding="utf-8"),
+        extensions=["tables", "fenced_code", "codehilite"],
+        extension_configs={"codehilite": {"guess_lang": False, "css_class": "highlight"}},
+    )
+    html文件 = md文件.replace(".md", ".html")
+
+    return f"""<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <title>{标题}</title>
+    <style>
+{样式}
+    </style>
+</head>
+<body>
+<div class="nav-wrapper">
+{构造侧边栏(html文件)}
+<div class="main-content">
+    <div class="header"><h1>{标题}</h1></div>
+    <div class="content">
+        <div class="file-info"><div class="info-left">📄 源文件: <code>{md文件}</code></div><a class="download-btn" href="{md文件}" download>⬇ 下载 .md 文件</a></div>
+{正文}
+    </div>
+</div>
+</div>
+<button class="back-top" onclick="window.scrollTo({{top:0,behavior:'smooth'}})" title="返回顶部">⬆</button>
+<script>window.addEventListener("scroll",function(){{  var btn=document.querySelector(".back-top");  if(btn)btn.style.display=window.scrollY>300?"block":"none";}});</script>
+{复制脚本}
 </body>
 </html>"""
 
 
 def main():
-    指定 = [a for a in sys.argv[1:] if a.endswith(".py")]
+    指定 = [a for a in sys.argv[1:] if a.endswith((".py", ".md"))]
     样式 = 提取样式()
     生成数 = 0
-    for py文件, 标题 in 页面清单:
-        if 指定 and py文件 not in 指定:
+    for 源文件, 标题 in 页面清单:
+        if 指定 and 源文件 not in 指定:
             continue
-        html文件 = 根目录 / py文件.replace(".py", ".html")
-        if not (根目录 / py文件).exists():
-            print(f"⚠️ 跳过（找不到 {py文件}）")
+        html文件 = 根目录 / 源文件.replace(".py", ".html").replace(".md", ".html")
+        if not (根目录 / 源文件).exists():
+            print(f"⚠️ 跳过（找不到 {源文件}）")
             continue
-        html文件.write_text(生成页面(py文件, 标题, 样式), encoding="utf-8")
+        if 源文件.endswith(".md"):
+            html文件.write_text(生成文档页面(源文件, 标题, 样式), encoding="utf-8")
+        else:
+            html文件.write_text(生成页面(源文件, 标题, 样式), encoding="utf-8")
         print(f"✅ 已生成 {html文件.name}")
         生成数 += 1
     print(f"\n共生成 {生成数} 个页面")

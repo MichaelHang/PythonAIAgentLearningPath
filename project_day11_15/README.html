@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light dark">
-    <title>🐍 Day03 Practice Template</title>
+    <title>🛠 项目脚手架 · 使用说明</title>
     <style>
 
 
@@ -464,7 +464,7 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 <a class="" href="day02_practice_template.html">Day 2 - 模板</a>
 <a class="" href="day02_practice_validator.html">Day 2 - 验收</a>
 <a class="" href="day03_lesson.html">Day 3 - 学习</a>
-<a class="active" href="day03_practice_template.html">Day 3 - 模板</a>
+<a class="" href="day03_practice_template.html">Day 3 - 模板</a>
 <a class="" href="day03_practice_validator.html">Day 3 - 验收</a>
 <h4>Day 4-5 (LLM)</h4>
 <a class="" href="day04_lesson.html">Day 4 - 学习</a>
@@ -496,277 +496,97 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 <a class="" href="day13_lesson.html">Day 13 - 学习</a>
 <a class="" href="day14_lesson.html">Day 14 - 学习</a>
 <a class="" href="day15_lesson.html">Day 15 - 学习</a>
-<a class="" href="project_day11_15/README.html">项目脚手架</a>
+<a class="active" href="project_day11_15/README.html">项目脚手架</a>
 </div>
 <div class="main-content">
-    <div class="header"><h1>🐍 Day03 Practice Template</h1></div>
+    <div class="header"><h1>🛠 项目脚手架 · 使用说明</h1></div>
     <div class="content">
-        <div class="file-info"><div class="info-left">📄 文件: <code>day03_practice_template.py</code></div><a class="download-btn" href="day03_practice_template.py" download>⬇ 下载 .py 文件</a></div>
-<div class="highlight"><pre><span></span><span class="sd">"""</span>
-<span class="sd">Day 3 练习：实现流式 LLM 响应的异步生成器包装器</span>
-<span class="sd">验收标准：</span>
-<span class="sd">1. 必须实现异步生成器（async def + yield）</span>
-<span class="sd">2. 必须实现同步生成器（def + yield）做对比</span>
-<span class="sd">3. 必须使用 @contextmanager 或 __enter__/__exit__ 实现上下文管理器</span>
-<span class="sd">4. 必须使用 @asynccontextmanager 实现异步上下文管理器</span>
-<span class="sd">5. 流式输出模拟：逐块（chunk）产出数据，不是一次性返回</span>
-<span class="sd">6. 代码有类型注解</span>
-<span class="sd">"""</span>
+        <div class="file-info"><div class="info-left">📄 源文件: <code>project_day11_15/README.md</code></div><a class="download-btn" href="project_day11_15/README.md" download>⬇ 下载 .md 文件</a></div>
+<h1>智能开发助手 Agent —— 项目脚手架（Day 11-15）</h1>
+<p>这是 15 天路线图<strong>阶段三</strong>的起点：一个分层清晰的 FastAPI 项目骨架，TODO 已经标好，
+Day 11-15 的所有开发都在这个目录里进行。</p>
+<h2>使用方式</h2>
+<div class="highlight"><pre><span></span><code><span class="c1"># 0. 建议把本目录复制一份作为你的项目根目录（保留本仓库原样作参考）</span>
+<span class="c1">#    以下命令都在 project_day11_15/ 目录下执行</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncGenerator</span><span class="p">,</span> <span class="n">Generator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">contextmanager</span><span class="p">,</span> <span class="n">asynccontextmanager</span>
+<span class="c1"># 1. 安装依赖</span>
+pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
 
+<span class="c1"># 2. 配置 Key（永远用环境变量，不要写进代码）</span>
+<span class="c1">#    Windows PowerShell:  $env:DEEPSEEK_API_KEY = "sk-..."</span>
+<span class="c1">#    macOS / Linux:       export DEEPSEEK_API_KEY=sk-...</span>
+<span class="c1">#    也可以复制 .env.example 为 .env 自行加载</span>
 
-<span class="c1"># ==================== 任务 1：同步生成器（基础） ====================</span>
-<span class="c1"># 提示：生成器用 yield 而不是 return，可以暂停和恢复</span>
+<span class="c1"># 3. 启动开发服务器（在项目根目录运行）</span>
+uvicorn<span class="w"> </span>app.main:app<span class="w"> </span>--reload
 
-<span class="k">def</span><span class="w"> </span><span class="nf">模拟_llm_流式输出_同步</span><span class="p">(</span><span class="n">提示词</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">延迟秒</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    同步生成器：模拟 LLM 逐 token 输出</span>
-<span class="sd">    </span>
-<span class="sd">    需求：</span>
-<span class="sd">    1. 用 yield 逐块输出（不要用 return）</span>
-<span class="sd">    2. 每次 yield 后暂停，下次迭代从上次暂停处继续</span>
-<span class="sd">    3. 模拟 5 个 chunk 的输出</span>
-<span class="sd">    </span>
-<span class="sd">    示例输出：</span>
-<span class="sd">    "我"</span>
-<span class="sd">    "我喜欢"</span>
-<span class="sd">    "我喜欢写"</span>
-<span class="sd">    "我喜欢写代码"</span>
-<span class="sd">    "（完成）"</span>
-<span class="sd">    """</span>
-    <span class="c1"># TODO 1.1：实现同步生成器</span>
-    <span class="c1"># 提示：</span>
-    <span class="c1"># 1. 把 提示词 拆成若干个 chunk</span>
-    <span class="c1"># 2. 用 for 循环遍历 chunk，每次 yield 一个</span>
-    <span class="c1"># 3. 每次 yield 前用 time.sleep(延迟秒) 模拟延迟</span>
-    <span class="k">pass</span>
+<span class="c1"># 4. 测试接口</span>
+curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://127.0.0.1:8000/chat<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">"Content-Type: application/json"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"session_id": "s1", "message": "帮我计算 3 + 5 * 2"}'</span>
 
+<span class="c1"># 交互式 API 文档：浏览器打开 http://127.0.0.1:8000/docs</span>
+</code></pre></div>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">同步调用示例</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">"""演示如何使用同步生成器"""</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"📝 同步生成器示例："</span><span class="p">)</span>
-    <span class="c1"># TODO 1.2：用 for 循环迭代生成器，打印每个 chunk</span>
-    <span class="c1"># 提示：for chunk in 模拟_llm_流式输出_同步("Hello"):</span>
-    <span class="c1">#           print(chunk, end="", flush=True)</span>
-    <span class="k">pass</span>
+<h2>目录结构（为什么这样分层）</h2>
+<div class="highlight"><pre><span></span><code>app/
+├── main.py      # FastAPI 路由层：只做 HTTP ↔ 内部转换，保持"薄"
+├── schemas.py   # 请求/响应模型（Pydantic）：API 的契约
+├── agent.py     # Agent 核心循环：业务层（Day 4/6/9 的服务化组装）
+├── tools.py     # 工具系统：注册表 + 内置工具（Day 2/8 模式）
+├── memory.py    # 会话记忆：session_id → 会话隔离（Day 9 服务化）
+├── llm.py       # LLM 客户端：外部服务适配层——换供应商只改这里
+└── config.py    # 配置中心：环境变量单点读取
+</code></pre></div>
 
-
-<span class="c1"># ==================== 任务 2：异步生成器（核心） ====================</span>
-<span class="c1"># 提示：async def + yield = 异步生成器，可以用在 async for 中</span>
-
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">模拟_llm_流式输出_异步</span><span class="p">(</span><span class="n">提示词</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">延迟秒</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    异步生成器：模拟 LLM 流式输出（Agent 核心机制）</span>
-<span class="sd">    </span>
-<span class="sd">    需求：</span>
-<span class="sd">    1. 用 async def 定义，函数体里用 yield</span>
-<span class="sd">    2. 用 await asyncio.sleep() 模拟延迟（不要用 time.sleep！）</span>
-<span class="sd">    3. 逐 chunk yield，不是一次性返回</span>
-<span class="sd">    </span>
-<span class="sd">    提示：这是 Agent 接收 LLM 流式响应的核心模式</span>
-<span class="sd">    """</span>
-    <span class="c1"># TODO 2.1：实现异步生成器</span>
-    <span class="c1"># 提示：</span>
-    <span class="c1"># 1. 拆分提示词为 chunk</span>
-    <span class="c1"># 2. async for? 不，用 for + await asyncio.sleep()</span>
-    <span class="c1"># 3. 每次循环 yield 一个 chunk</span>
-    <span class="k">pass</span>
-
-
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">异步调用示例</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">"""演示如何使用异步生成器"""</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">📝 异步生成器示例："</span><span class="p">)</span>
-    <span class="c1"># TODO 2.2：用 async for 迭代异步生成器</span>
-    <span class="c1"># 提示：async for chunk in 模拟_llm_流式输出_异步("Hello World"):</span>
-    <span class="c1">#           print(chunk, end="", flush=True)</span>
-    <span class="c1">#       print()  # 换行</span>
-    <span class="k">pass</span>
-
-
-<span class="c1"># ==================== 任务 3：上下文管理器（同步） ====================</span>
-<span class="c1"># 提示：上下文管理器用于资源管理（文件、连接、计时等）</span>
-
-<span class="k">class</span><span class="w"> </span><span class="nc">LLM请求计时器</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    同步上下文管理器：统计 LLM 请求耗时</span>
-<span class="sd">    </span>
-<span class="sd">    需求：</span>
-<span class="sd">    1. 实现 __enter__ 和 __exit__ 方法</span>
-<span class="sd">    2. __enter__ 记录开始时间，返回 self</span>
-<span class="sd">    3. __exit__ 计算耗时并打印</span>
-<span class="sd">    4. 支持 with 语句</span>
-<span class="sd">    """</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c1"># TODO 3.1：记录开始时间，返回 self</span>
-        <span class="k">pass</span>
-    
-    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
-        <span class="c1"># TODO 3.2：计算耗时并打印</span>
-        <span class="c1"># 提示：如果 exc_type 不为 None，说明 with 块内发生了异常</span>
-        <span class="k">pass</span>
-
-
-<span class="nd">@contextmanager</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">llm请求计时器_装饰器版本</span><span class="p">(</span><span class="n">请求名称</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    用 @contextmanager 实现上下文管理器（更简洁）</span>
-<span class="sd">    </span>
-<span class="sd">    需求：</span>
-<span class="sd">    1. 用 @contextmanager 装饰器</span>
-<span class="sd">    2. yield 之前是 __enter__ 的逻辑</span>
-<span class="sd">    3. yield 之后是 __exit__ 的逻辑</span>
-<span class="sd">    """</span>
-    <span class="c1"># TODO 3.3：实现 @contextmanager 版本的上下文管理器</span>
-    <span class="c1"># 提示：</span>
-    <span class="c1"># 1. 记录开始时间</span>
-    <span class="c1"># 2. yield（yield 处相当于 __enter__ return）</span>
-    <span class="c1"># 3. 计算耗时并打印（yield 之后相当于 __exit__）</span>
-    <span class="k">pass</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">上下文管理器示例</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">"""演示如何使用上下文管理器"""</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">📝 同步上下文管理器示例："</span><span class="p">)</span>
-    
-    <span class="c1"># 方式 1：类实现</span>
-    <span class="k">with</span> <span class="n">LLM请求计时器</span><span class="p">():</span>
-        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"  （模拟 LLM 请求中...）"</span><span class="p">)</span>
-    
-    <span class="c1"># 方式 2：@contextmanager 实现</span>
-    <span class="k">with</span> <span class="n">llm请求计时器_装饰器版本</span><span class="p">(</span><span class="s2">"查询天气"</span><span class="p">):</span>
-        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.3</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"  （模拟工具调用中...）"</span><span class="p">)</span>
-
-
-<span class="c1"># ==================== 任务 4：异步上下文管理器 ====================</span>
-
-<span class="k">class</span><span class="w"> </span><span class="nc">异步LLM请求计时器</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    异步上下文管理器：统计异步 LLM 请求耗时</span>
-<span class="sd">    </span>
-<span class="sd">    需求：</span>
-<span class="sd">    1. 实现 __aenter__ 和 __aexit__ 方法（注意是 aenter/aexit）</span>
-<span class="sd">    2. 用 asyncio.sleep() 而不是 time.sleep()</span>
-<span class="sd">    """</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__aenter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c1"># TODO 4.1：记录开始时间，返回 self</span>
-        <span class="k">pass</span>
-    
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__aexit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
-        <span class="c1"># TODO 4.2：计算耗时并打印</span>
-        <span class="k">pass</span>
-
-
-<span class="nd">@asynccontextmanager</span>
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">异步请求计时器</span><span class="p">(</span><span class="n">请求名称</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""用 @asynccontextmanager 实现异步上下文管理器"""</span>
-    <span class="c1"># TODO 4.3：实现异步上下文管理器</span>
-    <span class="c1"># 提示：和同步版本类似，但用 async def + yield</span>
-    <span class="k">pass</span>
-
-
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">异步上下文管理器示例</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">"""演示如何使用异步上下文管理器"""</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">📝 异步上下文管理器示例："</span><span class="p">)</span>
-    
-    <span class="k">async</span> <span class="k">with</span> <span class="n">异步LLM请求计时器</span><span class="p">():</span>
-        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"  （模拟异步 LLM 请求中...）"</span><span class="p">)</span>
-    
-    <span class="k">async</span> <span class="k">with</span> <span class="n">异步请求计时器</span><span class="p">(</span><span class="s2">"批量工具调用"</span><span class="p">):</span>
-        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.3</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"  （模拟并发工具调用中...）"</span><span class="p">)</span>
-
-
-<span class="c1"># ==================== 任务 5：组合——流式输出 + 计时 ====================</span>
-<span class="c1"># 这是 Day 3 的最终目标：一个完整的流式 LLM 调用包装器</span>
-
-<span class="k">class</span><span class="w"> </span><span class="nc">流式LLM客户端</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    流式 LLM 客户端（完整的 Agent 组件）</span>
-<span class="sd">    </span>
-<span class="sd">    需求：</span>
-<span class="sd">    1. __init__ 接受 API key 和模型名称</span>
-<span class="sd">    2. chat() 方法返回异步生成器（AsyncGenerator）</span>
-<span class="sd">    3. 用异步上下文管理器包装，自动计时</span>
-<span class="sd">    4. 支持 system_prompt 和 user_prompt</span>
-<span class="sd">    """</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">模型名称</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"deepseek-chat"</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">模型名称</span> <span class="o">=</span> <span class="n">模型名称</span>
-    
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">chat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">提示词</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        发起聊天请求，返回流式响应</span>
-<span class="sd">        </span>
-<span class="sd">        需求：</span>
-<span class="sd">        1. 这是一个异步生成器方法（async def + yield，缺一不可）</span>
-<span class="sd">        2. 用异步上下文管理器包装，自动打印耗时</span>
-<span class="sd">        3. 逐 chunk yield 响应内容</span>
-<span class="sd">        """</span>
-        <span class="c1"># TODO 5.1：实现流式 chat 方法</span>
-        <span class="c1"># 提示：这是异步生成器，用 async def + yield</span>
-        <span class="c1"># 结合 async with 异步上下文管理器</span>
-        <span class="k">pass</span>
-
-
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">最终示例</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">"""Day 3 最终示例：完整的流式 LLM 客户端"""</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">📝 Day 3 最终示例：流式 LLM 客户端"</span><span class="p">)</span>
-    
-    <span class="n">客户端</span> <span class="o">=</span> <span class="n">流式LLM客户端</span><span class="p">(</span><span class="n">模型名称</span><span class="o">=</span><span class="s2">"deepseek-chat"</span><span class="p">)</span>
-    
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"用户：请用中文介绍 Python 的 async/await"</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"助手："</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">""</span><span class="p">)</span>
-    
-    <span class="k">async</span> <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">客户端</span><span class="o">.</span><span class="n">chat</span><span class="p">(</span><span class="s2">"请用中文介绍 Python 的 async/await"</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">chunk</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">()</span>  <span class="c1"># 换行</span>
-
-
-<span class="c1"># ==================== 主函数 ====================</span>
-
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">"""运行所有示例"""</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"Day 3 练习：流式 LLM 响应的异步生成器包装器"</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
-    
-    <span class="c1"># 任务 1：同步生成器</span>
-    <span class="n">同步调用示例</span><span class="p">()</span>
-    
-    <span class="c1"># 任务 2：异步生成器</span>
-    <span class="k">await</span> <span class="n">异步调用示例</span><span class="p">()</span>
-    
-    <span class="c1"># 任务 3：同步上下文管理器</span>
-    <span class="n">上下文管理器示例</span><span class="p">()</span>
-    
-    <span class="c1"># 任务 4：异步上下文管理器</span>
-    <span class="k">await</span> <span class="n">异步上下文管理器示例</span><span class="p">()</span>
-    
-    <span class="c1"># 任务 5：组合</span>
-    <span class="k">await</span> <span class="n">最终示例</span><span class="p">()</span>
-    
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ 所有示例完成！现在运行 python day03_practice_validator.py 验收"</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
-
-
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
-    <span class="n">开始时间</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">⚠️ 运行中断：</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"💡 这通常是因为上面的 TODO 还没有完成。请先实现各个任务函数，再运行本文件。"</span><span class="p">)</span>
-    <span class="n">总耗时</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">开始时间</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">⏱ 总耗时：</span><span class="si">{</span><span class="n">总耗时</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> 秒"</span><span class="p">)</span>
-</pre></div>
-
+<p>分层的好处：路由层薄到可以直接读懂数据流向；业务逻辑可以脱离 HTTP 单测；
+换 LLM 供应商（DeepSeek → Qwen → 本地模型）只动 <code>llm.py</code> 一个文件。</p>
+<h2>每天的任务</h2>
+<table>
+<thead>
+<tr>
+<th>天</th>
+<th>内容</th>
+<th>对应 TODO</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Day 11</td>
+<td>架构理解 + FastAPI 搭建 + Agent 核心循环</td>
+<td><code>schemas.py</code> / <code>agent.py</code> / <code>main.py</code></td>
+</tr>
+<tr>
+<td>Day 12</td>
+<td>工具系统完善 + 会话记忆 + 错误处理</td>
+<td><code>tools.py</code> / <code>memory.py</code></td>
+</tr>
+<tr>
+<td>Day 13</td>
+<td>Web UI + SSE 流式</td>
+<td><code>main.py</code> TODO 6.x（<code>llm.chat_stream</code> 和 <code>static/index.html</code> 已提供）</td>
+</tr>
+<tr>
+<td>Day 14</td>
+<td>pytest 测试 + Docker 部署</td>
+<td><code>tests/</code>（<code>test_memory/test_tools/test_api</code>）+ <code>Dockerfile</code></td>
+</tr>
+<tr>
+<td>Day 15</td>
+<td>文档 + 收尾</td>
+<td>更新本 README</td>
+</tr>
+</tbody>
+</table>
+<h2>设计约定（改代码前先读）</h2>
+<ol>
+<li><strong>Key 只从 <code>config.py</code> 来</strong>——任何模块不要直接 <code>os.environ</code></li>
+<li><strong>路由层不做业务</strong>——<code>main.py</code> 里不写 Agent 逻辑</li>
+<li><strong>工具执行走注册表</strong>——<code>agent.py</code> 不要绕过 <code>tools.py</code> 直接调函数</li>
+<li><strong>错误处理三层</strong>：LLM 超时重试在 <code>llm.py</code>、工具失败作为 Observation 回传在 <code>agent.py</code>、
+   统一 HTTP 错误响应在 <code>main.py</code></li>
+<li><strong>单进程够用</strong>：<code>memory.py</code> 用进程内字典；真要多进程部署时换成 Redis（README 层面了解即可）</li>
+</ol>
     </div>
 </div>
 </div>

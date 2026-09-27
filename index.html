@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
     <title>Python 工程师 AI Agent 开发 15 天学习路线图</title>
     <style>
 /* ===== Maple Mono 代码字体（自托管，OFL 开源协议） ===== */
@@ -321,6 +322,85 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
     }
     .download-btn:hover { background:#0077ed; }
 
+
+/* ===== 代码块复制按钮 ===== */
+.code-copy-btn {
+    position:absolute; top:10px; right:10px;
+    padding:3px 12px; font-size:12px; font-family:inherit;
+    background:rgba(0,0,0,0.05); color:#6e6e73;
+    border:1px solid rgba(0,0,0,0.12); border-radius:8px;
+    cursor:pointer; opacity:0; transition:opacity .2s, background .2s, color .2s;
+}
+.highlight:hover .code-copy-btn, pre.code-block:hover .code-copy-btn,
+.code-copy-btn:focus { opacity:1; }
+.code-copy-btn:hover { background:rgba(0,0,0,0.09); color:#1d1d1f; }
+
+/* ===== 深色模式（跟随系统 prefers-color-scheme） ===== */
+@media (prefers-color-scheme: dark) {
+    body { background:#1a1a1c; color:#f5f5f7; }
+    a { color:#409cff; }
+    a:hover { color:#6cb2ff; }
+    hr { background:#3a3a3c; }
+    h1, h2, h3, h4, strong { color:#f5f5f7; }
+    p, li { color:#c7c7cc; }
+    .nav-sidebar { background:rgba(28,28,30,0.72); border-right-color:rgba(255,255,255,0.08); }
+    .nav-sidebar h3 { color:#f5f5f7; }
+    .nav-sidebar h4 { color:#98989d; }
+    .nav-sidebar a { color:#c7c7cc; }
+    .nav-sidebar a:hover { background:rgba(255,255,255,0.07); color:#f5f5f7; }
+    .nav-sidebar a.active { background:#0071e3; color:#fff; }
+    .main-content { background:#232326; box-shadow:0 4px 24px rgba(0,0,0,0.35); }
+    .header { background:#232326; color:#f5f5f7; border-bottom-color:rgba(255,255,255,0.08); }
+    .header h1 { color:#f5f5f7; }
+    .header .meta { color:#98989d; }
+    code { background:rgba(255,255,255,0.09); color:#f5f5f7; }
+    .code-block, pre.code-block, .highlight { background:#1d1d20; color:#e8e8ed; border:1px solid rgba(255,255,255,0.06); }
+    .highlight .hll, pre.code-block .hll { background-color:#3a3a3c; }
+    .styled-table { border-color:rgba(255,255,255,0.1); }
+    .styled-table thead { background:#2c2c2e; }
+    .styled-table th { color:#f5f5f7; }
+    .styled-table td { color:#c7c7cc; border-top-color:rgba(255,255,255,0.09); }
+    .styled-table tbody tr:hover { background-color:#2c2c2e; }
+    .note-block { background:#2c2c2e; }
+    .note-block p { color:#c7c7cc; }
+    .file-info { background:#2c2c2e; color:#a1a1a6; }
+    .back-top { background:rgba(44,44,46,0.85); color:#f5f5f7; border-color:rgba(255,255,255,0.12); }
+    .code-copy-btn { background:rgba(255,255,255,0.07); color:#a1a1a6; border-color:rgba(255,255,255,0.14); }
+    .code-copy-btn:hover { background:rgba(255,255,255,0.13); color:#f5f5f7; }
+    /* 语法配色 → Xcode Dark */
+    .highlight .k, .highlight .kc, .highlight .kd, .highlight .kn, .highlight .kp, .highlight .kr, .highlight .ow,
+    pre.code-block .k, pre.code-block .kc, pre.code-block .kd, pre.code-block .kn, pre.code-block .kp, pre.code-block .kr, pre.code-block .ow { color:#FC5FA3; }
+    .highlight .kt, pre.code-block .kt { color:#41A1C6; }
+    .highlight .s, .highlight .sa, .highlight .sb, .highlight .sc, .highlight .dl, .highlight .sd, .highlight .s2,
+    .highlight .se, .highlight .sh, .highlight .si, .highlight .sx, .highlight .sr, .highlight .s1, .highlight .ss,
+    pre.code-block .s, pre.code-block .sa, pre.code-block .sb, pre.code-block .sc, pre.code-block .dl, pre.code-block .sd,
+    pre.code-block .s2, pre.code-block .se, pre.code-block .sh, pre.code-block .si, pre.code-block .sx,
+    pre.code-block .sr, pre.code-block .s1, pre.code-block .ss { color:#FF8170; }
+    .highlight .m, .highlight .mb, .highlight .mf, .highlight .mh, .highlight .mi, .highlight .mo, .highlight .il,
+    pre.code-block .m, pre.code-block .mb, pre.code-block .mf, pre.code-block .mh, pre.code-block .mi,
+    pre.code-block .mo, pre.code-block .il { color:#D0BF69; }
+    .highlight .c, .highlight .ch, .highlight .cm, .highlight .cp, .highlight .cpf, .highlight .c1, .highlight .cs,
+    pre.code-block .c, pre.code-block .ch, pre.code-block .cm, pre.code-block .cp, pre.code-block .cpf,
+    pre.code-block .c1, pre.code-block .cs { color:#6C7986; }
+    .highlight .nb, .highlight .bp, .highlight .nc, .highlight .nn, .highlight .vm,
+    pre.code-block .nb, pre.code-block .bp, pre.code-block .nc, pre.code-block .nn, pre.code-block .vm { color:#5DD8FF; }
+    .highlight .nf, .highlight .fm, .highlight .ne,
+    pre.code-block .nf, pre.code-block .fm, pre.code-block .ne { color:#67B7A4; }
+    .highlight .nd, pre.code-block .nd { color:#D0BF69; }
+    .highlight .n, .highlight .na, .highlight .ni, .highlight .nl, .highlight .no,
+    .highlight .nx, .highlight .o, .highlight .p, .highlight .w, .highlight .x, .highlight .esc,
+    .highlight .g, .highlight .vc, .highlight .vg, .highlight .vi, .highlight .gh, .highlight .gu,
+    pre.code-block .n, pre.code-block .na, pre.code-block .ni, pre.code-block .nl, pre.code-block .no,
+    pre.code-block .nx, pre.code-block .o, pre.code-block .p, pre.code-block .w, pre.code-block .x,
+    pre.code-block .esc, pre.code-block .g, pre.code-block .vc, pre.code-block .vg, pre.code-block .vi,
+    pre.code-block .gh, pre.code-block .gu { color:#e8e8ed; }
+    .highlight .gp, pre.code-block .gp { color:#98989d; }
+    .highlight .go, pre.code-block .go { color:#98989d; }
+    .highlight .gt, pre.code-block .gt { color:#FF6482; }
+    .highlight .gi, pre.code-block .gi { color:#66E29A; }
+    .highlight .gd, pre.code-block .gd { color:#FF6482; }
+}
+
 @media print { body { background:#fff; padding:0; } .main-content { box-shadow:none; } .nav-sidebar { display:none; } .back-top { display:none; } }
 @media (max-width:900px) {
     .nav-sidebar { width:200px; min-width:200px; font-size:13px; padding:16px 10px; }
@@ -381,7 +461,7 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 <h4>Day 11-15 (项目实战)</h4>
 <a class="" href="day11_lesson.html">Day 11 - 学习</a>
 <a class="" href="day12_lesson.html">Day 12 - 学习</a>
-<a class="" href="project_day11_15/README.md">项目脚手架</a>
+<a class="" href="project_day11_15/README.html">项目脚手架</a>
 <a class="" href="day13_lesson.html">Day 13 - 学习</a>
 <a class="" href="day14_lesson.html">Day 14 - 学习</a>
 <a class="" href="day15_lesson.html">Day 15 - 学习</a>
@@ -437,94 +517,7 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 </table>
 <p><strong>练习项目</strong>: 异步批量调用多个 API（模拟 Agent 多工具并发调用）</p>
 <p><strong>📔 实战教程</strong>: 运行 <code>tutorial_02_async.py</code> 跟着 9 步实战教程学习（已包含在项目中）</p>
-<h4 id="vs">核心概念：同步 vs 异步</h4>
-<div class="codehilite"><pre class="code-block"><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
-
-<span class="c1"># 同步：一件一件来（总耗时 = 所有任务时间之和）</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">同步烧水</span><span class="p">():</span>
-    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>  <span class="c1"># ❌ 阻塞整个程序</span>
-    <span class="k">return</span> <span class="s2">"开水"</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">同步切菜</span><span class="p">():</span>
-    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-    <span class="k">return</span> <span class="s2">"菜"</span>
-
-<span class="c1"># 异步：同时开始，谁先完成谁先返回（总耗时 = 最慢的任务）</span>
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">异步烧水</span><span class="p">():</span>
-    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>  <span class="c1"># ✅ 不阻塞，其他任务可以运行</span>
-    <span class="k">return</span> <span class="s2">"开水"</span>
-
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">异步切菜</span><span class="p">():</span>
-    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-    <span class="k">return</span> <span class="s2">"菜"</span>
-
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">异步做饭</span><span class="p">():</span>
-    <span class="n">任务1</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="n">异步烧水</span><span class="p">())</span>
-    <span class="n">任务2</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="n">异步切菜</span><span class="p">())</span>
-    <span class="n">水</span><span class="p">,</span> <span class="n">菜</span> <span class="o">=</span> <span class="k">await</span> <span class="n">任务1</span><span class="p">,</span> <span class="k">await</span> <span class="n">任务2</span>  <span class="c1"># 并发等待</span>
-    <span class="k">return</span> <span class="n">水</span><span class="p">,</span> <span class="n">菜</span>
-
-<span class="c1"># 结果：同步 5 秒，异步 3 秒！</span>
-</code></pre></div>
-<h4 id="_2">关键要点</h4>
-<table class="styled-table">
-<thead>
-<tr>
-<th>关键字</th>
-<th>作用</th>
-<th>示例</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>async def</code></td>
-<td>定义协程函数</td>
-<td><code>async def 下载文件():</code></td>
-</tr>
-<tr>
-<td><code>await</code></td>
-<td>等待异步操作（不阻塞其他任务）</td>
-<td><code>result = await asyncio.sleep(1)</code></td>
-</tr>
-<tr>
-<td><code>asyncio.run()</code></td>
-<td>启动事件循环</td>
-<td><code>asyncio.run(main())</code></td>
-</tr>
-<tr>
-<td><code>asyncio.gather()</code></td>
-<td>并发执行多个任务，等全部完成</td>
-<td><code>await asyncio.gather(任务1, 任务2)</code></td>
-</tr>
-<tr>
-<td><code>asyncio.create_task()</code></td>
-<td>后台启动任务，更灵活</td>
-<td><code>task = asyncio.create_task(下载())</code></td>
-</tr>
-<tr>
-<td><code>asyncio.timeout()</code></td>
-<td>超时控制</td>
-<td><code>async with asyncio.timeout(5):</code></td>
-</tr>
-</tbody>
-</table>
 <p><strong>⚠️ 黄金法则</strong>: 在 <code>async</code> 函数里<strong>永远不用</strong> <code>time.sleep()</code>，用 <code>await asyncio.sleep()</code>！</p>
-<h4 id="ai-agent">AI Agent 实战：并发调用多个工具</h4>
-<div class="codehilite"><pre class="code-block"><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">Agent并发调用</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">"""Agent 同时调用多个工具"""</span>
-    <span class="c1"># 并发调用所有工具（不是逐个等待！）</span>
-    <span class="n">结果们</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
-        <span class="n">调用LLM工具</span><span class="p">(</span><span class="s2">"计算器"</span><span class="p">,</span> <span class="s2">"3 + 5 * 2"</span><span class="p">),</span>
-        <span class="n">调用LLM工具</span><span class="p">(</span><span class="s2">"天气查询"</span><span class="p">,</span> <span class="s2">"北京"</span><span class="p">),</span>
-        <span class="n">调用LLM工具</span><span class="p">(</span><span class="s2">"文件搜索"</span><span class="p">,</span> <span class="s2">"config.py"</span><span class="p">),</span>
-        <span class="n">调用LLM工具</span><span class="p">(</span><span class="s2">"翻译"</span><span class="p">,</span> <span class="s2">"Hello World"</span><span class="p">),</span>
-    <span class="p">)</span>
-
-    <span class="c1"># 结果：4 个工具只花了最长的那个的时间（不是 4 倍！）</span>
-    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">结果们</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"🔧 </span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">'工具'</span><span class="p">]</span><span class="si">}</span><span class="s2">：</span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">'结果'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</code></pre></div>
 <p><strong>免费资源</strong>:</p>
 <ul>
 <li><a href="https://realpython.com/async-io-python/">Real Python: Async IO in Python</a></li>
@@ -567,125 +560,6 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 </table>
 <p><strong>练习项目</strong>: 用 Pydantic 定义 Agent 的 Tool 输入输出 Schema，并用装饰器实现工具注册机制</p>
 <p><strong>📗 实战教程</strong>: 运行 <code>tutorial_01_decorators.py</code> 跟着 8 步实战教程学习（已包含在项目中）</p>
-<h4 id="_3">装饰器核心概念</h4>
-<p><strong>本质</strong>：装饰器 = 接受一个函数，返回一个新函数（就像给手机套壳）</p>
-<div class="codehilite"><pre class="code-block"><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
-
-<span class="c1"># 第 1 步：最简单的装饰器</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">计时装饰器</span><span class="p">(</span><span class="n">原函数</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""包装一个函数，让它执行时自动打印耗时"""</span>
-    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">原函数</span><span class="p">)</span>  <span class="c1"># ✅ 必须加！保留原函数信息</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">包装函数</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">开始</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-        <span class="n">结果</span> <span class="o">=</span> <span class="n">原函数</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">耗时</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">开始</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"⏱ </span><span class="si">{</span><span class="n">原函数</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> 执行耗时：</span><span class="si">{</span><span class="n">耗时</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> 秒"</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">结果</span>
-    <span class="k">return</span> <span class="n">包装函数</span>
-
-<span class="c1"># 第 2 步：使用 @ 语法糖</span>
-<span class="nd">@计时装饰器</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">慢速加法</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
-    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
-
-<span class="n">结果</span> <span class="o">=</span> <span class="n">慢速加法</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>  <span class="c1"># 自动计时！</span>
-</code></pre></div>
-<h4 id="functoolswraps">⚠️ 装饰器的致命陷阱：<code>@functools.wraps</code></h4>
-<div class="codehilite"><pre class="code-block"><span></span><code><span class="c1"># ❌ 错误写法：不带 wraps</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">坏装饰器</span><span class="p">(</span><span class="n">原函数</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">包装</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">原函数</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">包装</span>
-
-<span class="nd">@坏装饰器</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">函数A</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">"""这是文档"""</span>
-    <span class="k">pass</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="n">函数A</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>  <span class="c1"># 输出 "包装"（丢失了原函数名！）</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">函数A</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>   <span class="c1"># 输出 None（丢失了文档！）</span>
-
-
-<span class="c1"># ✅ 正确写法：带 wraps</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">好装饰器</span><span class="p">(</span><span class="n">原函数</span><span class="p">):</span>
-    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">原函数</span><span class="p">)</span>  <span class="c1"># 保留原函数的元信息</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">包装</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">原函数</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">包装</span>
-
-<span class="nd">@好装饰器</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">函数B</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">"""这是文档"""</span>
-    <span class="k">pass</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="n">函数B</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>  <span class="c1"># 输出 "函数B" ✅</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">函数B</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>   <span class="c1"># 输出 "这是文档" ✅</span>
-</code></pre></div>
-<h4 id="_4">进阶：带参数的装饰器（三层嵌套）</h4>
-<div class="codehilite"><pre class="code-block"><span></span><code><span class="c1"># 需求：重试 3 次 vs 重试 5 次（参数化装饰器）</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">重试</span><span class="p">(</span><span class="n">最大次数</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">等待秒</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""装饰器工厂：根据参数创建不同的重试装饰器"""</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">装饰器</span><span class="p">(</span><span class="n">原函数</span><span class="p">):</span>
-        <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">原函数</span><span class="p">)</span>
-        <span class="k">def</span><span class="w"> </span><span class="nf">包装</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">最大次数</span><span class="p">):</span>
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="n">原函数</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">最大次数</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
-                        <span class="k">raise</span>  <span class="c1"># 最后一次还失败就抛出</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  重试 </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">最大次数</span><span class="si">}</span><span class="s2">：</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">等待秒</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">包装</span>
-    <span class="k">return</span> <span class="n">装饰器</span>
-
-<span class="nd">@重试</span><span class="p">(</span><span class="n">最大次数</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">等待秒</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">不稳定的网络请求</span><span class="p">():</span>
-    <span class="c1"># 模拟不稳定连接</span>
-    <span class="k">pass</span>
-</code></pre></div>
-<h4 id="ai-agent_1">🔧 AI Agent 实战：用装饰器注册工具</h4>
-<div class="codehilite"><pre class="code-block"><span></span><code><span class="c1"># 这是你未来 AI Agent 的核心机制之一！</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
-
-<span class="c1"># 工具注册表（全局）</span>
-<span class="n">工具注册表</span> <span class="o">=</span> <span class="p">{}</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">工具</span><span class="p">(</span><span class="n">名称</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">描述</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""装饰器：把 Python 函数注册为 Agent 可用的工具"""</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">装饰器</span><span class="p">(</span><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
-        <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
-        <span class="k">def</span><span class="w"> </span><span class="nf">包装</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-        <span class="c1"># 注册到工具表</span>
-        <span class="n">工具注册表</span><span class="p">[</span><span class="n">名称</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">"函数"</span><span class="p">:</span> <span class="n">包装</span><span class="p">,</span>
-            <span class="s2">"描述"</span><span class="p">:</span> <span class="n">描述</span><span class="p">,</span>
-            <span class="s2">"参数"</span><span class="p">:</span> <span class="n">func</span><span class="o">.</span><span class="vm">__code__</span><span class="o">.</span><span class="n">co_varnames</span><span class="p">[:</span><span class="n">func</span><span class="o">.</span><span class="vm">__code__</span><span class="o">.</span><span class="n">co_argcount</span><span class="p">]</span>
-        <span class="p">}</span>
-        <span class="k">return</span> <span class="n">包装</span>
-    <span class="k">return</span> <span class="n">装饰器</span>
-
-<span class="c1"># 使用：和写普通函数一样简单！</span>
-<span class="nd">@工具</span><span class="p">(</span><span class="s2">"计算器"</span><span class="p">,</span> <span class="s2">"执行四则运算，例如：计算 3 + 5 * 2"</span><span class="p">)</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">计算</span><span class="p">(</span><span class="n">表达式</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="k">return</span> <span class="nb">eval</span><span class="p">(</span><span class="n">表达式</span><span class="p">)</span>  <span class="c1"># 生产环境用 ast.literal_eval 更安全</span>
-
-<span class="nd">@工具</span><span class="p">(</span><span class="s2">"天气查询"</span><span class="p">,</span> <span class="s2">"查询指定城市的天气"</span><span class="p">)</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">查天气</span><span class="p">(</span><span class="n">城市</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="k">return</span> <span class="p">{</span><span class="s2">"城市"</span><span class="p">:</span> <span class="n">城市</span><span class="p">,</span> <span class="s2">"温度"</span><span class="p">:</span> <span class="s2">"25°C"</span><span class="p">,</span> <span class="s2">"天气"</span><span class="p">:</span> <span class="s2">"晴"</span><span class="p">}</span>
-
-<span class="c1"># 查看注册的工具</span>
-<span class="k">for</span> <span class="n">名称</span><span class="p">,</span> <span class="n">信息</span> <span class="ow">in</span> <span class="n">工具注册表</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"🔧 </span><span class="si">{</span><span class="n">名称</span><span class="si">}</span><span class="s2">：</span><span class="si">{</span><span class="n">信息</span><span class="p">[</span><span class="s1">'描述'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-
-<span class="c1"># 调用工具</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">计算</span><span class="p">(</span><span class="s2">"3+5*2"</span><span class="p">))</span>        <span class="c1"># 输出: 13</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">查天气</span><span class="p">(</span><span class="s2">"北京"</span><span class="p">))</span>         <span class="c1"># 输出: {'城市': '北京', '温度': '25°C', ...}</span>
-</code></pre></div>
-<p><strong>练习项目</strong>: 用 Pydantic 定义 Agent 的 Tool 输入输出 Schema，并用装饰器实现工具注册机制</p>
 <p><strong>免费资源</strong>:</p>
 <ul>
 <li><a href="https://mypy.readthedocs.io/">mypy 官方文档</a></li>
@@ -1010,10 +884,10 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 <h2 id="agent-day-11-15">阶段三：完整 Agent 实战项目（Day 11-15）</h2>
 <blockquote class="note-block">
 <p><strong>目标</strong>: 从零开发一个完整的、可部署的 AI Agent 应用<br/>
-<strong>说明</strong>: <strong>材料</strong>: <a href="day11_lesson.html">Day 11</a> / <a href="day12_lesson.html">12</a> / <a href="day13_lesson.html">13</a> / <a href="day14_lesson.html">14</a> / <a href="day15_lesson.html">15 学习页</a> + 项目脚手架 <a href="project_day11_15/README.md">project_day11_15/</a>（分层 FastAPI 骨架 + TODO，Day 13/14 的前端与 Docker 文件已提供）</p>
+<strong>说明</strong>: <strong>材料</strong>: <a href="day11_lesson.html">Day 11</a> / <a href="day12_lesson.html">12</a> / <a href="day13_lesson.html">13</a> / <a href="day14_lesson.html">14</a> / <a href="day15_lesson.html">15 学习页</a> + 项目脚手架 <a href="project_day11_15/README.html">project_day11_15/</a>（分层 FastAPI 骨架 + TODO，Day 13/14 的前端与 Docker 文件已提供）</p>
 </blockquote>
 <h3 id="day-11-12">Day 11-12：项目设计与核心开发</h3>
-<p>📖 <strong><a href="day11_lesson.html">Day 11 学习页</a></strong>（架构 + FastAPI + 核心循环） ｜ <strong><a href="day12_lesson.html">Day 12 学习页</a></strong>（工具 / 记忆 / 错误处理） ｜ 🛠 <a href="project_day11_15/README.md">项目脚手架</a></p>
+<p>📖 <strong><a href="day11_lesson.html">Day 11 学习页</a></strong>（架构 + FastAPI + 核心循环） ｜ <strong><a href="day12_lesson.html">Day 12 学习页</a></strong>（工具 / 记忆 / 错误处理） ｜ 🛠 <a href="project_day11_15/README.html">项目脚手架</a></p>
 <a class="" href="day13_lesson.html">Day 13 - 学习</a>
 <a class="" href="day14_lesson.html">Day 14 - 学习</a>
 <a class="" href="day15_lesson.html">Day 15 - 学习</a>
@@ -1353,5 +1227,35 @@ pre.code-block .il { color: #1C00CF } /* Literal.Number.Integer.Long */
 </div>
 <button class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="返回顶部">⬆</button>
 <script>window.addEventListener("scroll",function(){  var btn=document.querySelector(".back-top");  if(btn)btn.style.display=window.scrollY>300?"block":"none";});</script>
+<script>
+(function () {
+    document.querySelectorAll(".highlight, pre.code-block").forEach(function (block) {
+        var btn = document.createElement("button");
+        btn.className = "code-copy-btn";
+        btn.type = "button";
+        btn.textContent = "复制";
+        btn.addEventListener("click", function () {
+            var text = block.innerText;
+            var done = function () {
+                btn.textContent = "已复制 ✓";
+                setTimeout(function () { btn.textContent = "复制"; }, 1500);
+            };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(done).catch(function () { fallback(); });
+            } else { fallback(); }
+            function fallback() {
+                var ta = document.createElement("textarea");
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand("copy");
+                document.body.removeChild(ta);
+                done();
+            }
+        });
+        block.appendChild(btn);
+    });
+})();
+</script>
 </body>
 </html>

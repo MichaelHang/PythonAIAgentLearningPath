@@ -10,7 +10,7 @@ import html as htmllib
 import sys
 from pathlib import Path
 
-from generate_html import 根目录, 构造侧边栏, 提取样式
+from generate_html import 复制脚本, 根目录, 构造侧边栏, 提取样式
 
 
 def esc(文本: str) -> str:
@@ -978,7 +978,7 @@ def day10() -> str:
 def 项目导航() -> str:
     """Day 11-12 学习页顶部的资源条（没有独立模板页，脚手架就是模板）"""
     return (
-        '<div class="file-info"><div class="info-left">🛠 项目脚手架：<a href="project_day11_15/README.md">'
+        '<div class="file-info"><div class="info-left">🛠 项目脚手架：<a href="project_day11_15/README.html">'
         'project_day11_15/</a>（开发都在这个目录里） ｜ 📋 <a href="ACCEPTANCE_CRITERIA.html">验收清单</a>'
         "</div></div>"
     )
@@ -1429,6 +1429,7 @@ def 生成学习页(day: int, 主题: str, 内容函数, 有验收: bool, 样式
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
     <title>{标题}</title>
     <style>
 {样式}
@@ -1446,6 +1447,7 @@ def 生成学习页(day: int, 主题: str, 内容函数, 有验收: bool, 样式
 </div>
 <button class="back-top" onclick="window.scrollTo({{top:0,behavior:'smooth'}})" title="返回顶部">⬆</button>
 <script>window.addEventListener("scroll",function(){{  var btn=document.querySelector(".back-top");  if(btn)btn.style.display=window.scrollY>300?"block":"none";}});</script>
+{复制脚本}
 </body>
 </html>"""
 
